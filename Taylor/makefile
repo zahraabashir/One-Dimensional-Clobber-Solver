@@ -2,7 +2,7 @@ CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
 run: clobber
-	./clobber BWBWBW B 100
+	./clobber BWBWBWBWBWBWBWBWBWBWB B 100
 
 clobber: main.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $^ -o $@

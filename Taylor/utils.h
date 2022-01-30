@@ -10,11 +10,10 @@
 #define B 1
 #define W 2
 
-int opponentNumber(int);
-char opponentChar(char);
-char playerNumberToChar(int);
-int charToPlayerNumber(char);
-
+int opponentNumber(int n);
+char opponentChar(char c);
+char playerNumberToChar(int n);
+int charToPlayerNumber(char c);
 
 template <class T1, class T2>
 std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {

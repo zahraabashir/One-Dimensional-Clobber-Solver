@@ -1,7 +1,6 @@
 #include "utils.h"
+#include "options.h"
 #include <iostream>
-
-#define DEBUG_OUTPUT
 
 int opponentNumber(int n) {
     switch (n) {
@@ -17,6 +16,7 @@ int opponentNumber(int n) {
     #if defined(DEBUG_OUTPUT)
     std::cout << "Bad input to opponentNumber(): " << n << std::endl;
     #endif
+
     return EMPTY;
 }
 
@@ -25,12 +25,14 @@ char opponentChar(char c) {
         case 'B':
             return 'W';
             break;
+
         case 'W':
             return 'B';
             break;
     }
+
     #if defined(DEBUG_OUTPUT)
-        std::cout << "Bad input to opponentChar(): " << c << std::endl;
+    std::cout << "Bad input to opponentChar(): " << c << std::endl;
     #endif
 
     return '.';
@@ -41,6 +43,7 @@ char playerNumberToChar(int n) {
         case BLACK:
             return 'B';
             break;
+
         case WHITE:
             return 'W';
             break;
@@ -49,6 +52,7 @@ char playerNumberToChar(int n) {
     #if defined(DEBUG_OUTPUT)
     std::cout << "Bad input to playerNumberToChar(): " << n << std::endl;
     #endif
+
     return '.';
 }
 
@@ -57,6 +61,7 @@ int charToPlayerNumber(char c) {
         case 'B':
             return BLACK;
             break;
+
         case 'W':
             return WHITE;
             break;
@@ -65,6 +70,7 @@ int charToPlayerNumber(char c) {
     #if defined(DEBUG_OUTPUT)
     std::cout << "Bad input to charToPlayerNumber(): " << c << std::endl;
     #endif
+
     return EMPTY;
 }
 

@@ -3,97 +3,12 @@
 #include "utils.h"
 #include <iostream>
 
-
-/*
-class State {
-
-
-
-
-    State();
-    ~State();
-    int code();
-    bool operator==(const State &s);
-    State *play(int from, int to);
-    bool isTerminal();
-    void expand();
-
-
-};
-
-std::ostream &operator<<(std::ostream &os, const State &s);
-*/
-
 void State::zeroPointers() {
     children = NULL;
     moves = NULL;
     moveCount = (size_t) -1;
     outcome = EMPTY;
 }
-
-State::State() {
-    zeroPointers();
-}
-
-
-State::State(std::string board, int playerNumber) {
-    zeroPointers();
-    this->board = board;
-    this->playerNumber = playerNumber;
-    this->playerChar = playerNumberToChar(playerNumber);
-}
-
-State::~State() {
-    if (children != nullptr) {
-        for (size_t i = 0; i < moveCount; i++) {
-            children[i].reset();
-        }
-        delete[] children;
-    }
-
-    if (moves != nullptr) {
-        delete[] moves;
-    }
-}
-
-int State::code() {
-    int result = 0;
-    int cumulativePower = 1;
-    for (size_t i = 0; i < board.length(); i++) {
-        result += cumulativePower * charToPlayerNumber(board[i]);
-        cumulativePower *= 3;
-    }
-    return result;
-}
-
-bool State::operator==(const State &s) {
-    return board == s.board;
-}
-
-
-State *State::play(int from, int to) {
-    State *s = new State();
-    s->board = board;
-
-
-    s->board[to] = s->board[from];
-    s->board[from] = '.';
-
-    s->playerNumber = opponentNumber(playerNumber);
-    s->playerChar = opponentChar(playerChar);
-
-    return s;
-}
-
-const int *State::getMoves() {
-    if (moveCount != (size_t) -1) {
-        return moves;
-    }
-
-    generateMoves();
-    return moves;
-}
-
 
 void State::generateMoves(int idx, int moveDepth) {
     if (moveCount != (size_t) -1) {
@@ -131,6 +46,67 @@ void State::generateMoves(int idx, int moveDepth) {
     }
 }
 
+State::State() {
+    zeroPointers();
+}
+
+State::State(std::string board, int playerNumber) {
+    zeroPointers();
+    this->board = board;
+    this->playerNumber = playerNumber;
+    this->playerChar = playerNumberToChar(playerNumber);
+}
+
+State::~State() {
+    if (children != nullptr) {
+        for (size_t i = 0; i < moveCount; i++) {
+            children[i].reset();
+        }
+        delete[] children;
+    }
+
+    if (moves != nullptr) {
+        delete[] moves;
+    }
+}
+
+int State::code() {
+    int result = 0;
+    int cumulativePower = 1;
+    for (size_t i = 0; i < board.length(); i++) {
+        result += cumulativePower * charToPlayerNumber(board[i]);
+        cumulativePower *= 3;
+    }
+    return result;
+}
+
+bool State::operator==(const State &s) {
+    return board == s.board;
+}
+
+State *State::play(int from, int to) {
+    State *s = new State();
+    s->board = board;
+
+
+    s->board[to] = s->board[from];
+    s->board[from] = '.';
+
+    s->playerNumber = opponentNumber(playerNumber);
+    s->playerChar = opponentChar(playerChar);
+
+    return s;
+}
+
+const int *State::getMoves() {
+    if (moveCount != (size_t) -1) {
+        return moves;
+    }
+
+    generateMoves();
+    return moves;
+}
+
 void State::expand() {
     generateMoves();
     if (moveCount == 0 || children != nullptr) {
@@ -152,7 +128,6 @@ bool State::isTerminal() {
     generateMoves();
     return moveCount == 0;
 }
-
 
 std::ostream &operator<<(std::ostream &os, const State &s) {
     os << "[" << s.board << " " << s.playerChar << "]";

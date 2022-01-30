@@ -1,18 +1,10 @@
 #include "solver.h"
 #include "utils.h"
 
-
-/*
-    BasicSolver(int rootPlayer);
-    bool solveOr(State *state);
-    bool solveAnd(State *state);
-*/
-
 BasicSolver::BasicSolver(int rootPlayer) {
     this->rootPlayer = rootPlayer;
     this->rootOpponent = opponentNumber(rootPlayer);
 }
-
 
 int BasicSolver::solveOr(State *state) {
     if (state->isTerminal()) {

@@ -10,9 +10,9 @@ class State {
     State();
 
   public:
-    std::string board;
+    int *board;
+    int boardSize;
     int playerNumber;
-    char playerChar;
 
     int *moves;
     size_t moveCount;

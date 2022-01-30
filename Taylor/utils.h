@@ -10,7 +10,10 @@
 #define B 1
 #define W 2
 
-int opponentNumber(int n);
+inline int opponentNumber(int n) { //Inline means this needs to be in the header
+    return (n % 2) + 1;
+}
+
 char opponentChar(char c);
 char playerNumberToChar(int n);
 int charToPlayerNumber(char c);
@@ -20,3 +23,5 @@ std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {
     os << "(" << p.first << " " << p.second << ")";
     return os;
 }
+
+

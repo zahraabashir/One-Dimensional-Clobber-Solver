@@ -2,10 +2,12 @@
 
 #include "utils.h"
 #include <iostream>
+#include <cstring>
 
 void State::zeroPointers() {
-    children = NULL;
-    moves = NULL;
+    board = nullptr;
+    children = nullptr;
+    moves = nullptr;
     moveCount = (size_t) -1;
     outcome = EMPTY;
 }
@@ -15,7 +17,7 @@ void State::generateMoves(int idx, int moveDepth) {
         return;
     }
 
-    if (idx > board.length()) {
+    if (idx > boardSize) {
         if (moveDepth > 0) {
             moves = new int[moveDepth * 2];
         }
@@ -23,15 +25,15 @@ void State::generateMoves(int idx, int moveDepth) {
         return;
     }
 
-    char *c2 = &board[idx];
+    int *c2 = &board[idx];
     bool move1 = false;
     bool move2 = false;
 
-    if (*c2 == playerChar) {
-        char *c1 = &board[idx - 1];
-        char *c3 = &board[idx + 1];
-        move1 = idx > 0 && *c1 == opponentChar(playerChar);
-        move2 = *c3 == opponentChar(playerChar);
+    if (*c2 == playerNumber) {
+        int *c1 = &board[idx - 1];
+        int *c3 = &board[idx + 1];
+        move1 = idx > 0 && *c1 == opponentNumber(playerNumber);
+        move2 = *c3 == opponentNumber(playerNumber);
     }
 
     generateMoves(idx + 1, moveDepth + move1 + move2);
@@ -52,9 +54,14 @@ State::State() {
 
 State::State(std::string board, int playerNumber) {
     zeroPointers();
-    this->board = board;
+
+    this->boardSize = board.length();
+    this->board = new int[this->boardSize];
+    for (int i = 0; i < this->boardSize; i++) {
+        this->board[i] = charToPlayerNumber(board[i]);
+    }
+
     this->playerNumber = playerNumber;
-    this->playerChar = playerNumberToChar(playerNumber);
 }
 
 State::~State() {
@@ -68,32 +75,46 @@ State::~State() {
     if (moves != nullptr) {
         delete[] moves;
     }
+
+    if (board != nullptr) {
+        delete[] board;
+    }
 }
 
 int State::code() {
     int result = 0;
     int cumulativePower = 1;
-    for (size_t i = 0; i < board.length(); i++) {
-        result += cumulativePower * charToPlayerNumber(board[i]);
+    for (size_t i = 0; i < boardSize; i++) {
+        result += cumulativePower * board[i];
         cumulativePower *= 3;
     }
     return result;
 }
 
 bool State::operator==(const State &s) {
-    return board == s.board;
+    if (boardSize == s.boardSize) {
+        for (int i = 0; i < boardSize; i++) {
+            if (board[i] != s.board[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
 }
 
 State *State::play(int from, int to) {
     State *s = new State();
-    s->board = board;
 
+    s->board = new int[boardSize];
+    memcpy(s->board, board, sizeof(int) * boardSize);
 
     s->board[to] = s->board[from];
-    s->board[from] = '.';
+    s->board[from] = EMPTY;
 
+    s->boardSize = boardSize;
     s->playerNumber = opponentNumber(playerNumber);
-    s->playerChar = opponentChar(playerChar);
 
     return s;
 }
@@ -130,6 +151,6 @@ bool State::isTerminal() {
 }
 
 std::ostream &operator<<(std::ostream &os, const State &s) {
-    os << "[" << s.board << " " << s.playerChar << "]";
+    os << "[" << s.board << " " << playerNumberToChar(s.playerNumber) << "]";
     return os;
 }

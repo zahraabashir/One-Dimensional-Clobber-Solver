@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -Wall --std=c++17 -g
+FLAGS = -Wall --std=c++17 -O3
 
 run: clobber
 	./clobber BWBWBW B 100

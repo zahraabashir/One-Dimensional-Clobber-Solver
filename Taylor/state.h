@@ -1,22 +1,27 @@
+#pragma once
+
 #include <memory>
 #include <string>
 
 class State {
   private:
 
-    //State **children;
-    std::shared_ptr<State> *children; //array of shared pointers
+    void zeroPointers();
+
+  public:
 
     int *moves;
-    size_t moveCount;
 
 
     State();
     void generateMoves(int idx = 0, int moveDepth = 0);
 
-  public:
     std::string board;
+    size_t moveCount;
 
+
+    //State **children;
+    std::shared_ptr<State> *children; //array of shared pointers
 
     int playerNumber;
     char playerChar;
@@ -39,3 +44,4 @@ class State {
 };
 
 std::ostream &operator<<(std::ostream &os, const State &s);
+

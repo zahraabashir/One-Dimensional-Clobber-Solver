@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ostream>
 
 #define EMPTY 0

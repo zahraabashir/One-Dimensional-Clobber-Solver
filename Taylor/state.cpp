@@ -24,18 +24,20 @@ class State {
 std::ostream &operator<<(std::ostream &os, const State &s);
 */
 
-State::State() {
+void State::zeroPointers() {
     children = NULL;
     moves = NULL;
     moveCount = (size_t) -1;
     outcome = EMPTY;
+}
 
-
+State::State() {
+    zeroPointers();
 }
 
 
 State::State(std::string board, int playerNumber) {
-    State();
+    zeroPointers();
     this->board = board;
     this->playerNumber = playerNumber;
     this->playerChar = playerNumberToChar(playerNumber);
@@ -75,7 +77,7 @@ State *State::play(int from, int to) {
 
 
     s->board[to] = s->board[from];
-    s->board[from] = playerNumberToChar(EMPTY);
+    s->board[from] = '.';
 
     s->playerNumber = opponentNumber(playerNumber);
     s->playerChar = opponentChar(playerChar);
@@ -124,8 +126,8 @@ void State::generateMoves(int idx, int moveDepth) {
         moves[moveDepth * 2 + 1] = idx - 1;
     }
     if (move2) {
-        moves[moveDepth * 2 + move1] = idx;
-        moves[moveDepth * 2 + move1 + 1] = idx + 1;
+        moves[(moveDepth + move1) * 2] = idx;
+        moves[(moveDepth + move1) * 2 + 1] = idx + 1;
     }
 }
 
@@ -149,4 +151,10 @@ void State::expand() {
 bool State::isTerminal() {
     generateMoves();
     return moveCount == 0;
+}
+
+
+std::ostream &operator<<(std::ostream &os, const State &s) {
+    os << "[" << s.board << " " << s.playerChar << "]";
+    return os;
 }

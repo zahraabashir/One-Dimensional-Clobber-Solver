@@ -1,6 +1,7 @@
 #include <iostream>
 #include "utils.h"
 #include "state.h"
+#include "solver.h"
 
 using namespace std;
 
@@ -11,8 +12,21 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    int rootPlayer = charToPlayerNumber(*argv[2]);
+    BasicSolver solver(rootPlayer);
+    State *root = new State(argv[1], rootPlayer);
 
+    root->expand();
+/*
+    for (size_t i = 0; i < root->moveCount; i++) {
+        cout << root->moves[2 * i] << " " << root->moves[2 * i + 1] << endl;
+    }
 
+    return 0;
+*/
+
+    int result = solver.solveOr(root);
+    cout << playerNumberToChar(result) << endl;
 
     return 0;
 }

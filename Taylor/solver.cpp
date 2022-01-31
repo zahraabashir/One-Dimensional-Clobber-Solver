@@ -7,42 +7,60 @@ BasicSolver::BasicSolver(int rootPlayer) {
 }
 
 int BasicSolver::solveOr(State *state) {
-    if (state->isTerminal()) {
-        state->outcome = opponentNumber(state->playerNumber);
-        return state->outcome;
+    size_t moveCount;
+    int *moves = state->getMoves(rootPlayer, rootOpponent, &moveCount);
+
+    if (moveCount == 0) {
+        return rootOpponent;
     }
 
-    state->expand();
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
 
-    for (size_t i = 0; i < state->moveCount; i++) {
-        int result = solveAnd(state->children[i].get());
+    for (size_t i = 0; i < moveCount; i++) {
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+
+        state->play(from, to, undoBuffer);
+        int result = solveAnd(state);
+        state->undo(undoBuffer);
 
         if (result == rootPlayer) {
-            state->outcome = rootPlayer;
+            delete[] moves;
             return rootPlayer;
         }
     }
-    state->outcome = rootOpponent;
+
+    delete[] moves;
     return rootOpponent;
 }
 
+
 int BasicSolver::solveAnd(State *state) {
-    if (state->isTerminal()) {
-        state->outcome = opponentNumber(state->playerNumber);
-        return state->outcome;
+    size_t moveCount;
+    int *moves = state->getMoves(rootOpponent, rootPlayer, &moveCount);
+
+    if (moveCount == 0) {
+        return rootPlayer;
     }
 
-    state->expand();
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
 
-    for (size_t i = 0; i < state->moveCount; i++) {
-        int result = solveOr(state->children[i].get());
+    for (size_t i = 0; i < moveCount; i++) {
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+
+        state->play(from, to, undoBuffer);
+        int result = solveOr(state);
+        state->undo(undoBuffer);
 
         if (result == rootOpponent) {
-            state->outcome = rootOpponent;
+            delete[] moves;
             return rootOpponent;
         }
     }
-    state->outcome = rootPlayer;
+
+    delete[] moves;
     return rootPlayer;
 }
+
 

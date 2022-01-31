@@ -16,7 +16,6 @@ int main(int argc, char **argv) {
     BasicSolver solver(rootPlayer);
     State *root = new State(argv[1], rootPlayer);
 
-    root->expand();
 /*
     for (size_t i = 0; i < root->moveCount; i++) {
         cout << root->moves[2 * i] << " " << root->moves[2 * i + 1] << endl;

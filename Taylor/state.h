@@ -15,7 +15,7 @@ class State {
 
     State(std::string board, int player);
     ~State();
-    int code();
+    int code(int player);
     bool operator==(const State &s);
     void play(int from, int to, char *undoBuffer);
     void undo(char *undoBuffer);

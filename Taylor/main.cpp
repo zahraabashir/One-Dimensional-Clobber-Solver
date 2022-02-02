@@ -12,9 +12,11 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    string board(argv[1]);
+
     int rootPlayer = charToPlayerNumber(*argv[2]);
-    BasicSolver solver(rootPlayer);
-    State *root = new State(argv[1], rootPlayer);
+    BasicSolver solver(rootPlayer, board.length());
+    State *root = new State(board, rootPlayer);
 
 /*
     for (size_t i = 0; i < root->moveCount; i++) {
@@ -24,7 +26,7 @@ int main(int argc, char **argv) {
     return 0;
 */
 
-    int result = solver.solveOr(root);
+    int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
     cout << playerNumberToChar(result) << endl;
 
     return 0;

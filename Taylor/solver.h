@@ -7,10 +7,17 @@ class BasicSolver {
   public:
     int rootPlayer;
     int rootOpponent;
+    int boardSize;
 
-    BasicSolver(int rootPlayer);
-    int solveOr(State *state);
-    int solveAnd(State *state);
+    char *table;
+    int bitMask;
+    int tableEntrySize;
+
+    BasicSolver(int rootPlayer, int boardSize);
+    ~BasicSolver();
+    int solve(State *state, int p, int n);
+    //void setTableEntry(int code, char *board, char player, char outcome);
+    char *getTablePtr(int code);
 
 };
 

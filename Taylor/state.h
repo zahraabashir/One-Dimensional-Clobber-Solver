@@ -9,14 +9,14 @@ class State {
     State();
 
   public:
-    int *board;
+    char *board;
     int boardSize;
     //int player;
 
     State(std::string board, int player);
     ~State();
     int code(int player);
-    bool operator==(const State &s);
+    //bool operator==(const State &s);
     void play(int from, int to, char *undoBuffer);
     void undo(char *undoBuffer);
     int *getMoves(const int &player, const int &opponent, size_t *moveCount);

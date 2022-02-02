@@ -15,13 +15,13 @@ int *State::generateMoves(const int &player, const int &opponent, size_t *moveCo
         return nullptr;
     }
 
-    int *c2 = &board[idx];
+    char *c2 = &board[idx];
     bool move1 = false;
     bool move2 = false;
 
     if (*c2 == player) {
-        int *c1 = &board[idx - 1];
-        int *c3 = &board[idx + 1];
+        char *c1 = &board[idx - 1];
+        char *c3 = &board[idx + 1];
         move1 = idx > 0 && *c1 == opponent;
         move2 = *c3 == opponent;
     }
@@ -45,7 +45,7 @@ State::State() {
 
 State::State(std::string board, int player) {
     this->boardSize = board.length();
-    this->board = new int[this->boardSize];
+    this->board = new char[this->boardSize];
     //this->player = player;
 
     for (int i = 0; i < this->boardSize; i++) {
@@ -71,6 +71,7 @@ int State::code(int player) {
     return result;
 }
 
+/*
 bool State::operator==(const State &s) {
     if (boardSize == s.boardSize) {
         for (int i = 0; i < boardSize; i++) {
@@ -83,6 +84,7 @@ bool State::operator==(const State &s) {
 
     return false;
 }
+*/
 
 void State::play(int from, int to, char *undoBuffer) {
     int minIdx = std::min<int>(from, to);
@@ -96,8 +98,8 @@ void State::play(int from, int to, char *undoBuffer) {
 
 void State::undo(char *undoBuffer) {
     int start = ((int *) undoBuffer)[0];
-    board[start] = (int) undoBuffer[0 + sizeof(int)];
-    board[start + 1] = (int) undoBuffer[0 + sizeof(int) + 1];
+    board[start] = (char) undoBuffer[0 + sizeof(int)];
+    board[start + 1] = (char) undoBuffer[0 + sizeof(int) + 1];
 }
 
 int *State::getMoves(const int &player, const int &opponent, size_t *moveCount) {

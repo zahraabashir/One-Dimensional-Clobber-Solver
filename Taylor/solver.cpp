@@ -56,6 +56,10 @@ int BasicSolver::solve(State *state, int p, int n) {
     int *moves = state->getMoves(p, n, &moveCount);
 
     if (moveCount == 0) {
+        memcpy(entry, state->board, boardSize);
+        PLAYER(entry) = p;
+        OUTCOME(entry) = n;
+
         return n;
     }
 

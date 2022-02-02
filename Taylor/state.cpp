@@ -61,8 +61,8 @@ State::~State() {
 }
 
 int State::code(int player) {
-    int result = 1 * player;
-    int cumulativePower = 3;
+    int result = 1 * (player - 1);
+    int cumulativePower = 2;
 
     for (size_t i = 0; i < boardSize; i++) {
         result += cumulativePower * board[i];

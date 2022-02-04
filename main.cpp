@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
 
     return 0;
 */
-int depth = 0;
-    // int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer),depth);
+
+    //int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
     
     int result = solver.IDSearch(root, rootPlayer, opponentNumber(rootPlayer));
     cout << "\n";

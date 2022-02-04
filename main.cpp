@@ -12,11 +12,12 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    int rootPlayer = charToPlayerNumber(*argv[2]);
-    BasicSolver solver(rootPlayer);
-    State *root = new State(argv[1], rootPlayer);
+    string board(argv[1]);
 
-    root->expand();
+    int rootPlayer = charToPlayerNumber(*argv[2]);
+    BasicSolver solver(rootPlayer, board.length());
+    State *root = new State(board, rootPlayer);
+
 /*
     for (size_t i = 0; i < root->moveCount; i++) {
         cout << root->moves[2 * i] << " " << root->moves[2 * i + 1] << endl;
@@ -24,8 +25,11 @@ int main(int argc, char **argv) {
 
     return 0;
 */
-
-    int result = solver.solveOr(root);
+int depth = 0;
+    // int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer),depth);
+    
+    int result = solver.IDSearch(root, rootPlayer, opponentNumber(rootPlayer));
+    cout << "\n";
     cout << playerNumberToChar(result) << endl;
 
     return 0;

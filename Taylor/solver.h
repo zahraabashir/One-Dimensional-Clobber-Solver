@@ -2,7 +2,7 @@
 
 #include "state.h"
 
-
+extern int node_count;
 class BasicSolver {
   public:
     int rootPlayer;
@@ -12,6 +12,7 @@ class BasicSolver {
     char *table;
     int bitMask;
     int tableEntrySize;
+
 
     BasicSolver(int rootPlayer, int boardSize);
     ~BasicSolver();

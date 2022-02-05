@@ -8,7 +8,7 @@
 #define BOARD(te) te
 #define PLAYER(te) *(te + boardSize)
 #define OUTCOME(te) *(te + boardSize + 1)
-
+int node_count = 0;
 BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootPlayer = rootPlayer;
     this->rootOpponent = opponentNumber(rootPlayer);
@@ -59,7 +59,7 @@ int BasicSolver::solve(State *state, int p, int n) {
         memcpy(entry, state->board, boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = n;
-
+        node_count += 1;
         return n;
     }
 
@@ -70,6 +70,7 @@ int BasicSolver::solve(State *state, int p, int n) {
         int to = moves[2 * i + 1];
 
         state->play(from, to, undoBuffer);
+        node_count += 1;
         int result = solve(state, n, p);
         state->undo(undoBuffer);
 

@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
 */
 
     int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
+    cout<< node_count<<"NODE_COUNT\n";
     cout << playerNumberToChar(result) << endl;
 
     return 0;

@@ -38,14 +38,13 @@ for t in tests:
 
 
     output = result.stdout.decode("utf-8").rstrip("\n")
-
     if output[0] == t[1]:
         print(cGreen, end="")
     else:
         print(cRed, end="")
 
-    print(command + ": ", end="")
+    # print(command + ": ", end="")
     print(output, end="")
-    print(" - " + t[1] + " " + str(end - start))
+    print(" " + str(end - start))
 
     print(cReset,end="")

@@ -3,8 +3,8 @@
 #include "state.h"
 #include "solver.h"
 
-#include <chrono>
-using namespace std::chrono;
+// #include <chrono>
+// using namespace std::chrono;
   
 // Use auto keyword to avoid typing long
 // type definitions to get the timepoint
@@ -16,16 +16,11 @@ using namespace std;
 
 
 int main(int argc, char **argv) {
-    auto start = high_resolution_clock::now();
+    // auto start = high_resolution_clock::now();
     if (argc < 4) {
         cout << "Usage:\n" << argv[0] << " <board> <toPlay> <time> [debug]" << endl;
         return 0;
     }
-
-
-
-
-
 
 
 
@@ -50,21 +45,21 @@ int main(int argc, char **argv) {
     int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     //auto stop = high_resolution_clock::now();
 
-    auto finish = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = finish - start;
-    std::cout << "Elapsed time: " << elapsed.count() << " s\n";
-    if (elapsed.count() >= timelimit){
-        cout << "?" ;
-        }
+    // auto finish = std::chrono::high_resolution_clock::now();
+    // std::chrono::duration<double> elapsed = finish - start;
+    // std::cout << "Elapsed time: " << elapsed.count() << " s\n";
 
-    else if (best_from==-1){
+
+    if (best_from==-1){
     cout << playerNumberToChar(result)<< " None"<<" "<<node_count;
     }
     else{
         cout << playerNumberToChar(result) <<" "<<best_from<<"-"<< best_to<<" "<<node_count;
     }
 
-
+    // if (elapsed.count() >= timelimit){
+    //     cout << "?" ;
+    //     }
 
     // int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     

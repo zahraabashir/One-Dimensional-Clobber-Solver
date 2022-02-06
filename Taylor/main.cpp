@@ -26,9 +26,15 @@ int main(int argc, char **argv) {
     return 0;
 */
 
-    int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
-    cout<< node_count<<"NODE_COUNT\n";
-    cout << playerNumberToChar(result) << endl;
+    int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
+    if (best_from==-1){
+    cout << playerNumberToChar(result)<< " None"<<" "<<node_count;
+    }
+    else{
+        cout << playerNumberToChar(result) <<" "<<best_from<<"-"<< best_to<<" "<<node_count;
+    }
+    
+
 
     return 0;
 }

@@ -3,18 +3,38 @@
 #include "state.h"
 #include "solver.h"
 
+#include <chrono>
+using namespace std::chrono;
+  
+// Use auto keyword to avoid typing long
+// type definitions to get the timepoint
+// at this instant use function now()
+
+
+
 using namespace std;
 
 
 int main(int argc, char **argv) {
+    auto start = high_resolution_clock::now();
     if (argc < 4) {
         cout << "Usage:\n" << argv[0] << " <board> <toPlay> <time> [debug]" << endl;
         return 0;
     }
 
+
+
+
+
+
+
+
+
+
     string board(argv[1]);
 
     int rootPlayer = charToPlayerNumber(*argv[2]);
+    int timelimit = *argv[3];
     BasicSolver solver(rootPlayer, board.length());
     State *root = new State(board, rootPlayer);
 
@@ -25,10 +45,21 @@ int main(int argc, char **argv) {
 
     return 0;
 */
-
+    
     int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
-    cout<< node_count<<"NODE_COUNT\n";
-    cout << playerNumberToChar(result) << endl;
+    //auto stop = high_resolution_clock::now();
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+    if (elapsed.count() >= timelimit){
+        cout << "?" ;
+        }
+    else{
+    cout << playerNumberToChar(result);
+    cout<< " "<<node_count;
+    }
+
+
 
     return 0;
 }

@@ -45,21 +45,36 @@ int main(int argc, char **argv) {
 
     return 0;
 */
+
     
-    int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
+    int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     //auto stop = high_resolution_clock::now();
+
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     std::cout << "Elapsed time: " << elapsed.count() << " s\n";
     if (elapsed.count() >= timelimit){
         cout << "?" ;
         }
+
+    else if (best_from==-1){
+    cout << playerNumberToChar(result)<< " None"<<" "<<node_count;
+    }
     else{
-    cout << playerNumberToChar(result);
-    cout<< " "<<node_count;
+        cout << playerNumberToChar(result) <<" "<<best_from<<"-"<< best_to<<" "<<node_count;
     }
 
 
+
+    // int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
+    
+    // if (best_from==-1){
+    // cout << playerNumberToChar(result)<< " None"<<" "<<node_count;
+    // }
+    // else{
+    //     cout << playerNumberToChar(result) <<" "<<best_from<<"-"<< best_to<<" "<<node_count;
+    // }
+    
 
     return 0;
 }

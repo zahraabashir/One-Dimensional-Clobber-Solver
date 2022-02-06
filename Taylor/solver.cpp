@@ -9,12 +9,9 @@
 #define PLAYER(te) *(te + boardSize)
 #define OUTCOME(te) *(te + boardSize + 1)
 int node_count = 0;
-<<<<<<< HEAD
-
-=======
 int best_from = 0;
 int best_to = 0;
->>>>>>> f567c54445feb0dccbd4f8696e21ddd9bc5a75d8
+
 BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootPlayer = rootPlayer;
     this->rootOpponent = opponentNumber(rootPlayer);

@@ -17,8 +17,8 @@ class BasicSolver {
 
   private:
     int maxDepth;
-    int maxCompleted;
-    int completed;
+    int64_t maxCompleted;
+    int64_t completed;
 
   public:
     int rootPlayer;

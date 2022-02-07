@@ -127,6 +127,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
 
         int h = (int) moveCount - (int) pMoveCount;
+        if (validEntry) {
+            h = std::max<int>(h, HEURISTIC(entry));
+        }
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);

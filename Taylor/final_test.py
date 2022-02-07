@@ -1,6 +1,7 @@
 import subprocess
 import atexit
 import time
+import os
 
 def resetColor():
     print(cReset)
@@ -27,14 +28,24 @@ for line in testFile:
     tests.append((params, result, time1))
 
 testFile.close()
-
+time_out = False
 
 for t in tests:
-    command = "./clobber " + t[0] + " " + t[1] + " 100"
+    command = "./clobber " + t[0] + " " + t[1] + " 1"
     start = time.clock_gettime(time.CLOCK_MONOTONIC)
-    result = subprocess.run(command, capture_output = True, shell = True)
+
+    try:
+        result = subprocess.run(command, capture_output = True, shell = True, timeout=1)
+
+    except subprocess.TimeoutExpired:
+        print("TIME OUT")
+        time_out = True
+
     end = time.clock_gettime(time.CLOCK_MONOTONIC)
 
+
+    # if time_out:
+    #     output = "? None"
     output = result.stdout.decode("utf-8").rstrip("\n")
 
 

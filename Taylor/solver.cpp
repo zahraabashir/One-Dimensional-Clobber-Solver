@@ -66,13 +66,23 @@ int BasicSolver::solveID(State *state, int p, int n) {
     int depth = 0;
 
     maxCompleted = 1;
+    limitCompletions = true;
 
     while (true) {
         maxDepth = depth;
         collisions = 0;
 
         completed = 0;
+
         maxCompleted += 100;
+
+        if (depth > 150) {
+            limitCompletions = false;
+        }
+
+
+        //std::cout << depth << std::endl;
+
 
         std::pair<int, bool> result = RootsearchID(state, p, n, 0);
         //std::cout << depth << " " << collisions << std::endl;
@@ -122,7 +132,7 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
 
 
     //if deep, generate heuristic and return
-    if (depth == maxDepth || completed >= maxCompleted) {
+    if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
 
         size_t pMoveCount;
@@ -291,7 +301,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
     //if deep, generate heuristic and return
-    if (depth == maxDepth || completed >= maxCompleted) {
+    if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
 
         size_t pMoveCount;

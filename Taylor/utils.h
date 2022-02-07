@@ -14,6 +14,8 @@ inline int opponentNumber(int n) { //Inline means this needs to be in the header
     return (n % 2) + 1;
 }
 
+
+int playerSign(int p);
 char opponentChar(char c);
 char playerNumberToChar(int n);
 int charToPlayerNumber(char c);

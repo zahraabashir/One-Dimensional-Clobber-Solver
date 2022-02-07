@@ -1,6 +1,10 @@
 #include "utils.h"
 #include <iostream>
 
+int playerSign(int p) {
+    return p == 1 ? 1 : -1;
+}
+
 char opponentChar(char c) {
     switch (c) {
         case 'B':

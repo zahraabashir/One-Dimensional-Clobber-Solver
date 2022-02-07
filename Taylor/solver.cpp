@@ -4,22 +4,23 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
-#define BOARD(te) te
-#define PLAYER(te) *(te + boardSize)
-#define OUTCOME(te) *(te + boardSize + 1)
+
 int node_count = 0;
 int best_from = 0;
 int best_to = 0;
+
+int collisions = 0;
 
 BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootPlayer = rootPlayer;
     this->rootOpponent = opponentNumber(rootPlayer);
     this->boardSize = boardSize;
 
-    int bits = 20;
-    //board, player, outcome
-    tableEntrySize = boardSize + 2;
+    int bits = 24;
+    //board, player, outcome, heuristic, bestmove
+    tableEntrySize = boardSize + 3 + 2 * sizeof(int);
 
     bitMask = 0;
     for (int i = 0; i < bits; i++) {
@@ -27,11 +28,189 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
         bitMask |= 1;
     }
 
-    table = (char *) calloc((1 << bits) * 1 * tableEntrySize, 1);
+    size_t tableSize = 1;
+    tableSize <<= (size_t) bits;
+    tableSize *= (size_t) tableEntrySize;
+
+
+    std::cout << "SIZE: " << tableSize << std::endl;
+    std::cout << sizeof(size_t) << std::endl;
+
+    table = (char *) calloc(tableSize, 1);
 }
 
 BasicSolver::~BasicSolver() {
     free(table);
+}
+
+bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
+    bool found = false;
+    if (PLAYER(entry) == p) {
+        found = true;
+        for (int i = 0; i < boardSize; i++) {
+            if (entry[i] != state->board[i]) {
+                found = false;
+                break;
+            }
+        }
+    }
+    return found;
+}
+
+int BasicSolver::solveID(State *state, int p, int n) {
+    for (int depth = 0; ; depth++) {
+        maxDepth = depth;
+        collisions = 0;
+
+        std::pair<int, bool> result = searchID(state, p, n, 0);
+        std::cout << depth << " " << collisions << std::endl;
+
+        if (result.second) {
+            return result.first;
+        }
+    }
+}
+
+
+std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
+    //lookup entry
+    //if solved, return
+    int code = state->code(p);
+    char *entry = getTablePtr(code);
+
+    bool validEntry = validateTableEntry(state, p, entry);
+    if (validEntry && OUTCOME(entry) != EMPTY) {
+        return std::pair<int, bool>(OUTCOME(entry), true);
+    }
+
+    if (!validEntry && PLAYER(entry) != 0) {
+        collisions++;
+    }
+
+    //generate moves
+    //check for terminal
+    size_t moveCount;
+    int *moves = state->getMoves(p, n, &moveCount);
+
+    if (moveCount == 0) { //is terminal
+        if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = n;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = 10000;
+        }
+        return std::pair<int, bool>(n, true);
+    }
+
+
+    //if deep, generate heuristic and return
+    if (depth == maxDepth) {
+        size_t pMoveCount;
+        int *pMoves = state->getMoves(n, p, &pMoveCount);
+
+        if (pMoveCount > 0) {
+            delete[] pMoves;
+        }
+
+        int h = (int) moveCount - (int) pMoveCount;
+
+        if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = EMPTY;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = h;
+        }        
+
+        return std::pair<int, bool>(h, false);
+    }
+
+    //visit children, starting with best; find new best and update heuristic
+    //if solved, save value and return
+    int bestMove = 0;
+    bool checkedBestMove = false;
+    if (validEntry) {
+        bestMove = BESTMOVE(entry);
+    }
+
+    int bestVal = -10000;
+
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
+
+    int newBestMove = 0;
+
+    bool allProven = true;
+
+    for (int i = bestMove; i < moveCount; i++) {
+        if (checkedBestMove && i == bestMove) {
+            continue;
+        }
+
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+
+        state->play(from, to, undoBuffer);
+        std::pair<int, bool> result = searchID(state, n, p, depth + 1);
+        state->undo(undoBuffer);
+
+        allProven &= result.second;
+
+        if (result.second && result.first == p) {
+            if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                memcpy(entry, state->board, boardSize);
+                PLAYER(entry) = p;
+                OUTCOME(entry) = p;
+                BESTMOVE(entry) = i;
+                DEPTH(entry) = depth;
+                HEURISTIC(entry) = 10000;
+            }
+
+            delete[] moves;
+            return std::pair<int, bool>(p, true);
+        }
+
+        if (!result.second) {
+            result.first *= -1;
+            if (result.first > bestVal) {
+                newBestMove = i;
+                bestVal = result.first;
+            }
+        }
+
+        if (!checkedBestMove) {
+            checkedBestMove = true;
+            i = -1;
+        }
+    }
+
+    delete[] moves;
+
+    if (allProven) {
+        if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = n;
+            BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = bestVal;
+
+        }
+        return std::pair<int, bool>(n, true);
+    }
+
+
+    if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        memcpy(entry, state->board, boardSize);
+        PLAYER(entry) = p;
+        OUTCOME(entry) = EMPTY;
+        BESTMOVE(entry) = newBestMove;
+        DEPTH(entry) = depth;
+        HEURISTIC(entry) = bestVal;
+    }
+    return std::pair<int, bool>(HEURISTIC(entry), false);
 }
 
 // to print the first best move

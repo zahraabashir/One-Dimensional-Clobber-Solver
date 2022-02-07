@@ -1,10 +1,13 @@
+
+#./clobber BWBWBWBWBWBWBWBWBWBW W 100
+
 SHELL := /bin/bash
 
 CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
 run: clobber
-	./clobber BWBWBWBWBWBWBWBWBWBW W 100
+	time ./clobber BWBWBWBWBWBWBWBWBW W 100
 
 clobber: main.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $^ -o $@

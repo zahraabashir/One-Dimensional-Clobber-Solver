@@ -20,8 +20,9 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
 
     int bits = 24;
     codeLength = bits;
-    //board, player, outcome, heuristic, bestmove
-    tableEntrySize = boardSize + 3 + 2 * sizeof(int);
+
+    //look at macros in header file
+    tableEntrySize = boardSize + 5 + 0 * sizeof(int);
 
     bitMask = 0;
     for (int i = 0; i < bits; i++) {
@@ -33,9 +34,10 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     tableSize <<= (size_t) bits;
     tableSize *= (size_t) tableEntrySize;
 
+    std::cout << "Entry size: " << tableEntrySize << std::endl;
+    std::cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << std::endl;
 
-    //std::cout << "SIZE: " << tableSize << std::endl;
-    //std::cout << sizeof(size_t) << std::endl;
+
 
     table = (char *) calloc(tableSize, 1);
 }

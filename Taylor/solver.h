@@ -6,8 +6,9 @@
 #define PLAYER(te) *(te + boardSize)
 #define OUTCOME(te) *(te + boardSize + 1)
 #define BESTMOVE(te) *(te + boardSize + 2)
-#define DEPTH(te) *((int *) (te + boardSize + 3))
-#define HEURISTIC(te) *((int *) (te + boardSize + 3 + sizeof(int)))
+#define DEPTH(te) *(te + boardSize + 3)
+#define HEURISTIC(te) *(te + boardSize + 4)
+
 
 
 extern int node_count;

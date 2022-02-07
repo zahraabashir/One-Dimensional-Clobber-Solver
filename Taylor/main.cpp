@@ -12,21 +12,25 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    string board(argv[1]);
+
     int rootPlayer = charToPlayerNumber(*argv[2]);
-    BasicSolver solver(rootPlayer);
-    State *root = new State(argv[1], rootPlayer);
+    BasicSolver solver(rootPlayer, board.length());
+    State *root = new State(board, rootPlayer);
 
-    root->expand();
-/*
-    for (size_t i = 0; i < root->moveCount; i++) {
-        cout << root->moves[2 * i] << " " << root->moves[2 * i + 1] << endl;
-    }
+    //best solver
+    int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
 
-    return 0;
-*/
+    //uncomment for Heuristic ID
+    // int result = solver.H_IDSearch(root, rootPlayer, opponentNumber(rootPlayer));
 
-    int result = solver.solveOr(root);
-    cout << playerNumberToChar(result) << endl;
+    //uncomment for Iterative deepening
+    // int result = solver.IDSearch(root, rootPlayer, opponentNumber(rootPlayer));
+
+
+
+    cout <<" \n"<<playerNumberToChar(result)<<" "<<node_count;
+    
 
     return 0;
 }

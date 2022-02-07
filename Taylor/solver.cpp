@@ -51,9 +51,6 @@ BasicSolver::~BasicSolver() {
 }
 
 void BasicSolver::copyCompactBoard(char *dst, char *src) {
-   // for (int i = 0; i < boardSize; i++) {
-   //     src[i] = i % 3;
-   // }
 
     char c = 0;
 
@@ -71,19 +68,22 @@ void BasicSolver::copyCompactBoard(char *dst, char *src) {
 
         if (count == 4) {
             dst[i / 4] = c;
-            //std::cout << " [ " << i / 4 << " " << (int) c << " ] ";
             c = 0;
             count = 0;
         }
     }
 
-
     //std::cout << std::endl;
 
     for (int i = 0; i < boardSize; i++) {
-        //std::cout << ((dst[i / 4] >> (2 * (3 - (i % 4)))) & 0x3) << " ";
+        char c = ((dst[i / 4] >> (2 * (3 - (i % 4)))) & 0x3);
+        if (c != src[i]) {
+            std::cout << "Bad board copy" << std::endl;
+        }
     }
     //std::cout << std::endl << std::endl;
+
+
 }
 
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {

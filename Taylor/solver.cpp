@@ -58,7 +58,9 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 }
 
 int BasicSolver::solveID(State *state, int p, int n) {
-    for (int depth = 0; ; depth++) {
+
+    int depth = 0;
+    while (true) {
         maxDepth = depth;
         collisions = 0;
 
@@ -68,6 +70,11 @@ int BasicSolver::solveID(State *state, int p, int n) {
         if (result.second) {
             return result.first;
         }
+
+        if (depth >= 4) {
+            depth += 10000;
+        }
+        depth += 1;
     }
 }
 
@@ -195,7 +202,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = bestVal;
+            HEURISTIC(entry) = -10000;
 
         }
         return std::pair<int, bool>(n, true);
@@ -210,7 +217,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         DEPTH(entry) = depth;
         HEURISTIC(entry) = bestVal;
     }
-    return std::pair<int, bool>(HEURISTIC(entry), false);
+    return std::pair<int, bool>(bestVal, false);
 }
 
 // to print the first best move

@@ -41,6 +41,8 @@ class BasicSolver {
 
     int solveID(State *state, int p, int n);
     std::pair<int, bool> searchID(State *state, int p, int n, int depth);
+    std::pair<int, bool> RootsearchID(State *state, int p, int n, int depth);
+
 
     int solve(State *state, int p, int n);
     int solveRoot(State *state, int p, int n);

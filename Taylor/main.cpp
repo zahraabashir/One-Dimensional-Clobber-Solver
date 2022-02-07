@@ -42,8 +42,8 @@ int main(int argc, char **argv) {
 */
 
     
-    //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
-    int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));
+    int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
+    // int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));
     //auto stop = high_resolution_clock::now();
 
     // auto finish = std::chrono::high_resolution_clock::now();

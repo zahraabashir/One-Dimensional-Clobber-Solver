@@ -6,6 +6,8 @@ extern int node_count;
 extern int best_from;
 extern int best_to;
 class BasicSolver {
+
+    int codeLength;
   public:
     int rootPlayer;
     int rootOpponent;

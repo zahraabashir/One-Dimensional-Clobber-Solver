@@ -18,6 +18,7 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->boardSize = boardSize;
 
     int bits = 24;
+    codeLength = bits;
     //board, player, outcome
     tableEntrySize = boardSize + 2;
 

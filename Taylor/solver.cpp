@@ -66,13 +66,23 @@ int BasicSolver::solveID(State *state, int p, int n) {
     int depth = 0;
 
     maxCompleted = 1;
+    limitCompletions = true;
 
     while (true) {
         maxDepth = depth;
         collisions = 0;
 
         completed = 0;
+
         maxCompleted += 100;
+
+        if (depth > 150) {
+            limitCompletions = false;
+        }
+
+
+        //std::cout << depth << std::endl;
+
 
         std::pair<int, bool> result = RootsearchID(state, p, n, 0);
         //std::cout << depth << " " << collisions << std::endl;
@@ -115,14 +125,14 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = 10000;
+            HEURISTIC(entry) = -127;
         }
         return std::pair<int, bool>(n, true);
     }
 
 
     //if deep, generate heuristic and return
-    if (depth == maxDepth || completed >= maxCompleted) {
+    if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
 
         size_t pMoveCount;
@@ -158,7 +168,7 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
         bestMove = BESTMOVE(entry);
     }
 
-    int bestVal = -10000;
+    int bestVal = -127;
 
     char undoBuffer[sizeof(int) + 2 * sizeof(char)];
 
@@ -194,7 +204,7 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
                 DEPTH(entry) = depth;
-                HEURISTIC(entry) = 10000;
+                HEURISTIC(entry) = 127;
             }
             best_from = from;
             best_to = to;
@@ -233,7 +243,7 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
 
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = -10000;
+            HEURISTIC(entry) = -127;
 
         }
         best_from = -1;
@@ -284,14 +294,14 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = 10000;
+            HEURISTIC(entry) = -127;
         }
         return std::pair<int, bool>(n, true);
     }
 
 
     //if deep, generate heuristic and return
-    if (depth == maxDepth || completed >= maxCompleted) {
+    if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
 
         size_t pMoveCount;
@@ -327,7 +337,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         bestMove = BESTMOVE(entry);
     }
 
-    int bestVal = -10000;
+    int bestVal = -127;
 
     char undoBuffer[sizeof(int) + 2 * sizeof(char)];
 
@@ -363,7 +373,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
                 DEPTH(entry) = depth;
-                HEURISTIC(entry) = 10000;
+                HEURISTIC(entry) = 127;
             }
 
             delete[] moves;
@@ -398,7 +408,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = -10000;
+            HEURISTIC(entry) = -127;
 
         }
         return std::pair<int, bool>(n, true);

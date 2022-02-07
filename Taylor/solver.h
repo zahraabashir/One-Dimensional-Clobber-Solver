@@ -25,6 +25,7 @@ class BasicSolver {
     int rootPlayer;
     int rootOpponent;
     int boardSize;
+    bool limitCompletions;
 
 
 

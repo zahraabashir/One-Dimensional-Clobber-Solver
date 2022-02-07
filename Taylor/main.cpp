@@ -23,9 +23,6 @@ int main(int argc, char **argv) {
     }
 
 
-
-
-
     string board(argv[1]);
 
     int rootPlayer = charToPlayerNumber(*argv[2]);
@@ -42,10 +39,9 @@ int main(int argc, char **argv) {
 */
 
 
-    // int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
+    
+    //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));
-    std::cout<<result<<"RESULTE CPP";
-    std::cout<<"\n";
 
     //auto stop = high_resolution_clock::now();
 

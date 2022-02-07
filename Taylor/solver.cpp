@@ -17,7 +17,7 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootOpponent = opponentNumber(rootPlayer);
     this->boardSize = boardSize;
 
-    int bits = 20;
+    int bits = 24;
     //board, player, outcome
     tableEntrySize = boardSize + 2;
 
@@ -160,7 +160,25 @@ int BasicSolver::solve(State *state, int p, int n) {
     return n;
 }
 
+//char *BasicSolver::getTablePtr(int code) {
+//    int idx = code & bitMask;
+//    return table + (idx * tableEntrySize);
+//}
+
 char *BasicSolver::getTablePtr(int code) {
     int idx = code & bitMask;
+    for (int i = 1; ; i++) {
+        int shift = i * codeLength;
+
+        if (shift >= sizeof(int) * 8) {
+            break;
+        }
+
+        int add = code >> shift;
+        add &= bitMask;
+        code += add;
+    }
+    code &= bitMask;
+
     return table + (idx * tableEntrySize);
 }

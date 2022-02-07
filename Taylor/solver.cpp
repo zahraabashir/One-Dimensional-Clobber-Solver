@@ -208,8 +208,6 @@ int BasicSolver::IDSearch(State *state, int p, int n) {
     // state->failure = true;
     int result = 3;
     while(result == 3){
-        std :: cout << depth; 
-        // std :: cout << "Here\n";
         result= DLNegaMax(state, p, n, depth);
         
         depth +=1;
@@ -325,6 +323,87 @@ bool BasicSolver::solveAnd(State *state, int p, int n) {
     }
     return true;
 }
+
+//ID+tt+negamax
+
+int BasicSolver::tt_ID_NegaMax(State *state, int p, int n, int depth) {
+    
+    //Look up state in table
+    int code = state->code(p);
+    char *entry = getTablePtr(code);
+
+    bool found = false;
+    if (PLAYER(entry) == p) {
+        found = true;
+        for (int i = 0; i < boardSize; i++) {
+            if (entry[i] != state->board[i]) {
+                found = false;
+                break;
+            }
+        }
+    }
+
+    if (found) {
+        return OUTCOME(entry);
+    }
+    size_t moveCount;
+    int *moves = state->getMoves(p, n, &moveCount);
+
+    if (moveCount == 0) {
+        memcpy(entry, state->board, boardSize);
+        PLAYER(entry) = p;
+        OUTCOME(entry) = n;
+        node_count += 1;
+        return n;
+    }
+    else if (depth == 0){
+        node_count += 1;
+        return  3;
+    }
+
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
+    bool Flag = false;
+    for (size_t i = 0; i < moveCount; i++) {
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+        state->play(from, to, undoBuffer);
+        node_count += 1;
+        int result = tt_ID_NegaMax(state, n, p, depth-1);
+        state->undo(undoBuffer);
+        
+        if (result == p) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = n;
+            delete[] moves;
+            return p;
+        }
+        if (result == 3 ){
+            Flag = true;
+        }
+    }
+    if (Flag){
+        delete[] moves;
+        return 3;
+    }
+    memcpy(entry, state->board, boardSize);
+    PLAYER(entry) = p;
+    OUTCOME(entry) = n;
+    delete[] moves;
+    return n;
+}
+int BasicSolver::tt_IDSearch(State *state, int p, int n) {
+    int depth = 0;
+
+    int result = 3;
+    while(result == 3){
+        result= tt_ID_NegaMax(state, p, n, depth);
+        
+        depth +=1;
+    }
+    return result;
+}
+
 
 char *BasicSolver::getTablePtr(int code) {
     int idx = code & bitMask;

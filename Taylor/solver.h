@@ -30,6 +30,9 @@ class BasicSolver {
     //minimax
     bool solveOr(State *state, int p, int n);
     bool solveAnd(State *state, int p, int n);
+
+    int tt_IDSearch(State *state, int p, int n);
+    int tt_ID_NegaMax(State *state, int p, int n, int depth);
     //void setTableEntry(int code, char *board, char player, char outcome);
     char *getTablePtr(int code);
 

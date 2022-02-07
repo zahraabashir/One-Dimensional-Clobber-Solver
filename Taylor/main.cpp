@@ -2,7 +2,6 @@
 #include "utils.h"
 #include "state.h"
 #include "solver.h"
-
 using namespace std;
 
 
@@ -19,7 +18,7 @@ int main(int argc, char **argv) {
     State *root = new State(board, rootPlayer);
 
     //best solver
-    int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
+    // int result = solver.solve(root, rootPlayer, opponentNumber(rootPlayer));
 
     //uncomment for Heuristic ID
     // int result = solver.H_IDSearch(root, rootPlayer, opponentNumber(rootPlayer));
@@ -27,6 +26,8 @@ int main(int argc, char **argv) {
     //uncomment for Iterative deepening
     // int result = solver.IDSearch(root, rootPlayer, opponentNumber(rootPlayer));
 
+    //uncomment for minimax
+    int result = solver.solveOr(root, rootPlayer, opponentNumber(rootPlayer));
 
 
     cout <<" \n"<<playerNumberToChar(result)<<" "<<node_count;

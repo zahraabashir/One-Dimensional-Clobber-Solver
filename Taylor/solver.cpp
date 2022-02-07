@@ -218,39 +218,7 @@ int BasicSolver::IDSearch(State *state, int p, int n) {
 }
 
 
-
 ////////// ID + heuristics + negamax
-int BasicSolver::H_DLNegaMaxRoot(State *state, int p, int n, int depth) {
-
-    size_t moveCount;
-    int *moves = state->getMoves(p, n, &moveCount);
-
-    if (depth == 0 || moveCount == 0){
-        // std::cout << "DEPTH = 0\n";
-        int h = (moveCount-3);
-        // std::cout <<h<<"\n";
-        return  h;
-    }
-
-    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
-    
-    int best = -21474836;
-    for (size_t i = 0; i < moveCount; i++){
-        int from = moves[2 * i];
-        int to = moves[2 * i + 1];
-        state->play(from, to, undoBuffer);
-   
-        int result = -H_DLNegaMax(state, n, p, depth-1);
-        // std :: cout<<result<<"res \n";
-        if(result>best){
-            best = result;
-        }
-        state->undo(undoBuffer);
-        
-    }
-    delete[] moves;
-    return best;
-}
 
 int BasicSolver::H_DLNegaMax(State *state, int p, int n, int depth) {
 
@@ -285,7 +253,7 @@ int BasicSolver::H_IDSearch(State *state, int p, int n) {
     int result = 0;
     while(depth<=10){
         // std :: cout <<"\n depth"<< depth<<"\n"; 
-        result= H_DLNegaMaxRoot(state, p, n, depth);
+        result= H_DLNegaMax(state, p, n, depth);
         if (result>10){ //these threshold must be set according to the game statistics
             return p;
         }
@@ -295,6 +263,67 @@ int BasicSolver::H_IDSearch(State *state, int p, int n) {
         depth +=1;
     }
     return result;
+}
+
+//MINIMAX algorrithm
+bool BasicSolver::solveOr(State *state, int p, int n) {
+
+    size_t moveCount;
+    int *moves = state->getMoves(p, n, &moveCount);
+
+    if (moveCount == 0) {
+        node_count += 1;
+        return true;
+    }
+
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
+    for (size_t i = 0; i < moveCount; i++) {
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+
+        state->play(from, to, undoBuffer);
+        node_count += 1;
+        int result = solveAnd(state, p, n);
+        state->undo(undoBuffer);
+
+        if (result) {
+            delete[] moves;
+            return true;
+        }
+            
+
+    }
+    return false;
+}
+
+bool BasicSolver::solveAnd(State *state, int p, int n) {
+   
+    size_t moveCount;
+    int *moves = state->getMoves(p, n, &moveCount);
+
+    if (moveCount == 0) {
+        node_count += 1;
+        return true;
+    }
+
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
+    for (size_t i = 0; i < moveCount; i++) {
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+
+        state->play(from, to, undoBuffer);
+        node_count += 1;
+        int result = solveAnd(state, p, n);
+        state->undo(undoBuffer);
+
+        if (result) {
+            delete[] moves;
+            return false;
+        }
+            
+
+    }
+    return true;
 }
 
 char *BasicSolver::getTablePtr(int code) {

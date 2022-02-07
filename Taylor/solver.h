@@ -23,12 +23,13 @@ class BasicSolver {
     int solveRoot(State *state, int p, int n);
     //Heuristic ID
     int H_DLNegaMax(State *state, int p, int n, int depth);
-    int H_DLNegaMaxRoot(State *state, int p, int n, int depth);
     int H_IDSearch(State *state, int p, int n);
    //negamax ID
     int DLNegaMax(State *state, int p, int n, int depth);
-    int DLNegaMaxRoot(State *state, int p, int n, int depth);
     int IDSearch(State *state, int p, int n);
+    //minimax
+    bool solveOr(State *state, int p, int n);
+    bool solveAnd(State *state, int p, int n);
     //void setTableEntry(int code, char *board, char player, char outcome);
     char *getTablePtr(int code);
 

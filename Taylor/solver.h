@@ -17,6 +17,8 @@ class BasicSolver {
 
   private:
     int maxDepth;
+    int maxCompleted;
+    int completed;
 
   public:
     int rootPlayer;
@@ -27,6 +29,7 @@ class BasicSolver {
 
     char *table;
     int bitMask;
+    int codeLength;
     int tableEntrySize;
 
 

@@ -19,6 +19,7 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->boardSize = boardSize;
 
     int bits = 24;
+    codeLength = bits;
     //board, player, outcome, heuristic, bestmove
     tableEntrySize = boardSize + 3 + 2 * sizeof(int);
 
@@ -58,11 +59,15 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 }
 
 int BasicSolver::solveID(State *state, int p, int n) {
+    maxCompleted = 10;
 
     int depth = 0;
     while (true) {
         maxDepth = depth;
         collisions = 0;
+
+        completed = 0;
+        maxCompleted += 5;
 
         std::pair<int, bool> result = searchID(state, p, n, 0);
         std::cout << depth << " " << collisions << std::endl;
@@ -71,9 +76,6 @@ int BasicSolver::solveID(State *state, int p, int n) {
             return result.first;
         }
 
-        if (depth >= 4) {
-            depth += 10000;
-        }
         depth += 1;
     }
 }
@@ -100,7 +102,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     int *moves = state->getMoves(p, n, &moveCount);
 
     if (moveCount == 0) { //is terminal
-        if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        completed += 1;
+        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
@@ -113,7 +116,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
     //if deep, generate heuristic and return
-    if (depth == maxDepth) {
+    if (depth == maxDepth || completed >= maxCompleted) {
+        completed += 1;
+
         size_t pMoveCount;
         int *pMoves = state->getMoves(n, p, &pMoveCount);
 
@@ -123,7 +128,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         int h = (int) moveCount - (int) pMoveCount;
 
-        if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = EMPTY;
@@ -166,7 +171,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         allProven &= result.second;
 
         if (result.second && result.first == p) {
-            if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                 memcpy(entry, state->board, boardSize);
                 PLAYER(entry) = p;
                 OUTCOME(entry) = p;
@@ -196,7 +201,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     delete[] moves;
 
     if (allProven) {
-        if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
@@ -209,7 +214,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
 
-    if (depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+    if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         memcpy(entry, state->board, boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
@@ -348,5 +353,18 @@ int BasicSolver::solve(State *state, int p, int n) {
 
 char *BasicSolver::getTablePtr(int code) {
     int idx = code & bitMask;
+    for (int i = 1; ; i++) {
+        int shift = i * codeLength;
+
+        if (shift >= sizeof(int) * 8) {
+            break;
+        }
+
+        int add = code >> shift;
+        add &= bitMask;
+        code += add;
+    }
+    code &= bitMask;
+
     return table + (idx * tableEntrySize);
 }

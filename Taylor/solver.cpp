@@ -34,8 +34,8 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     tableSize *= (size_t) tableEntrySize;
 
 
-    std::cout << "SIZE: " << tableSize << std::endl;
-    std::cout << sizeof(size_t) << std::endl;
+    //std::cout << "SIZE: " << tableSize << std::endl;
+    //std::cout << sizeof(size_t) << std::endl;
 
     table = (char *) calloc(tableSize, 1);
 }
@@ -61,14 +61,10 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 int BasicSolver::solveID(State *state, int p, int n) {
     maxCompleted = 100;
 
-    //maxCompleted = -1;
-    //int64_t mask = (int64_t) 1 << 63;
-    //mask ^= (int64_t) -1;
-    //maxCompleted &= mask;
-
-
-
     int depth = 0;
+
+    maxCompleted = 1;
+
     while (true) {
         maxDepth = depth;
         collisions = 0;
@@ -77,7 +73,7 @@ int BasicSolver::solveID(State *state, int p, int n) {
         maxCompleted += 100;
 
         std::pair<int, bool> result = searchID(state, p, n, 0);
-        std::cout << depth << " " << collisions << std::endl;
+        //std::cout << depth << " " << collisions << std::endl;
 
         if (result.second) {
             return result.first;
@@ -172,9 +168,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             continue;
         }
 
-        if (depth == 0) {
-            std::cout << i << " ";
-        }
+        
+        //if (depth == 0) {
+        //    std::cout << i << " ";
+        //}
+        
 
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
@@ -213,9 +211,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
     }
 
-    if (depth == 0) {
-        std::cout << std::endl;
-    }
+    //if (depth == 0) {
+    //    std::cout << std::endl;
+    //}
 
 
     delete[] moves;

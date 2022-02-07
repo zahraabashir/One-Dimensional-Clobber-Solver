@@ -12,7 +12,9 @@ cGreen = "\u001b[32m"
 cReset = "\u001b[0m"
 
 
-testFile = open("tests_small.txt", "r")
+testFile = open("1.txt", "r")
+# testFile = open("worstcases.txt", "r")
+
 tests = []
 for line in testFile:
     line = line.split(" ")

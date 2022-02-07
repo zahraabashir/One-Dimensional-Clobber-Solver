@@ -25,6 +25,7 @@ class BasicSolver {
     int rootPlayer;
     int rootOpponent;
     int boardSize;
+    int compactBoardSize;
 
 
 
@@ -37,6 +38,7 @@ class BasicSolver {
     BasicSolver(int rootPlayer, int boardSize);
     ~BasicSolver();
 
+    void copyCompactBoard(char *dst, char *src);
     bool validateTableEntry(State *state, int p, char *entry);
 
     int solveID(State *state, int p, int n);

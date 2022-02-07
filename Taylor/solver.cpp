@@ -22,7 +22,11 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     codeLength = bits;
 
     //look at macros in header file
-    tableEntrySize = boardSize + 5 + 0 * sizeof(int);
+
+    compactBoardSize = (boardSize / 4) + ((boardSize % 4) != 0);
+
+
+    tableEntrySize = compactBoardSize + 5 + 0 * sizeof(int);
 
     bitMask = 0;
     for (int i = 0; i < bits; i++) {
@@ -46,17 +50,58 @@ BasicSolver::~BasicSolver() {
     free(table);
 }
 
+void BasicSolver::copyCompactBoard(char *dst, char *src) {
+   // for (int i = 0; i < boardSize; i++) {
+   //     src[i] = i % 3;
+   // }
+
+    char c = 0;
+
+    int count = 0;
+
+    int i = 0;
+    for (; i < compactBoardSize * 4; i++) {
+        char b = i < boardSize ? src[i] : 0;
+
+        //std::cout << (int) b << " ";
+
+        c *= 4;
+        c += b;
+        count += 1;
+
+        if (count == 4) {
+            dst[i / 4] = c;
+            //std::cout << " [ " << i / 4 << " " << (int) c << " ] ";
+            c = 0;
+            count = 0;
+        }
+    }
+
+
+    //std::cout << std::endl;
+
+    for (int i = 0; i < boardSize; i++) {
+        //std::cout << ((dst[i / 4] >> (2 * (3 - (i % 4)))) & 0x3) << " ";
+    }
+    //std::cout << std::endl << std::endl;
+}
+
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
     bool found = false;
     if (PLAYER(entry) == p) {
         found = true;
         for (int i = 0; i < boardSize; i++) {
-            if (entry[i] != state->board[i]) {
+            if (((entry[i / 4] >> (2 * (3 - (i % 4)))) & 0x3) != state->board[i]) {
                 found = false;
                 break;
             }
         }
     }
+
+    if (found) {
+        //std::cout << "FOUND" << std::endl;
+    }
+
     return found;
 }
 
@@ -75,7 +120,7 @@ int BasicSolver::solveID(State *state, int p, int n) {
         maxCompleted += 100;
 
         std::pair<int, bool> result = searchID(state, p, n, 0);
-        //std::cout << depth << " " << collisions << std::endl;
+        std::cout << depth << " " << collisions << std::endl;
 
         if (result.second) {
             return result.first;
@@ -109,12 +154,13 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     if (moveCount == 0) { //is terminal
         completed += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            copyCompactBoard(entry, state->board);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = 10000;
+            HEURISTIC(entry) = 128;
         }
         return std::pair<int, bool>(n, true);
     }
@@ -138,7 +184,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            copyCompactBoard(entry, state->board);
             PLAYER(entry) = p;
             OUTCOME(entry) = EMPTY;
             BESTMOVE(entry) = 0;
@@ -157,7 +204,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         bestMove = BESTMOVE(entry);
     }
 
-    int bestVal = -10000;
+    int bestVal = -127;
 
     char undoBuffer[sizeof(int) + 2 * sizeof(char)];
 
@@ -187,12 +234,13 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         if (result.second && result.first == p) {
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
+                //memcpy(entry, state->board, boardSize);
+                copyCompactBoard(entry, state->board);
                 PLAYER(entry) = p;
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
                 DEPTH(entry) = depth;
-                HEURISTIC(entry) = 10000;
+                HEURISTIC(entry) = 128;
             }
 
             delete[] moves;
@@ -222,12 +270,13 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     if (allProven) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            copyCompactBoard(entry, state->board);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
             DEPTH(entry) = depth;
-            HEURISTIC(entry) = -10000;
+            HEURISTIC(entry) = -127;
 
         }
         return std::pair<int, bool>(n, true);
@@ -235,7 +284,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
     if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        memcpy(entry, state->board, boardSize);
+        //memcpy(entry, state->board, boardSize);
+        copyCompactBoard(entry, state->board);
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
         BESTMOVE(entry) = newBestMove;

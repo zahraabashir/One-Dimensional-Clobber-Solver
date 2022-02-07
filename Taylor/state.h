@@ -5,29 +5,21 @@
 
 class State {
   private:
-    void zeroPointers();
-    void generateMoves(int idx = 0, int moveDepth = 0);
+    int *generateMoves(const int &player, const int &opponent, size_t *moveCount, int idx = 0, int moveDepth = 0);
     State();
 
   public:
-    int *board;
+    char *board;
     int boardSize;
-    int playerNumber;
+    //int player;
 
-    int *moves;
-    size_t moveCount;
-    std::shared_ptr<State> *children; //array of shared pointers
-
-    int outcome;
-
-    State(std::string board, int playerNumber);
+    State(std::string board, int player);
     ~State();
-    int code();
-    bool operator==(const State &s);
-    State *play(int from, int to);
-    const int *getMoves();
-    void expand();
-    bool isTerminal();
+    int code(int player);
+    //bool operator==(const State &s);
+    void play(int from, int to, char *undoBuffer);
+    void undo(char *undoBuffer);
+    int *getMoves(const int &player, const int &opponent, size_t *moveCount);
 };
 
 std::ostream &operator<<(std::ostream &os, const State &s);

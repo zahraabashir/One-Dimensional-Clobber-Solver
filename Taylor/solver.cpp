@@ -59,7 +59,14 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 }
 
 int BasicSolver::solveID(State *state, int p, int n) {
-    maxCompleted = 10;
+    maxCompleted = 100;
+
+    //maxCompleted = -1;
+    //int64_t mask = (int64_t) 1 << 63;
+    //mask ^= (int64_t) -1;
+    //maxCompleted &= mask;
+
+
 
     int depth = 0;
     while (true) {
@@ -67,7 +74,7 @@ int BasicSolver::solveID(State *state, int p, int n) {
         collisions = 0;
 
         completed = 0;
-        maxCompleted += 5;
+        maxCompleted += 100;
 
         std::pair<int, bool> result = searchID(state, p, n, 0);
         std::cout << depth << " " << collisions << std::endl;
@@ -126,9 +133,10 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             delete[] pMoves;
         }
 
-        int h = (int) moveCount - (int) pMoveCount;
-        if (validEntry) {
-            h = std::max<int>(h, HEURISTIC(entry));
+        int h = HEURISTIC(entry);
+        if (!validEntry) {
+            //h = (int) moveCount - (int) pMoveCount;
+            h = -pMoveCount;
         }
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
@@ -162,6 +170,10 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     for (int i = bestMove; i < moveCount; i++) {
         if (checkedBestMove && i == bestMove) {
             continue;
+        }
+
+        if (depth == 0) {
+            std::cout << i << " ";
         }
 
         int from = moves[2 * i];
@@ -200,6 +212,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             i = -1;
         }
     }
+
+    if (depth == 0) {
+        std::cout << std::endl;
+    }
+
 
     delete[] moves;
 

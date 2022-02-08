@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 
     State *root = new State(board, rootPlayer);
 
-    //Solve the state
+    // int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));
 
     //Print output
@@ -43,9 +43,5 @@ int main(int argc, char **argv) {
     }
 
     cout << endl;
-
-    //Other solver
-    //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
-
     return 0;
 }

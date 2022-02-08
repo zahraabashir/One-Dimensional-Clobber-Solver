@@ -19,24 +19,30 @@ int main(int argc, char **argv) {
     double timeLimit = (double) atoi(argv[3]);
 
     BasicSolver solver(rootPlayer, board.length());
-    solver.timeLimit = timeLimit - 0.1 - (((double) board.length()) * 0.01);
+    solver.timeLimit = timeLimit - 0.05;
     solver.startTime = std::chrono::steady_clock::now();
 
     State *root = new State(board, rootPlayer);
-
-
 
 
     
     //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));
 
+    auto now = std::chrono::steady_clock::now();
+    double elapsed = std::chrono::duration<double>(now - solver.startTime).count();
 
-    if (best_from==-1) {
+
+
+    if (solver.outOfTime) {
+        cout << "?" << " None " << elapsed << " " << node_count;
+    } else if (best_from == -1) {
         cout << playerNumberToChar(result) << " None" << " " << node_count;
     } else {
-        cout << playerNumberToChar(result) << " " << best_from << "-" << best_to << "  " << node_count;
+        cout << playerNumberToChar(result) << " " << best_from << "-" << best_to << " " << node_count;
     }
+
+    cout << endl;
 
 
     return 0;

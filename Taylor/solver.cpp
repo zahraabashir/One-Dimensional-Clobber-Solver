@@ -599,7 +599,7 @@ char *BasicSolver::getTablePtr(int code) {
 
 void BasicSolver::updateTime() {
     auto now = std::chrono::steady_clock::now();
-    float elapsed = std::chrono::duration<float>(now - startTime).count();
+    double elapsed = std::chrono::duration<double>(now - startTime).count();
 
     if (elapsed >= timeLimit) {
         outOfTime = true;

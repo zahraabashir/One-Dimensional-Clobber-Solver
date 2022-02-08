@@ -13,7 +13,6 @@ int main(int argc, char **argv) {
         cout << "Usage:\n" << argv[0] << " <board> <toPlay> <time>" << endl;
         return 0;
     }
-
     string board(argv[1]);
 
     int rootPlayer = charToPlayerNumber(*argv[2]);
@@ -24,6 +23,7 @@ int main(int argc, char **argv) {
     solver.startTime = std::chrono::steady_clock::now();
 
     State *root = new State(board, rootPlayer);
+
 
 
 

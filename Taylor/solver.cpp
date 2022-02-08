@@ -12,7 +12,7 @@ int node_count = 0; //nodes visited
 int best_from = 0; //root player's move
 int best_to = 0;
 
-int collisions = 0; //transposition table collisions
+//int collisions = 0; //transposition table collisions
 
 BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootPlayer = rootPlayer;
@@ -67,16 +67,15 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 }
 
 int BasicSolver::solveID(State *state, int p, int n) {
-    maxCompleted = 100;
+    maxCompleted = 1;
 
     int depth = 0;
 
-    maxCompleted = 1;
     limitCompletions = true;
 
     while (true) {
         maxDepth = depth;
-        collisions = 0;
+        //collisions = 0;
 
         completed = 0;
 
@@ -126,7 +125,7 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
     }
 
     if (!validEntry && PLAYER(entry) != 0) {
-        collisions++;
+        //collisions++;
     }
 
     //generate moves
@@ -306,7 +305,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     if (!validEntry && PLAYER(entry) != 0) {
-        collisions++;
+        //collisions++;
     }
 
     //generate moves
@@ -390,6 +389,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         state->play(from, to, undoBuffer);
         std::pair<int, bool> result = searchID(state, n, p, depth + 1);
         if (outOfTime) {
+            delete[] moves;
             return result;
         }
     

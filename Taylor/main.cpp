@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     State *root = new State(board, rootPlayer);
 
 
+
     
     //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));

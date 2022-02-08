@@ -7,7 +7,7 @@ CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
 run: clobber
-	time ./clobber BWBWBWBWBWBWBWBWBWBWBWBWBWBW W 3
+	time ./clobber BWBWBWBWBWBWBWBWBW W 1
 
 clobber: main.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $^ -o $@
@@ -20,3 +20,4 @@ clean:
 
 test: clobber
 	python3 test.py
+	python3 final_test.py

@@ -21,6 +21,10 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     outOfTime = false;
 
     int bits = 24;
+    if (boardSize > 38) {
+        bits = 23;
+    }
+
     codeLength = bits;
 
     //look at macros in header file
@@ -36,8 +40,9 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     tableSize <<= (size_t) bits;
     tableSize *= (size_t) tableEntrySize;
 
-    // std::cout << "Entry size: " << tableEntrySize << std::endl;
-    // std::cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << std::endl;
+    //std::cout << "Entry size: " << tableEntrySize << std::endl;
+    //std::cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << std::endl;
+    //std::cout << "Board size: " << boardSize << std::endl;   
 
 
 

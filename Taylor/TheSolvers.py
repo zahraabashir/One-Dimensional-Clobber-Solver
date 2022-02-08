@@ -21,10 +21,14 @@ for line in testFile:
 testFile.close()
 time_out = False
 
+f = open("results.log", "w")
+
 for t in tests:
-    command = "./clobber " + t[0] + " " + t[1] + " " +  t[2]
+    command = "./TheSolvers " + t[0] + " " + t[1] + " " +  t[2]
     start = time.clock_gettime(time.CLOCK_MONOTONIC)
     result = subprocess.run(command, capture_output = True, shell = True, timeout=1)
     end = time.clock_gettime(time.CLOCK_MONOTONIC)
     output = result.stdout.decode("utf-8")
+    f.write(output)
     print(output, end="")
+f.close()

@@ -6,17 +6,17 @@ SHELL := /bin/bash
 CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
-run: clobber
-	time ./clobber BWBWBWWBWBWBWB B 200
+run: TheSolvers
+	./TheSolvers BWBWBWWBWBWBWB B 200
 
-clobber: main.o utils.o state.o solver.o
+TheSolvers: main.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $^ -o $@
 
 %.o: %.cpp %.h
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o clobber
+	-rm *.o TheSolvers
 
-test: clobber
-	python3 the_solvers.py
+test: TheSolvers
+	python3 TheSolvers.py

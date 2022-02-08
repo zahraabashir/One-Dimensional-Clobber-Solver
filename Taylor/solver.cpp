@@ -152,7 +152,7 @@ bool BasicSolver::solveAnd(State *state, int p, int n) {
 
         state->play(from, to, undoBuffer);
         node_count += 1;
-        int result = solveAnd(state, p, n);
+        int result = solveOr(state, p, n);
         state->undo(undoBuffer);
 
         if (result) {

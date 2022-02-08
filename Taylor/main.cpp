@@ -43,5 +43,7 @@ int main(int argc, char **argv) {
     }
 
     cout << endl;
+
+    delete root;
     return 0;
 }

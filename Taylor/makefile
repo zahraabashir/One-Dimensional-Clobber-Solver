@@ -19,5 +19,4 @@ clean:
 	-rm *.o clobber
 
 test: clobber
-	python3 test.py
-	python3 final_test.py
+	python3 the_solvers.py

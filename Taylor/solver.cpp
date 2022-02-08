@@ -90,6 +90,7 @@ int BasicSolver::solveID(State *state, int p, int n) {
 
         if (outOfTime) {
             return EMPTY;
+            best_from = -1;
         }
 
         //std::cout << depth << " " << collisions << std::endl;

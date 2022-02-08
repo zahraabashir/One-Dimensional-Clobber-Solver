@@ -62,6 +62,7 @@ class BasicSolver {
 
         Visitors for the root and other nodes, in ID solver. Depth starts at 0 and increases with each recursive call.
 
+    if the bool is true, the int is the player who wins, otherwise it is the heuristic score
     */
     std::pair<int, bool> rootSearchID(State *state, int p, int n, int depth);
     std::pair<int, bool> searchID(State *state, int p, int n, int depth);

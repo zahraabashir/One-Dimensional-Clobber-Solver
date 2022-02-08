@@ -1,6 +1,7 @@
 #pragma once
 
 #include "state.h"
+#include <chrono>
 
 #define BOARD(te) te
 #define PLAYER(te) *(te + boardSize)
@@ -27,6 +28,12 @@ class BasicSolver {
     int boardSize;
     bool limitCompletions;
 
+    double timeLimit;
+    std::chrono::time_point<std::chrono::steady_clock> startTime;
+    
+
+    bool outOfTime;
+
 
 
     char *table;
@@ -42,13 +49,14 @@ class BasicSolver {
 
     int solveID(State *state, int p, int n);
     std::pair<int, bool> searchID(State *state, int p, int n, int depth);
-    std::pair<int, bool> RootsearchID(State *state, int p, int n, int depth);
+    std::pair<int, bool> rootSearchID(State *state, int p, int n, int depth);
 
 
     int solve(State *state, int p, int n);
     int solveRoot(State *state, int p, int n);
     //void setTableEntry(int code, char *board, char player, char outcome);
     char *getTablePtr(int code);
+    void updateTime();
 
 
 };

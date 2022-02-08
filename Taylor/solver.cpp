@@ -18,6 +18,8 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootOpponent = opponentNumber(rootPlayer);
     this->boardSize = boardSize;
 
+    outOfTime = false;
+
     int bits = 24;
     codeLength = bits;
 
@@ -84,7 +86,12 @@ int BasicSolver::solveID(State *state, int p, int n) {
         //std::cout << depth << std::endl;
 
 
-        std::pair<int, bool> result = RootsearchID(state, p, n, 0);
+        std::pair<int, bool> result = rootSearchID(state, p, n, 0);
+
+        if (outOfTime) {
+            return EMPTY;
+        }
+
         //std::cout << depth << " " << collisions << std::endl;
 
         if (result.second) {
@@ -96,7 +103,13 @@ int BasicSolver::solveID(State *state, int p, int n) {
 }
 
 
-std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int depth) {
+std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth) {
+    node_count += 1;
+    updateTime();
+    if (outOfTime) {
+        return std::pair<int, bool>(0, false);
+    }
+
     //lookup entry
     //if solved, return
     int code = state->code(p);
@@ -118,7 +131,6 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
 
     if (moveCount == 0) { //is terminal
         completed += 1;
-        node_count += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
@@ -191,8 +203,13 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
         int to = moves[2 * i + 1];
 
         state->play(from, to, undoBuffer);
-        node_count += 1;
         std::pair<int, bool> result = searchID(state, n, p, depth + 1);
+
+        if (outOfTime) {
+            delete[] moves;
+            return result;
+        }
+
         state->undo(undoBuffer);
 
         allProven &= result.second;
@@ -266,6 +283,13 @@ std::pair<int, bool> BasicSolver::RootsearchID(State *state, int p, int n, int d
     return std::pair<int, bool>(bestVal, false);
 }
 std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
+    node_count += 1;
+    updateTime();
+    if (outOfTime) {
+        return std::pair<int, bool>(0, false);
+    }
+
+
     //lookup entry
     //if solved, return
     int code = state->code(p);
@@ -287,7 +311,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     if (moveCount == 0) { //is terminal
         completed += 1;
-        node_count += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
@@ -360,8 +383,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         int to = moves[2 * i + 1];
 
         state->play(from, to, undoBuffer);
-        node_count += 1;
         std::pair<int, bool> result = searchID(state, n, p, depth + 1);
+        if (outOfTime) {
+            return result;
+        }
+    
         state->undo(undoBuffer);
 
         allProven &= result.second;
@@ -568,4 +594,13 @@ char *BasicSolver::getTablePtr(int code) {
     code &= bitMask;
 
     return table + (idx * tableEntrySize);
+}
+
+void BasicSolver::updateTime() {
+    auto now = std::chrono::steady_clock::now();
+    float elapsed = std::chrono::duration<float>(now - startTime).count();
+
+    if (elapsed >= timeLimit) {
+        outOfTime = true;
+    }
 }

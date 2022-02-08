@@ -2,8 +2,7 @@
 #include "utils.h"
 #include "state.h"
 #include "solver.h"
-
- #include <chrono>
+#include <chrono>
 
 using namespace std;
 
@@ -15,6 +14,8 @@ int main(int argc, char **argv) {
         cout << "Usage:\n" << argv[0] << " <board> <toPlay> <time>" << endl;
         return 0;
     }
+
+    //Initialize solver and state
     string board(argv[1]);
 
     int rootPlayer = charToPlayerNumber(*argv[2]);
@@ -26,15 +27,12 @@ int main(int argc, char **argv) {
 
     State *root = new State(board, rootPlayer);
 
-
-    
-    //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
+    //Solve the state
     int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));
 
+    //Print output
     auto now = std::chrono::steady_clock::now();
     double elapsed = std::chrono::duration<double>(now - solver.startTime).count();
-
-
 
     if (solver.outOfTime) {
         cout << "?" << " None " << elapsed << " " << node_count;
@@ -46,6 +44,8 @@ int main(int argc, char **argv) {
 
     cout << endl;
 
+    //Other solver
+    //int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
 
     return 0;
 }

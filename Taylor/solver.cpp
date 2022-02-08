@@ -7,11 +7,12 @@
 #include <limits>
 
 
-int node_count = 0;
-int best_from = 0;
+int node_count = 0; //nodes visited
+
+int best_from = 0; //root player's move
 int best_to = 0;
 
-int collisions = 0;
+int collisions = 0; //transposition table collisions
 
 BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootPlayer = rootPlayer;
@@ -43,8 +44,6 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     //std::cout << "Entry size: " << tableEntrySize << std::endl;
     //std::cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << std::endl;
     //std::cout << "Board size: " << boardSize << std::endl;   
-
-
 
     table = (char *) calloc(tableSize, 1);
 }

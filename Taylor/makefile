@@ -4,7 +4,7 @@ CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
 run: clobber
-	time ./clobber BWBWBWBWBW B 100
+	time ./clobber BWBW W 100
 
 clobber: main.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $^ -o $@

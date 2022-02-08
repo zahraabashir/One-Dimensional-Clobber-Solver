@@ -8,7 +8,6 @@
 
 
 int node_count = 0; //nodes visited
-
 int best_from = 0; //root player's move
 int best_to = 0;
 
@@ -262,7 +261,6 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
-
             DEPTH(entry) = depth;
             HEURISTIC(entry) = -127;
 
@@ -279,8 +277,6 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
         BESTMOVE(entry) = newBestMove;
-        // std::cout<<newBestMove;
-        // std::cout<<"\n";
         DEPTH(entry) = depth;
         HEURISTIC(entry) = bestVal;
     }
@@ -376,13 +372,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         if (checkedBestMove && i == bestMove) {
             continue;
         }
-
         
         //if (depth == 0) {
         //    std::cout << i << " ";
         //}
         
-
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
 
@@ -428,7 +422,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     //if (depth == 0) {
     //    std::cout << std::endl;
     //}
-
 
     delete[] moves;
 

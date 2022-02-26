@@ -1,6 +1,7 @@
 #pragma once
 
 #include "state.h"
+#include "database.h"
 #include <chrono>
 
 #define BOARD(te) te
@@ -22,6 +23,9 @@ class BasicSolver {
     //search is aborted after this
     int64_t maxCompleted;
     int64_t completed;
+
+    Database *db;
+    bool useDatabase;
 
   public:
     int rootPlayer;

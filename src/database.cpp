@@ -26,7 +26,7 @@ Database::Database() {
 
 Database::~Database() {
     fclose(file);
-	std::cout << "DB destructor" << std::endl;
+	//std::cout << "DB destructor" << std::endl;
 }
 
 int Database::get(int len, char *board) {

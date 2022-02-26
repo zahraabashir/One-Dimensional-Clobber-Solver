@@ -20,6 +20,9 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
     this->rootOpponent = opponentNumber(rootPlayer);
     this->boardSize = boardSize;
 
+    this->useDatabase = true;
+    db = new Database();
+
     outOfTime = false;
 
     int bits = 24;
@@ -50,6 +53,9 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
 }
 
 BasicSolver::~BasicSolver() {
+    if (useDatabase) {
+        delete db;
+    }
     free(table);
 }
 
@@ -464,6 +470,46 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     char *oldBoard = new char[state->boardSize];
     memcpy(oldBoard, state->board, state->boardSize);
     simplify(state);
+
+
+    //generate subgames, look them up in the database
+    if (useDatabase) {
+        std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+
+        std::vector<int> lengths;
+
+        for (auto it = subgames.begin(); it != subgames.end(); it++) {
+            lengths.push_back(it->second - it->first);
+        }
+
+        std::vector<int> outcomes;
+
+        for (auto it = subgames.begin(); it != subgames.end(); it++) {
+            int length = it->second - it->first;
+            std::string subBoard(&state->board[it->first], length);
+            int outcome = db->get(length, subBoard.data());
+            outcomes.push_back(outcome);
+        }
+
+        int commonOutcome = 0;
+        if (outcomes.size() > 0) {
+            commonOutcome = outcomes[0];
+        }
+
+        for (int i = 1; i < outcomes.size(); i++) {
+            if (outcomes[i] != commonOutcome && outcomes[i] != OC_P) {
+                commonOutcome = 0;
+                break;
+            }
+        }
+
+        if (commonOutcome == 1 || commonOutcome == 2) {
+            memcpy(state->board, oldBoard, state->boardSize);
+            delete[] oldBoard;
+            //std::cout << "DB CUT" << std::endl;
+            return std::pair<int, bool>(commonOutcome, true);
+        }
+    }
 
 
     //lookup entry

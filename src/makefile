@@ -20,3 +20,6 @@ clean:
 
 test: TheSolvers
 	python3 TheSolvers.py
+
+ptest: TheSolvers
+	python3 test.py

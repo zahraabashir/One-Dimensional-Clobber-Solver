@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <vector>
+#include <algorithm>
 
 
 int node_count = 0; //nodes visited
@@ -282,12 +284,186 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
     }
     return std::pair<int, bool>(bestVal, false);
 }
+
+std::vector<std::pair<int, int>> generateSubgames(State *state) {
+    char *board = state->board;
+    std::vector<std::pair<int, int>> subgames;
+
+    int start = -1;
+    int end = -1;
+
+    int foundMask = 0;
+
+    for (int i = 0; i < state->boardSize; i++) {
+        if (start == -1 && board[i] != 0) {
+            start = i;
+            foundMask = 0;
+        }
+        
+        if (board[i] != 0) {
+            foundMask |= board[i];
+        }
+
+        if (start != -1 && board[i] == 0) {
+            if (foundMask == 3) {
+                subgames.push_back(std::pair<int, int>(start, i));
+            }
+            start = -1;
+        }
+    }
+
+    if (start != -1) {
+        subgames.push_back(std::pair<int, int>(start, state->boardSize));
+    }
+
+          
+    return subgames;
+}
+
+
+
+char *boardComparePtr;
+bool subgameCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
+    char *board = boardComparePtr;
+
+    int s1 = a.first;
+    int e1 = a.second;
+    int l1 = e1 - s1;
+
+    int s2 = b.first;
+    int e2 = b.second;
+    int l2 = e2 - s2;
+
+    for (int i = 0; i < std::min(l1, l2); i++) {
+        if (board[s1 + i] == board[s2 + i]) {
+            continue;
+        }
+
+        if (board[s1 + i] < board[s2 + i]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    return l1 < l2;
+}
+
+
+
+void simplify(State *state) {
+    char *board = state->board;
+
+    //find subgames
+    std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+
+    //print
+    for (int i = 0; i < state->boardSize; i++) {
+        //std::cout << playerNumberToChar(board[i]);
+    }
+    //std::cout << std::endl;
+    //std::cout << "Subgames: " << subgames.size() << std::endl;
+
+    int subgameCount = subgames.size();
+
+    //find subgames that have the same length
+    for (int i = 0; i < subgameCount; i++) {
+        int s1 = subgames[i].first;
+        int e1 = subgames[i].second;
+        int l1 = e1 - s1;
+
+        for (int j = i + 1; j < subgameCount; j++) {
+            int s2 = subgames[j].first;
+            int e2 = subgames[j].second;
+            int l2 = e2 - s2;
+            if (l1 == l2) {
+                //std::cout << "Match" << std::endl;
+
+                //forward pass
+                bool diff = true;
+
+                for (int k = 0; k < l1; k++) {
+                    if (board[s1 + k] != 3 - board[s2 + k]) {
+                        diff = false;
+                        break;
+                    }
+                }
+
+                if (diff) {
+                    //std::cout << "Simplify on forward pass" << std::endl;
+                    for (int k = 0; k < l1; k++) {
+                        board[s1 + k] = 0;
+                        board[s2 + k] = 0;
+                    }
+                    continue;
+                }
+
+                //backward pass
+                diff = true;
+
+                for (int k = 0; k < l1; k++) {
+                    if (board[s1 + k] != 3 - board[e2 - 1 - k]) {
+                        diff = false;
+                        break;
+                    }
+                }
+
+                if (diff) {
+                    //std::cout << "Simplify on backward pass" << std::endl;
+                    for (int k = 0; k < l1; k++) {
+                        board[s1 + k] = 0;
+                        board[s2 + k] = 0;
+                    }
+                    continue;
+                }
+
+
+            }
+        }
+    }
+
+    //now canonicalize the board
+    subgames = generateSubgames(state);
+    subgameCount = subgames.size();
+
+    //sort subgames
+    boardComparePtr = board;
+    std::sort(subgames.begin(), subgames.end(), subgameCompare);
+
+
+    int position = 0;
+    char newBoard[state->boardSize] = {};
+    for (int i = 0; i < subgameCount; i++) {
+        int s = subgames[i].first;
+        int e = subgames[i].second;
+
+        memcpy(&newBoard[position], &board[s], e - s);
+        position += (e - s) + 1;
+    }
+
+    memcpy(state->board, newBoard, state->boardSize);
+
+    for (int i = 0; i < state->boardSize; i++) {
+    //    std::cout << playerNumberToChar(board[i]);
+    }
+    //std::cout << std::endl;
+
+
+
+    //std::cout << std::endl;
+}
+
 std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     node_count += 1;
     updateTime();
     if (outOfTime) {
         return std::pair<int, bool>(0, false);
     }
+
+    char *oldBoard = new char[state->boardSize];
+    memcpy(oldBoard, state->board, state->boardSize);
+    simplify(state);
 
 
     //lookup entry
@@ -297,6 +473,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     bool validEntry = validateTableEntry(state, p, entry);
     if (validEntry && OUTCOME(entry) != EMPTY) {
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
         return std::pair<int, bool>(OUTCOME(entry), true);
     }
 
@@ -319,6 +497,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             DEPTH(entry) = depth;
             HEURISTIC(entry) = -127;
         }
+
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
         return std::pair<int, bool>(n, true);
     }
 
@@ -349,6 +530,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = h;
         }        
 
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
         return std::pair<int, bool>(h, false);
     }
 
@@ -383,6 +566,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         state->play(from, to, undoBuffer);
         std::pair<int, bool> result = searchID(state, n, p, depth + 1);
         if (outOfTime) {
+            memcpy(state->board, oldBoard, state->boardSize);
+            delete[] oldBoard;
             delete[] moves;
             return result;
         }
@@ -401,6 +586,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 HEURISTIC(entry) = 127;
             }
 
+            memcpy(state->board, oldBoard, state->boardSize);
+            delete[] oldBoard;
             delete[] moves;
             return std::pair<int, bool>(p, true);
         }
@@ -435,6 +622,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = -127;
 
         }
+
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
         return std::pair<int, bool>(n, true);
     }
 
@@ -447,6 +637,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         DEPTH(entry) = depth;
         HEURISTIC(entry) = bestVal;
     }
+    memcpy(state->board, oldBoard, state->boardSize);
+    delete[] oldBoard;
     return std::pair<int, bool>(bestVal, false);
 }
 

@@ -13,6 +13,7 @@ cReset = "\u001b[0m"
 
 
 testFile = open("tests.txt", "r")
+testFile = open("tests_hard.txt", "r")
 tests = []
 for line in testFile:
     line = line.split("-")
@@ -31,7 +32,7 @@ testFile.close()
 
 
 for t in tests:
-    command = "./clobber " + t[0] + " 100"
+    command = "./TheSolvers " + t[0] + " 10000000000"
     start = time.clock_gettime(time.CLOCK_MONOTONIC)
     result = subprocess.run(command, capture_output = True, shell = True)
     end = time.clock_gettime(time.CLOCK_MONOTONIC)

@@ -15,13 +15,16 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    Database db;
+
+
     //Initialize solver and state
     string board(argv[1]);
 
     int rootPlayer = charToPlayerNumber(*argv[2]);
     double timeLimit = (double) atoi(argv[3]);
 
-    BasicSolver solver(rootPlayer, board.length());
+    BasicSolver solver(rootPlayer, board.length(), &db);
     solver.timeLimit = timeLimit - 0.05 - ((double) board.length()) * 0.002;
     solver.startTime = start;
 

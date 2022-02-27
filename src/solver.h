@@ -52,7 +52,7 @@ class BasicSolver {
     int tableEntrySize; //size in bytes of 1 table entry
 
 
-    BasicSolver(int rootPlayer, int boardSize);
+    BasicSolver(int rootPlayer, int boardSize, Database *db);
     ~BasicSolver();
 
     //true if the given entry matches the state and player

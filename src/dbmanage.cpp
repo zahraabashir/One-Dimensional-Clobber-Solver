@@ -63,7 +63,7 @@ int main() {
 
             {
                 auto start = std::chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(1, length);
+                BasicSolver *solver = new BasicSolver(1, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
@@ -77,7 +77,7 @@ int main() {
 
             {
                 auto start = std::chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(2, length);
+                BasicSolver *solver = new BasicSolver(2, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 

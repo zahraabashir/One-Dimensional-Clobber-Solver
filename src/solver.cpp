@@ -566,30 +566,35 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
         //Use differences
+        char boardCopy[state->boardSize];
+        memcpy(boardCopy, state->board, state->boardSize);
 
+        for (int i = 0; i < subgames.size(); i++) {
+            std::pair<int, int> &sg = subgames[i];
 
+            if (outcomes[i] == p) {
+                for (int j = 0; j < lengths[i]; j++) {
+                    state->board[sg.first + j] = 0;
+                }
+               
+                //Don't swap players or increase depth -- we haven't played a move
+                std::pair<int, bool> result = searchID(state, p, n, depth);
+                if (outOfTime) {
+                    memcpy(state->board, oldBoard, state->boardSize);
+                    delete[] oldBoard;
+                    return result;
+                }
+                memcpy(state->board, boardCopy, state->boardSize);
 
+                if (result.second && result.first == p) {
+                    memcpy(state->board, oldBoard, state->boardSize);
+                    delete[] oldBoard;
+                    return result;
+                }
 
-        /*
-        int commonOutcome = 0;
-        if (outcomes.size() > 0) {
-            commonOutcome = outcomes[0];
-        }
-
-        for (int i = 1; i < outcomes.size(); i++) {
-            if (outcomes[i] != commonOutcome && outcomes[i] != OC_P) {
-                commonOutcome = 0;
-                break;
             }
         }
 
-        if (commonOutcome == 1 || commonOutcome == 2) {
-            memcpy(state->board, oldBoard, state->boardSize);
-            delete[] oldBoard;
-            //std::cout << "DB CUT" << std::endl;
-            return std::pair<int, bool>(commonOutcome, true);
-        }
-        */
     }
 
 

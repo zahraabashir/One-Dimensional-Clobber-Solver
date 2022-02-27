@@ -479,6 +479,10 @@ void BasicSolver::simplify(State *state) {
     //std::cout << std::endl;
 }
 
+bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
+    return (a.second - a.first) > (b.second - b.first);
+}
+
 std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     node_count += 1;
     updateTime();
@@ -509,27 +513,58 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
 
-
-
     //generate subgames, look them up in the database
     if (useDatabase) {
         std::vector<std::pair<int, int>> subgames = generateSubgames(state);
 
+        //sort subgames by length
+        std::sort(subgames.begin(), subgames.end(), subgameLengthCompare);
+
         std::vector<int> lengths;
-
-        for (auto it = subgames.begin(); it != subgames.end(); it++) {
-            lengths.push_back(it->second - it->first);
-        }
-
         std::vector<int> outcomes;
+
+        //count outcomes
+        int counts[5] = {};
+        int outcomeMask = 0;
+
 
         for (auto it = subgames.begin(); it != subgames.end(); it++) {
             int length = it->second - it->first;
-            std::string subBoard(&state->board[it->first], length);
-            int outcome = db->get(length, subBoard.data());
+            lengths.push_back(length);
+
+            int outcome = db->get(length, &state->board[it->first]);
             outcomes.push_back(outcome);
+
+            counts[outcome] += 1;
+            outcomeMask |= (1 << outcome);
         }
 
+        //Only Bs
+        if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
+            memcpy(state->board, oldBoard, state->boardSize);
+            delete[] oldBoard;
+            return std::pair<int, bool>(OC_B, true);
+        }
+
+        //Only Ws
+        if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
+            memcpy(state->board, oldBoard, state->boardSize);
+            delete[] oldBoard;
+            return std::pair<int, bool>(OC_W, true);
+        }
+
+        //Only Ns
+        if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] > 0) {
+            memcpy(state->board, oldBoard, state->boardSize);
+            delete[] oldBoard;
+            return std::pair<int, bool>(p, true); //current player wins
+        }
+
+
+
+
+
+        /*
         int commonOutcome = 0;
         if (outcomes.size() > 0) {
             commonOutcome = outcomes[0];
@@ -548,6 +583,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             //std::cout << "DB CUT" << std::endl;
             return std::pair<int, bool>(commonOutcome, true);
         }
+        */
     }
 
 

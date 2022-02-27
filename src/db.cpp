@@ -40,7 +40,6 @@ int Database::get(int len, char *board) {
 	fseek(file, idx, SEEK_SET);
 	fread(&outcome, 1, 1, file);
 
-/*
     if (idx == 67914) {
         for (int i = 0; i < len; i++) {
             std::cout << playerNumberToChar(board[i]);
@@ -48,7 +47,6 @@ int Database::get(int len, char *board) {
         std::cout << std::endl << (int) outcome << std::endl;
         while (1) {}
     }
-*/
 
 	return outcome;
 }

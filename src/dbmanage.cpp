@@ -4,6 +4,7 @@
 #include "solver.h"
 #include "database.h"
 #include <chrono>
+#include <cstring>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ int main() {
 
         maxGame *= 2;
         maxGame += 1;
+
 
         char boardText[length];
         char board[length];
@@ -53,7 +55,8 @@ int main() {
 
             // check for game in database and maybe solve it
             int outcome = db.get(length, board);
-            if (outcome != 0) {
+            int stored = outcome;
+            if (outcome != 0 && false) {
                 cout << endl;
                 continue;
             }
@@ -61,9 +64,19 @@ int main() {
             cout << "solving" << endl;
             int result1, result2;
 
+
+
+            char bc[length];
+            memcpy(bc, boardText, length);
+
+
+
+
+
+
             {
                 auto start = std::chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(1, length);
+                BasicSolver *solver = new BasicSolver(1, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
@@ -77,7 +90,7 @@ int main() {
 
             {
                 auto start = std::chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(2, length);
+                BasicSolver *solver = new BasicSolver(2, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
@@ -89,6 +102,10 @@ int main() {
                 delete root;
             }
 
+
+
+
+
             outcome = 0;
 
             if (result1 == result2) {
@@ -98,6 +115,9 @@ int main() {
             } else {
                 outcome = OC_P;
             }
+
+            int idx = db.getIdx(length, board);
+
 
             db.set(length, board, outcome);
             cout << endl;

@@ -15,13 +15,13 @@ int best_to = 0;
 
 //int collisions = 0; //transposition table collisions
 
-BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
+BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     this->rootPlayer = rootPlayer;
     this->rootOpponent = opponentNumber(rootPlayer);
     this->boardSize = boardSize;
 
     this->useDatabase = true;
-    db = new Database();
+    this->db = db;
 
     outOfTime = false;
 
@@ -53,9 +53,6 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize) {
 }
 
 BasicSolver::~BasicSolver() {
-    if (useDatabase) {
-        delete db;
-    }
     free(table);
 }
 

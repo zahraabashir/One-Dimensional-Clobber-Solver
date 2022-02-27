@@ -7,6 +7,7 @@
 #include <limits>
 #include <vector>
 #include <algorithm>
+#include <random>
 
 
 int node_count = 0; //nodes visited
@@ -583,10 +584,26 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     //visit children, starting with best; find new best and update heuristic
     //if solved, save value and return
-    int bestMove = 0;
+
+    std::vector<int> moveOrder;
+
+
+    int bestMove = -1;
     bool checkedBestMove = false;
     if (validEntry) {
         bestMove = BESTMOVE(entry);
+    }
+
+    for (int i = 0; i < moveCount; i++) {
+        if (i == bestMove) {
+            continue;
+        }
+        moveOrder.push_back(i);
+    }
+
+    std::shuffle(moveOrder.begin(), moveOrder.end(), std::default_random_engine(3.141));
+    if (bestMove != -1) {
+        moveOrder.push_back(bestMove);
     }
 
     int bestVal = -127;
@@ -597,7 +614,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     bool allProven = true;
 
-    for (int i = bestMove; i < moveCount; i++) {
+    for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
+        int i = *it;
+
         if (checkedBestMove && i == bestMove) {
             continue;
         }

@@ -547,6 +547,16 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
             memcpy(state->board, oldBoard, state->boardSize);
             delete[] oldBoard;
+
+            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                memcpy(entry, state->board, boardSize);
+                PLAYER(entry) = p;
+                OUTCOME(entry) = BLACK;
+                BESTMOVE(entry) = 0;
+                DEPTH(entry) = depth;
+                HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
+            }        
+
             return std::pair<int, bool>(OC_B, true);
         }
 
@@ -554,6 +564,16 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
             memcpy(state->board, oldBoard, state->boardSize);
             delete[] oldBoard;
+
+            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                memcpy(entry, state->board, boardSize);
+                PLAYER(entry) = p;
+                OUTCOME(entry) = WHITE;
+                BESTMOVE(entry) = 0;
+                DEPTH(entry) = depth;
+                HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
+            }        
+
             return std::pair<int, bool>(OC_W, true);
         }
 
@@ -561,6 +581,16 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
             memcpy(state->board, oldBoard, state->boardSize);
             delete[] oldBoard;
+
+            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                memcpy(entry, state->board, boardSize);
+                PLAYER(entry) = p;
+                OUTCOME(entry) = p;
+                BESTMOVE(entry) = 0;
+                DEPTH(entry) = depth;
+                HEURISTIC(entry) = 127;
+            }        
+
             return std::pair<int, bool>(p, true); //current player wins
         }
 
@@ -589,6 +619,16 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 if (result.second && result.first == p) {
                     memcpy(state->board, oldBoard, state->boardSize);
                     delete[] oldBoard;
+
+                    if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                        memcpy(entry, state->board, boardSize);
+                        PLAYER(entry) = p;
+                        OUTCOME(entry) = p;
+                        BESTMOVE(entry) = 0;
+                        DEPTH(entry) = depth;
+                        HEURISTIC(entry) = 127;
+                    }        
+
                     return result;
                 }
 

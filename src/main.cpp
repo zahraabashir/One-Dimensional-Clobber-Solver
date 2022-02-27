@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char **argv) {
     auto start = std::chrono::steady_clock::now();
 
-    if (argc < 3) {
+    if (argc < 4) {
         cout << "Usage:\n" << argv[0] << " <board> <toPlay> <time>" << endl;
         return 0;
     }

@@ -27,6 +27,7 @@ class BasicSolver {
     Database *db;
     bool useDatabase;
 
+    void simplify(State *state);
   public:
     int rootPlayer;
     int rootOpponent;

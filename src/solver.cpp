@@ -359,7 +359,7 @@ bool subgameCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) 
 
 
 
-void simplify(State *state) {
+void BasicSolver::simplify(State *state) {
     char *board = state->board;
 
     //find subgames
@@ -426,6 +426,27 @@ void simplify(State *state) {
                 }
 
 
+            }
+        }
+    }
+
+    //delete other P positions
+    for (int i = 0; i < subgameCount; i++) {
+        int s = subgames[i].first;
+        int e = subgames[i].second;
+
+        if (board[s] == 0) {
+            continue;
+        }
+
+        int length = e - s;
+        std::string subBoard(&board[s], length);
+        int outcome = db->get(length, subBoard.data());
+
+        //std::cout << "Deleting" << std::endl;
+        if (outcome == OC_P) {
+            for (int j = 0; j < length; j++) {
+                board[s + j] = 0;
             }
         }
     }

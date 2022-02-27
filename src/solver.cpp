@@ -524,7 +524,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         std::vector<int> outcomes;
 
         //count outcomes
-        int counts[5] = {};
+        int counts[5];
+        for (int i = 0; i < 5; i++) {
+            counts[i] = 0;
+        }
+
         int outcomeMask = 0;
 
 
@@ -553,13 +557,15 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             return std::pair<int, bool>(OC_W, true);
         }
 
-        //Only Ns
-        if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] > 0) {
+        //Only one N
+        if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
             memcpy(state->board, oldBoard, state->boardSize);
             delete[] oldBoard;
             return std::pair<int, bool>(p, true); //current player wins
         }
 
+
+        //Use differences
 
 
 

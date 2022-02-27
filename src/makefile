@@ -34,3 +34,6 @@ db: DBManage
 	touch database.bin
 	./DBManage
 
+
+hardtest: TheSolvers
+	time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500

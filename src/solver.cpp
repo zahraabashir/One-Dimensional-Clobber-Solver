@@ -491,6 +491,26 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     simplify(state);
 
 
+    //lookup entry
+    //if solved, return
+    int code = state->code(p);
+    char *entry = getTablePtr(code);
+
+    bool validEntry = validateTableEntry(state, p, entry);
+    if (validEntry && OUTCOME(entry) != EMPTY) {
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
+        return std::pair<int, bool>(OUTCOME(entry), true);
+    }
+
+    if (!validEntry && PLAYER(entry) != 0) {
+        //collisions++;
+    }
+
+
+
+
+
     //generate subgames, look them up in the database
     if (useDatabase) {
         std::vector<std::pair<int, int>> subgames = generateSubgames(state);
@@ -530,22 +550,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
     }
 
-
-    //lookup entry
-    //if solved, return
-    int code = state->code(p);
-    char *entry = getTablePtr(code);
-
-    bool validEntry = validateTableEntry(state, p, entry);
-    if (validEntry && OUTCOME(entry) != EMPTY) {
-        memcpy(state->board, oldBoard, state->boardSize);
-        delete[] oldBoard;
-        return std::pair<int, bool>(OUTCOME(entry), true);
-    }
-
-    if (!validEntry && PLAYER(entry) != 0) {
-        //collisions++;
-    }
 
     //generate moves
     //check for terminal

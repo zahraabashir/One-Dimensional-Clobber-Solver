@@ -3,6 +3,7 @@
 #include "state.h"
 #include "database.h"
 #include <chrono>
+#include <random>
 
 #define BOARD(te) te
 #define PLAYER(te) *(te + boardSize)
@@ -26,6 +27,8 @@ class BasicSolver {
 
     Database *db;
     bool useDatabase;
+
+    std::default_random_engine *rng;
 
     void simplify(State *state);
   public:

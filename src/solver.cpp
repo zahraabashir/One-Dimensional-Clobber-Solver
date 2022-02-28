@@ -24,6 +24,8 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     this->useDatabase = true;
     this->db = db;
 
+    this->rng = new std::default_random_engine(3.141);
+
     outOfTime = false;
 
     int bits = 24;
@@ -55,6 +57,7 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
 
 BasicSolver::~BasicSolver() {
     free(table);
+    delete rng;
 }
 
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
@@ -710,7 +713,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         moveOrder.push_back(i);
     }
 
-    std::shuffle(moveOrder.begin(), moveOrder.end(), std::default_random_engine(3.141));
+    std::shuffle(moveOrder.begin(), moveOrder.end(), *rng);
     if (bestMove != -1) {
         moveOrder.push_back(bestMove);
     }

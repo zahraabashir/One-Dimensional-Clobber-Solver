@@ -517,128 +517,140 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
     //generate subgames, look them up in the database
-    if (useDatabase) {
-        std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+    std::vector<std::pair<int, int>> subgames = generateSubgames(state);
 
-        //sort subgames by length
-        std::sort(subgames.begin(), subgames.end(), subgameLengthCompare);
+    //sort subgames by length
+    std::sort(subgames.begin(), subgames.end(), subgameLengthCompare);
 
-        std::vector<int> lengths;
-        std::vector<int> outcomes;
+    std::vector<int> lengths;
+    std::vector<int> outcomes;
 
-        //count outcomes
-        int counts[5];
-        for (int i = 0; i < 5; i++) {
-            counts[i] = 0;
-        }
-
-        int outcomeMask = 0;
-
-
-        for (auto it = subgames.begin(); it != subgames.end(); it++) {
-            int length = it->second - it->first;
-            lengths.push_back(length);
-
-            int outcome = db->get(length, &state->board[it->first]);
-            outcomes.push_back(outcome);
-
-            counts[outcome] += 1;
-            outcomeMask |= (1 << outcome);
-        }
-
-        //Only Bs
-        if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
-            memcpy(state->board, oldBoard, state->boardSize);
-            delete[] oldBoard;
-
-            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
-                PLAYER(entry) = p;
-                OUTCOME(entry) = BLACK;
-                BESTMOVE(entry) = 0;
-                DEPTH(entry) = depth;
-                HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
-            }        
-
-            return std::pair<int, bool>(OC_B, true);
-        }
-
-        //Only Ws
-        if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
-            memcpy(state->board, oldBoard, state->boardSize);
-            delete[] oldBoard;
-
-            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
-                PLAYER(entry) = p;
-                OUTCOME(entry) = WHITE;
-                BESTMOVE(entry) = 0;
-                DEPTH(entry) = depth;
-                HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
-            }        
-
-            return std::pair<int, bool>(OC_W, true);
-        }
-
-        //Only one N
-        if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
-            memcpy(state->board, oldBoard, state->boardSize);
-            delete[] oldBoard;
-
-            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
-                PLAYER(entry) = p;
-                OUTCOME(entry) = p;
-                BESTMOVE(entry) = 0;
-                DEPTH(entry) = depth;
-                HEURISTIC(entry) = 127;
-            }        
-
-            return std::pair<int, bool>(p, true); //current player wins
-        }
-
-
-        //Use differences
-        char boardCopy[state->boardSize];
-        memcpy(boardCopy, state->board, state->boardSize);
-
-        for (int i = 0; i < subgames.size(); i++) {
-            std::pair<int, int> &sg = subgames[i];
-
-            if (outcomes[i] == p) {
-                for (int j = 0; j < lengths[i]; j++) {
-                    state->board[sg.first + j] = 0;
-                }
-               
-                //Don't swap players or increase depth -- we haven't played a move
-                std::pair<int, bool> result = searchID(state, p, n, depth);
-                if (outOfTime) {
-                    memcpy(state->board, oldBoard, state->boardSize);
-                    delete[] oldBoard;
-                    return result;
-                }
-                memcpy(state->board, boardCopy, state->boardSize);
-
-                if (result.second && result.first == p) {
-                    memcpy(state->board, oldBoard, state->boardSize);
-                    delete[] oldBoard;
-
-                    if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                        memcpy(entry, state->board, boardSize);
-                        PLAYER(entry) = p;
-                        OUTCOME(entry) = p;
-                        BESTMOVE(entry) = 0;
-                        DEPTH(entry) = depth;
-                        HEURISTIC(entry) = 127;
-                    }        
-
-                    return result;
-                }
-
-            }
-        }
-
+    //count outcomes
+    int counts[5];
+    for (int i = 0; i < 5; i++) {
+        counts[i] = 0;
     }
+
+    int outcomeMask = 0;
+
+
+    uint64_t opposingPositionMask;
+
+    for (auto it = subgames.begin(); it != subgames.end(); it++) {
+        int length = it->second - it->first;
+        lengths.push_back(length);
+
+        int outcome = db->get(length, &state->board[it->first]);
+        outcomes.push_back(outcome);
+
+        counts[outcome] += 1;
+        outcomeMask |= (1 << outcome);
+
+        if ((outcome == OC_B && p == WHITE) || (outcome == OC_W && p == BLACK)) {
+            uint64_t mask = 1;
+
+            for (int i = 1; i < length; i++) {
+                mask <<= 1;
+                mask |= 1;
+            }
+
+            mask <<= it->first;
+            opposingPositionMask |= mask;
+        }
+    }
+
+    //Only Bs
+    if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
+
+        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = BLACK;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
+        }        
+
+        return std::pair<int, bool>(OC_B, true);
+    }
+
+    //Only Ws
+    if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
+
+        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = WHITE;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
+        }        
+
+        return std::pair<int, bool>(OC_W, true);
+    }
+
+    //Only one N
+    if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
+        memcpy(state->board, oldBoard, state->boardSize);
+        delete[] oldBoard;
+
+        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = p;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = 127;
+        }        
+
+        return std::pair<int, bool>(p, true); //current player wins
+    }
+
+
+    //Use differences
+    char boardCopy[state->boardSize];
+    memcpy(boardCopy, state->board, state->boardSize);
+
+    for (int i = 0; i < subgames.size(); i++) {
+        std::pair<int, int> &sg = subgames[i];
+
+        if (outcomes[i] == p) {
+            for (int j = 0; j < lengths[i]; j++) {
+                state->board[sg.first + j] = 0;
+            }
+           
+            //Don't swap players or increase depth -- we haven't played a move
+            std::pair<int, bool> result = searchID(state, p, n, depth);
+            if (outOfTime) {
+                memcpy(state->board, oldBoard, state->boardSize);
+                delete[] oldBoard;
+                return result;
+            }
+            memcpy(state->board, boardCopy, state->boardSize);
+
+            if (result.second && result.first == p) {
+                memcpy(state->board, oldBoard, state->boardSize);
+                delete[] oldBoard;
+
+                if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                    memcpy(entry, state->board, boardSize);
+                    PLAYER(entry) = p;
+                    OUTCOME(entry) = p;
+                    BESTMOVE(entry) = 0;
+                    DEPTH(entry) = depth;
+                    HEURISTIC(entry) = 127;
+                }        
+
+                return result;
+            }
+
+        }
+    }
+
 
 
     //generate moves
@@ -707,16 +719,25 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     for (int i = 0; i < moveCount; i++) {
-        if (i == bestMove) {
+        if (i == bestMove || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;
         }
         moveOrder.push_back(i);
     }
 
     std::shuffle(moveOrder.begin(), moveOrder.end(), *rng);
+
+    for (int i = 0; i < moveCount; i++) {
+        if ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) {
+            moveOrder.push_back(i);
+        }
+    }
+
     if (bestMove != -1) {
         moveOrder.push_back(bestMove);
     }
+
+
 
     int bestVal = -127;
 

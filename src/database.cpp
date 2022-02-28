@@ -30,6 +30,10 @@ Database::~Database() {
 }
 
 int Database::get(int len, char *board) {
+    if (len > 16) {
+        return 0;
+    }
+
 	int idx = getIdx(len, board);
 
 	//std::cerr << idx << " ";

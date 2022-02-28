@@ -52,5 +52,5 @@ void Database::set(int len, char *board, int outcome) {
 	char outcomeByte = outcome;
 
 	fseek(file, idx, SEEK_SET);
-	fwrite(&outcome, 1, 1, file);
+	fwrite(&outcomeByte, 1, 1, file);
 }

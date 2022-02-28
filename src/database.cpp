@@ -30,7 +30,7 @@ Database::~Database() {
 }
 
 int Database::get(int len, char *board) {
-    if (len > 16) {
+    if (len > DB_MAX_BITS) {
         return 0;
     }
 

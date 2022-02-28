@@ -19,7 +19,7 @@ int main() {
     Database db;
 
 
-    int maxLength = 16;
+    int maxLength = DB_MAX_BITS;
     int maxGame = 0;
 
     for (int length = 1; length <= maxLength; length++) {

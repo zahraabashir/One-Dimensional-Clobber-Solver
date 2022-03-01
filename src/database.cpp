@@ -56,12 +56,56 @@ void Database::set(int len, char *board, int outcome) {
 
 void Database::load() {
     file = fopen("database.bin", "r+");
-    fread(data, 1, size, file);
+
+    //Decompress data
+    size_t compressedSize = (size / 2) + (size & 1);
+    unsigned char compressed[compressedSize];
+    fread(compressed, 1, compressedSize, file);
+
+    size_t dataIndex = 0;
+    for (size_t i = 0; i < compressedSize; i++) {
+        unsigned char byte = compressed[i];
+
+        unsigned char b1 = byte & 0xF;
+        data[dataIndex] = b1;
+        dataIndex += 1;
+ 
+        unsigned char b2 = (byte >> 4) & 0xF;
+        if (dataIndex < size) {
+            data[dataIndex] = b2;
+        }
+        dataIndex += 1;
+        
+    }
+
+
     fclose(file);
 }
 
 void Database::save() {
     file = fopen("database.bin", "r+");
-    fwrite(data, 1, size, file);
+
+
+    //Compress data
+    size_t compressedSize = (size / 2) + (size & 1);
+    unsigned char compressed[compressedSize];
+
+    for (size_t i = 0; i < size; i += 2) {
+        unsigned char b1 = 0;
+        unsigned char b2 = 0;
+
+        b1 = data[i];
+ 
+        if (i + 1 < size) {
+            b2 = data[i + 1];
+        }
+
+        unsigned char byte = ((b2 & 0xF) << 4) + (b1 & 0xF);
+
+        compressed[i / 2] = byte;
+    }
+
+
+    fwrite(compressed, 1, compressedSize, file);
     fclose(file);
 }

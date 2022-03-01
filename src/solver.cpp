@@ -532,7 +532,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     int outcomeMask = 0;
 
 
-    uint64_t opposingPositionMask;
+    uint64_t opposingPositionMask = 0;
 
     for (auto it = subgames.begin(); it != subgames.end(); it++) {
         int length = it->second - it->first;

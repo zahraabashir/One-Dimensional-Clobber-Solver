@@ -14,7 +14,7 @@ cReset = "\u001b[0m"
 
 testFile = open("tests.txt", "r")
 testFile = open("tests_hard.txt", "r")
-#testFile = open("tests_4.txt", "r")
+testFile = open("tests_4.txt", "r")
 
 tests = []
 for line in testFile:

@@ -26,14 +26,12 @@ class BasicSolver {
     int64_t completed;
 
     Database *db;
-    bool useDatabase;
 
     std::default_random_engine *rng;
 
     void simplify(State *state);
   public:
     int rootPlayer;
-    int rootOpponent;
     int boardSize;
 
     //unset to allow searches to reach leaf nodes uninterrupted
@@ -77,8 +75,8 @@ class BasicSolver {
 
 
     //basic solver functions
-    int solve(State *state, int p, int n);
-    int solveRoot(State *state, int p, int n);
+    //int solve(State *state, int p, int n);
+    //int solveRoot(State *state, int p, int n);
 
 
     //return a table entry pointer based on a State's code. Use validateTableEntry

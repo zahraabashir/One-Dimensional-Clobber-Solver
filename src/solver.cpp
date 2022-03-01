@@ -18,10 +18,8 @@ int best_to = 0;
 
 BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     this->rootPlayer = rootPlayer;
-    this->rootOpponent = opponentNumber(rootPlayer);
     this->boardSize = boardSize;
 
-    this->useDatabase = true;
     this->db = db;
 
     this->rng = new std::default_random_engine(3.141);

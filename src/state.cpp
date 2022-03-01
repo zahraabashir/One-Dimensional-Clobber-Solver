@@ -23,7 +23,7 @@ int *State::generateMoves(const int &player, const int &opponent, size_t *moveCo
         char *c1 = &board[idx - 1];
         char *c3 = &board[idx + 1];
         move1 = idx > 0 && *c1 == opponent;
-        move2 = *c3 == opponent;
+        move2 = (idx + 1 < boardSize) && *c3 == opponent; //check probably not needed -- null terminator
     }
 
     int *buffer = generateMoves(player, opponent, moveCount, idx + 1, moveDepth + move1 + move2);

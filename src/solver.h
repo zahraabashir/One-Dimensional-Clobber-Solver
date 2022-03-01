@@ -75,8 +75,8 @@ class BasicSolver {
 
 
     //basic solver functions
-    //int solve(State *state, int p, int n);
-    //int solveRoot(State *state, int p, int n);
+    int solve(State *state, int p, int n);
+    int solveRoot(State *state, int p, int n);
 
 
     //return a table entry pointer based on a State's code. Use validateTableEntry

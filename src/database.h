@@ -8,7 +8,7 @@
 #define OC_P 3
 #define OC_N 4
 
-#define DB_MAX_BITS 16
+#define DB_MAX_BITS 18
 
 class Database {
   private:

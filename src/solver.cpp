@@ -179,6 +179,7 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
             HEURISTIC(entry) = h;
         }        
 
+        delete[] moves;
         return std::pair<int, bool>(h, false);
     }
 
@@ -459,7 +460,9 @@ void BasicSolver::simplify(State *state) {
 
 
     int position = 0;
-    char newBoard[state->boardSize] = {};
+    char newBoard[state->boardSize];
+    memset(newBoard, 0, state->boardSize);
+
     for (int i = 0; i < subgameCount; i++) {
         int s = subgames[i].first;
         int e = subgames[i].second;
@@ -646,8 +649,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
     }
 
-
-
     //generate moves
     //check for terminal
     size_t moveCount;
@@ -696,6 +697,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }        
 
         memcpy(state->board, oldBoard, state->boardSize);
+        delete[] moves;
         return std::pair<int, bool>(h, false);
     }
 
@@ -829,6 +831,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     return std::pair<int, bool>(bestVal, false);
 }
 
+
+/*
 // to print the first best move
 int BasicSolver::solveRoot(State *state, int p, int n) {
 
@@ -893,7 +897,9 @@ int BasicSolver::solveRoot(State *state, int p, int n) {
     delete[] moves;
     return n;
 }
+*/
 
+/*
 int BasicSolver::solve(State *state, int p, int n) {
 
     //Look up state in table
@@ -954,6 +960,7 @@ int BasicSolver::solve(State *state, int p, int n) {
     delete[] moves;
     return n;
 }
+*/
 
 char *BasicSolver::getTablePtr(int code) {
     int idx = code & bitMask;

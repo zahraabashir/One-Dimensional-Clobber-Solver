@@ -17,6 +17,7 @@ void printBits(int x, int length) {
 int main() {
 
     Database db;
+    db.load();
 
 
     int maxLength = DB_MAX_BITS;
@@ -106,7 +107,6 @@ int main() {
     }
 
 
-
-
+    db.save();
     return 0;
 }

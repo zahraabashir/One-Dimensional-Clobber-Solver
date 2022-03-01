@@ -13,13 +13,18 @@
 class Database {
   private:
     FILE *file;
+    unsigned char *data;
 
 
   public:
+    size_t size;
     int getIdx(int len, char *board);
 
     Database();
     ~Database();
     int get(int len, char *board);
     void set(int len, char *board, int outcome);
+
+    void load();
+    void save();
 };

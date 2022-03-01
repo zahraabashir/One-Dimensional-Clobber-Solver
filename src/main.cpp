@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
     }
 
     Database db;
+    db.load();
 
 
     //Initialize solver and state

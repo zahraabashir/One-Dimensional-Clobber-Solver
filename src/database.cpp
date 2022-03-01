@@ -21,11 +21,21 @@ int Database::getIdx(int len, char *board) {
 }
 
 Database::Database() {
-    file = fopen("database.bin", "r+");
+    size = 0;
+
+    int maxGame = 0;
+    for (int length = 1; length <= DB_MAX_BITS; length++) {
+        maxGame *= 2;
+        maxGame += 1;
+
+        size += maxGame + 1;
+    }
+
+    data = (unsigned char *) calloc(size, 1);
 }
 
 Database::~Database() {
-    fclose(file);
+    free(data);
 	//std::cout << "DB destructor" << std::endl;
 }
 
@@ -35,22 +45,23 @@ int Database::get(int len, char *board) {
     }
 
 	int idx = getIdx(len, board);
-
-	//std::cerr << idx << " ";
-
-	char outcome = 0;
-
-	fseek(file, idx, SEEK_SET);
-	fread(&outcome, 1, 1, file);
-
-	return outcome;
+    return data[idx];
 }
 
 void Database::set(int len, char *board, int outcome) {
 	int idx = getIdx(len, board);
-
 	char outcomeByte = outcome;
+    data[idx] = outcomeByte;
+}
 
-	fseek(file, idx, SEEK_SET);
-	fwrite(&outcomeByte, 1, 1, file);
+void Database::load() {
+    file = fopen("database.bin", "r+");
+    fread(data, 1, size, file);
+    fclose(file);
+}
+
+void Database::save() {
+    file = fopen("database.bin", "r+");
+    fwrite(data, 1, size, file);
+    fclose(file);
 }

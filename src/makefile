@@ -24,6 +24,11 @@ clean:
 rmdb:
 	-rm database.bin
 
+corr: TheSolvers
+	@echo "This is a W position"
+	./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 1
+	./TheSolvers W.W.BW.WB.WBWWWWWBWWBBWBBBB B 1
+
 test: TheSolvers
 	python3 TheSolvers.py
 

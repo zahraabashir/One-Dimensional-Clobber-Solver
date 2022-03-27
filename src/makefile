@@ -39,6 +39,9 @@ corr: TheSolvers referenceSolver
 fcorr: TheSolvers referenceSolver
 	python3 instructorSolution/runTests.py --fast
 
+report: TheSolvers referenceSolver
+	python3 instructorSolution/runTests.py -nc > correctnessReport.txt
+
 test: TheSolvers
 	python3 TheSolvers.py
 

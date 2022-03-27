@@ -47,7 +47,7 @@ atexit.register(exitHandler)
 
 
 testList = open(baseDir + "/testlist.txt", "r")
-testFiles = [baseDir + "/tests/" + x.strip() for x in testList]
+testFiles = [baseDir + "/tests/" + x.strip() for x in testList if x.strip().find("#") != 0 and x.strip() != ""]
 testList.close()
 
 cacheFile = open(baseDir + "/cachedOutcomes.json", "r")
@@ -158,6 +158,7 @@ def runTest(inputLine, outputLine):
 
 
 for f in testFiles:
+    print("f\n")
     file = open(f, "r")
 
     line1 = ""

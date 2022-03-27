@@ -6,7 +6,7 @@
 #include <algorithm>
 
 int *State::generateMoves(const int &player, const int &opponent, size_t *moveCount, int idx, int moveDepth) {
-    if (idx > boardSize) {
+    if (idx >= boardSize) {
         if (moveDepth > 0) {
             *moveCount = moveDepth;
             return new int[moveDepth * 2];

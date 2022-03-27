@@ -3,6 +3,9 @@ import atexit
 import time
 import os
 import sys
+import json
+
+testStats = {"totalTime": 0, "totalTests": 0, "correct": 0, "failed": 0, "wrongMove": 0}
 
 fastMode = False
 noColor = False
@@ -34,6 +37,11 @@ def exitHandler():
     print(cReset,end="")
     print(testStats)
 
+    js = json.dumps(cache)
+    cacheFile = open(baseDir + "/cachedOutcomes.json", "w")
+    cacheFile.write(js)
+    cacheFile.close()
+
 
 atexit.register(exitHandler)
 
@@ -42,13 +50,16 @@ testList = open(baseDir + "/tests/testlist.txt", "r")
 testFiles = [baseDir + "/tests/" + x.strip() for x in testList]
 testList.close()
 
+cacheFile = open(baseDir + "/cachedOutcomes.json", "r")
+cache = json.loads("\n".join([x for x in cacheFile]))
+cacheFile.close()
+
 instructorClobber = baseDir + "/sample_c++/code/clobber"
 
 print("Test files (%d):" % (len(testFiles),))
 for x in testFiles:
     print(x)
 
-testStats = {"totalTime": 0, "totalTests": 0, "correct": 0, "failed": 0, "wrongMove": 0}
 def runTest(inputLine, outputLine):
     testStats["totalTests"] += 1
 
@@ -109,10 +120,15 @@ def runTest(inputLine, outputLine):
                         outcome2 = None
 
                         if not (newBoard.find("BW") == -1 and newBoard.find("WB") == -1):
-                            command2 = instructorClobber + " %s %s %s" % (newBoard, nextPlayer, "100")
-                            result2 = subprocess.run(command2, capture_output = True, shell = True)
-                            output2 = result2.stdout.decode("utf-8").rstrip("\n")
-                            outcome2 = output2.split()[0]
+                            key = newBoard + " " + nextPlayer
+                            if key in cache.keys():
+                                outcome2 = cache[key]
+                            else:
+                                command2 = instructorClobber + " %s %s %s" % (newBoard, nextPlayer, "1000")
+                                result2 = subprocess.run(command2, capture_output = True, shell = True)
+                                output2 = result2.stdout.decode("utf-8").rstrip("\n")
+                                outcome2 = output2.split()[0]
+                                cache[key] = outcome2
                         else:
                             outcome2 = toPlay
 

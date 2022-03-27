@@ -33,10 +33,10 @@ rmdb:
 #@echo "This is a W position"
 #./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 1
 #./TheSolvers W.W.BW.WB.WBWWWWWBWWBBWBBBB B 1
-corr: TheSolvers instructorSolver
+corr: TheSolvers referenceSolver
 	python3 instructorSolution/test.py
 
-fcorr: TheSolvers instructorSolver
+fcorr: TheSolvers referenceSolver
 	python3 instructorSolution/test.py --fast
 
 test: TheSolvers
@@ -49,7 +49,10 @@ db: DBManage
 	touch database.bin
 	./DBManage
 
-instructorSolver:
+resetReferenceCache:
+	echo -e "{\n}" > instructorSolution/cachedOutcomes.json
+
+referenceSolver:
 	make -C instructorSolution/sample_c++/code
 
 hardtest: TheSolvers

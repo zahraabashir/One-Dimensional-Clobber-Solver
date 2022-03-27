@@ -46,7 +46,7 @@ def exitHandler():
 atexit.register(exitHandler)
 
 
-testList = open(baseDir + "/tests/testlist.txt", "r")
+testList = open(baseDir + "/testlist.txt", "r")
 testFiles = [baseDir + "/tests/" + x.strip() for x in testList]
 testList.close()
 
@@ -131,7 +131,7 @@ def runTest(inputLine, outputLine):
                             if key in cache.keys():
                                 outcome2 = cache[key]
                             else:
-                                command2 = instructorClobber + " %s %s %s" % (newBoard, nextPlayer, "1000")
+                                command2 = instructorClobber + " %s %s %s" % (newBoard, nextPlayer, "100000")
                                 result2 = subprocess.run(command2, capture_output = True, shell = True)
                                 output2 = result2.stdout.decode("utf-8").rstrip("\n")
                                 outcome2 = output2.split()[0]

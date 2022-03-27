@@ -34,10 +34,10 @@ rmdb:
 #./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 1
 #./TheSolvers W.W.BW.WB.WBWWWWWBWWBBWBBBB B 1
 corr: TheSolvers referenceSolver
-	python3 instructorSolution/test.py
+	python3 instructorSolution/runTests.py
 
 fcorr: TheSolvers referenceSolver
-	python3 instructorSolution/test.py --fast
+	python3 instructorSolution/runTests.py --fast
 
 test: TheSolvers
 	python3 TheSolvers.py

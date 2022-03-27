@@ -78,6 +78,9 @@ def runTest(inputLine, outputLine):
 
     outcome, move, reportedTime, nodes = output.split()
 
+    print(command)
+    print(output)
+
     correctness = 0
     #-1 -- fail, 0 -- bad move, 1 -- correct
 
@@ -104,6 +107,10 @@ def runTest(inputLine, outputLine):
                 else:
                     newBoard = [x for x in board]
                     a, b = [int(x) for x in move.split("-")]
+
+                    #print(str(a) + " " + str(b))
+                    #print(len(newBoard))
+
                     if newBoard[a] not in ["B", "W"] or newBoard[b] not in ["B", "W"] or newBoard[a] == newBoard[b]:
                         #invalid move
                         correctness = 0

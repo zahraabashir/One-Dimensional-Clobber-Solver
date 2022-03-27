@@ -78,8 +78,8 @@ def runTest(inputLine, outputLine):
 
     outcome, move, reportedTime, nodes = output.split()
 
-    print(command)
-    print(output)
+    #print(command)
+    #print(output)
 
     correctness = 0
     #-1 -- fail, 0 -- bad move, 1 -- correct

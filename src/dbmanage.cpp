@@ -17,7 +17,7 @@ void printBits(int x, int length) {
 int main() {
 
     Database db;
-    db.load();
+    //db.load(); //might be wrong to load here
 
 
     int maxLength = DB_MAX_BITS;

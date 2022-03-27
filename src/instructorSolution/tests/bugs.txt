@@ -1,6 +1,6 @@
-# 3 correct
 # 5 bad move
 # 2 wrong
+# 3 correct
 
 
 ############################## BAD MOVES

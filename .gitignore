@@ -1,3 +1,4 @@
 *.o
 src/TheSolvers
+src/DBManage
 **/clobber

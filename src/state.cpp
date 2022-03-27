@@ -55,7 +55,7 @@ State::State(std::string board, int player) {
 }
 
 State::~State() {
-    if (board != nullptr) {
+    if (this->boardSize != 0) {
         delete[] board;
     }
 }

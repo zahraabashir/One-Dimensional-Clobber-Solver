@@ -1,6 +1,6 @@
+unverified/easy.txt
 unverified/added_hard.txt
 unverified/added_random.txt
-unverified/easy.txt
 unverified/hard.txt
 unverified/random_40_to_64.txt
 unverified/random_hard.txt

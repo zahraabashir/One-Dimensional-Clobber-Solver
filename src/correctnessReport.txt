@@ -1,0 +1,4065 @@
+Test files (12):
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/special.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BB W 100
+OUT: B 0-0 0.000296764 1
+EXP: B None 0.000 0
+[WRONG MOVE]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBBW.BWW B 100
+OUT: B 5-6 0.000332235 9
+EXP: B 5-6 0.0000 6
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBBW.BWW W 100
+OUT: W 3-2 0.000327804 3
+EXP: W 7-6 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWB.WBWBWBW B 100
+OUT: W None 0.000378419 74
+EXP: W None 0.0000 137
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWB.WBWBWBW W 100
+OUT: B None 0.00081373 83
+EXP: B None 0.0000 137
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW B 100
+OUT: B 0-1 9.0789e-05 3
+EXP: B 0-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW W 100
+OUT: W 1-0 0.00019005 3
+EXP: W 1-0 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWB B 100
+OUT: B 0-1 0.000257424 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWB W 100
+OUT: W 1-0 0.000230705 3
+EXP: W 1-2 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBW B 100
+OUT: B 0-1 0.000122909 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBW W 100
+OUT: W 1-2 0.000219969 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWB B 100
+OUT: W None 0.000276479 6
+EXP: W None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWB W 100
+OUT: W 1-2 0.000112493 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBW B 100
+OUT: W None 0.00024203 14
+EXP: W None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBW W 100
+OUT: B None 0.000278289 15
+EXP: B None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWB B 100
+OUT: W None 0.000153344 18
+EXP: W None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWB W 100
+OUT: W 1-0 9.2987e-05 3
+EXP: W 5-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBW B 100
+OUT: B 0-1 0.000123464 3
+EXP: B 6-7 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBW W 100
+OUT: W 1-0 0.000259057 3
+EXP: W 7-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWB B 100
+OUT: B 2-1 0.000258486 4
+EXP: B 6-7 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWB W 100
+OUT: W 1-0 0.000105067 3
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBW B 100
+OUT: B 2-1 0.000138274 4
+EXP: B 6-7 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBW W 100
+OUT: W 3-2 0.000153403 5
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWB B 100
+OUT: W None 0.00069341 211
+EXP: W None 0.0000 21
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWB W 100
+OUT: W 3-2 0.000130578 5
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBW B 100
+OUT: B 6-5 0.000604643 263
+EXP: B 6-5 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBW W 100
+OUT: W 5-6 0.0005414 260
+EXP: W 5-6 0.0000 51
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWB B 100
+OUT: W None 0.000680375 381
+EXP: W None 0.0000 59
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000262979 3
+EXP: W 11-12 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000129824 4
+EXP: B 8-7 0.0000 125
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBW W 100
+OUT: W 7-6 0.000139274 10
+EXP: W 11-12 0.0000 19
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWB B 100
+OUT: W None 0.00256495 1461
+EXP: W None 0.0001 343
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000122537 3
+EXP: W 13-14 0.0000 60
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000125745 4
+EXP: B 12-13 0.0001 237
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.000392488 17
+EXP: W 13-14 0.0001 192
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.00988554 3274
+EXP: W None 0.0009 1650
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000186515 3
+EXP: W 15-16 0.0001 344
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.00015399 4
+EXP: B 14-15 0.0006 1431
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW W 100
+OUT: W 15-16 0.000184618 20
+EXP: W 15-16 0.0004 1047
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0110231 4536
+EXP: W None 0.0027 6489
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWB W 100
+OUT: W 3-2 0.000334395 5
+EXP: W 17-18 0.0007 1651
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWBWBBWBWW.WB.BWWBBWW B 100
+OUT: W None 0.00656991 1569
+EXP: W None 0.0001 221
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWBWBBWBWW.WB.BWWBBWW W 100
+OUT: W 12-13 0.000201091 11
+EXP: W 18-17 0.0001 212
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWBB.BWW.WWWB.BWWW B 100
+OUT: W None 0.000461842 16
+EXP: W None 0.0000 73
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWBB.BWW.WWWB.BWWW W 100
+OUT: W 1-0 0.000214362 3
+EXP: W 16-17 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWW.BW.BWBWWB.WBW B 100
+OUT: W None 0.000855221 166
+EXP: W None 0.0000 86
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWW.BW.BWBWWB.WBW W 100
+OUT: W 8-7 0.000542045 36
+EXP: W 16-15 0.0000 161
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWB.WBB.BBWWWBBBBWB.BW B 100
+OUT: B 9-10 0.000316348 43
+EXP: B 21-20 0.0000 16
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWB.WBB.BBWWWBBBBWB.BW W 100
+OUT: W 17-16 0.00093195 101
+EXP: W 20-19 0.0000 22
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWW.WBBWBWBWW.WB B 100
+OUT: B 9-8 0.000562935 50
+EXP: B 13-14 0.0000 58
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWW.WBBWBWBWW.WB W 100
+OUT: W 8-9 0.00154219 272
+EXP: W 15-14 0.0000 36
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBBBWB.WBW.BBBBWBWWWWBBBBB B 100
+OUT: B 16-17 0.000407976 121
+EXP: B 27-26 0.0000 42
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBBBWB.WBW.BBBBWBWWWWBBBBB W 100
+OUT: B None 0.00504903 1106
+EXP: B None 0.0001 114
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB B 100
+OUT: W None 0.00550506 3799
+EXP: W None 0.0027 7743
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 100
+OUT: W 22-21 0.000245112 13
+EXP: W 26-25 0.0004 988
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BBBWB.BWBWWW.WWB.WB.WB.WBBB B 100
+OUT: B 18-17 0.00240717 678
+EXP: B 26-27 0.0002 840
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BBBWB.BWBWWW.WWB.WB.WB.WBBB W 100
+OUT: W 10-9 0.000402575 90
+EXP: W 25-24 0.0001 743
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWBBBWBB.WWB.BW.BW.WWB.WB B 100
+OUT: W None 0.00111029 327
+EXP: W None 0.0000 153
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWBBBWBB.WWB.BW.BW.WWB.WB W 100
+OUT: W 5-6 0.000317383 7
+EXP: W 22-23 0.0000 30
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWBBWBWBBBBBB B 100
+OUT: B 5-4 0.000262518 6
+EXP: B 7-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWBBWBWBBBBBB W 100
+OUT: W 4-5 0.000291438 5
+EXP: W 6-5 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBB.WB.WBWW.WB.BW.WWBWBBBBWWW.BW B 100
+OUT: B 25-26 0.000906592 110
+EXP: B 31-30 0.0019 7850
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBB.WB.WBWW.WB.BW.WWBWBBBBWWW.BW W 100
+OUT: B None 0.00129865 205
+EXP: B None 0.0027 13144
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBB.WBB.WBW.WBW.BW.BW B 100
+OUT: B 1-0 0.00095175 447
+EXP: B 19-18 0.0000 130
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBB.WBB.WBW.WBW.BW.BW W 100
+OUT: B None 0.000855168 156
+EXP: B None 0.0001 966
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.WBW.WB.BWWBB.BW.BW B 100
+OUT: B 13-12 0.000355044 10
+EXP: B 19-18 0.0000 288
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.WBW.WB.BWWBB.BW.BW W 100
+OUT: W 3-4 0.000127462 4
+EXP: W 19-20 0.0000 134
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.BWB.BBW.WBBWWBB B 100
+OUT: B 16-15 0.00116113 304
+EXP: B 16-17 0.0000 61
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.BWB.BBW.WBBWWBB W 100
+OUT: B None 0.000239481 62
+EXP: B None 0.0000 65
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.WB.WBW B 100
+OUT: B 7-6 0.000105988 5
+EXP: B 8-7 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.WB.WBW W 100
+OUT: W 6-7 0.000100924 5
+EXP: W 7-8 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBWBB.WB.BW.BBBBWBWWWB.WBBWB B 100
+OUT: B 5-4 0.00440607 1282
+EXP: B 28-27 0.0011 2487
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBWBB.WB.BW.BBBBWBWWWB.WBBWB W 100
+OUT: B None 0.00552928 1916
+EXP: B None 0.0016 3586
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBB.BBBBWWBBW B 100
+OUT: B 1-0 0.00025696 3
+EXP: B 11-10 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBB.BBBBWWBBW W 100
+OUT: B None 0.000117113 10
+EXP: B None 0.0000 12
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBWWB.BWW.BBW.BWWB.BBW.BWBWBBBB B 100
+OUT: B 23-24 0.00280831 1488
+EXP: B 27-28 0.0013 4167
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBWWB.BWW.BBW.BWWB.BBW.BWBWBBBB W 100
+OUT: W 26-25 0.000205593 22
+EXP: W 26-25 0.0037 11172
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.WBWBB.WWB B 100
+OUT: W None 0.000269174 9
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.WBWBB.WWB W 100
+OUT: W 10-11 0.000173898 30
+EXP: W 10-11 0.0000 24
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWBW.BBBWBWBB B 100
+OUT: B 0-1 0.000951336 291
+EXP: B 9-10 0.0000 28
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWBW.BBBWBWBB W 100
+OUT: W 9-10 0.000337212 8
+EXP: W 11-12 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBWWWBWBBWBWB.WWBWWWBWW.BBBWW.BW B 100
+OUT: W None 0.00725266 3469
+EXP: W None 0.0024 6109
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBWWWBWBBWBWB.WWBWWWBWW.BBBWW.BW W 100
+OUT: W 31-30 0.000193161 18
+EXP: W 30-31 0.0007 1904
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BBBBBBBBBBBWBW.BBBW.WB.BW B 100
+OUT: B 1-0 0.000147114 18
+EXP: B 27-26 0.0000 42
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BBBBBBBBBBBWBW.BBBW.WB.BW W 100
+OUT: B None 0.000202173 47
+EXP: B None 0.0000 181
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWWWW.BBWWBW.WWWWWWB B 100
+OUT: W None 0.000502693 146
+EXP: W None 0.0000 47
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBWWWW.BBWWBW.WWWWWWB W 100
+OUT: W 1-0 0.000288038 41
+EXP: W 18-17 0.0000 28
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWB.BBWWW.WWWB B 100
+OUT: W None 0.000155068 6
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWB.BBWWW.WWWB W 100
+OUT: W 1-2 0.000114679 3
+EXP: W 12-13 0.0000 7
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.WWB.BWBWBBBB.WBB B 100
+OUT: B 9-10 0.000310163 7
+EXP: B 13-14 0.0000 44
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.WWB.BWBWBBBB.WBB W 100
+OUT: W 8-7 0.000436928 23
+EXP: W 12-11 0.0000 52
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BWWWBWBBBWWB B 100
+OUT: W None 0.000580134 83
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BWWWBWBBBWWB W 100
+OUT: W 8-7 0.000181468 21
+EXP: W 8-7 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBBBWWBW B 100
+OUT: B 7-6 0.000121624 6
+EXP: B 7-6 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBBBWWBW W 100
+OUT: B None 0.000285288 8
+EXP: B None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BWBWWB.WBB.BBWBWBBWW B 100
+OUT: B 5-4 0.00099201 100
+EXP: B 19-20 0.0002 620
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WB.BWBWWB.WBB.BBWBWBBWW W 100
+OUT: W 10-11 0.00265118 1221
+EXP: W 21-22 0.0001 376
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBBW.BBBBBBBBW.BWWWB.BWW.WB.BWW B 100
+OUT: B 21-22 0.00384593 789
+EXP: B 29-30 0.0000 148
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBBW.BBBBBBBBW.BWWWB.BWW.WB.BWW W 100
+OUT: B None 0.00343391 2004
+EXP: B None 0.0001 470
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWBBBB.WWWWWB.WWWB.WWBW B 100
+OUT: W None 0.000200267 55
+EXP: W None 0.0000 100
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWBBBB.WWWWWB.WWWB.WWBW W 100
+OUT: W 20-21 0.000145462 6
+EXP: W 18-19 0.0000 7
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBW.BW.BBW.WWB B 100
+OUT: B 4-5 0.000212355 4
+EXP: B 12-13 0.0000 18
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBW.BW.BBW.WWB W 100
+OUT: W 2-1 0.000260467 3
+EXP: W 13-12 0.0000 6
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBW.WWBB.BW B 100
+OUT: B 6-5 0.000293566 4
+EXP: B 9-8 0.0000 4
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBW.WWBB.BW W 100
+OUT: W 2-1 0.000214255 3
+EXP: W 10-9 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBB.WWB.BW.WB.BW.WB.BBWWWBB B 100
+OUT: W None 0.000383159 21
+EXP: W None 0.0001 653
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBB.WWB.BW.WB.BW.WB.BBWWWBB W 100
+OUT: B None 0.000150696 21
+EXP: B None 0.0001 421
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBWB.BW.WB.BBW B 100
+OUT: B 4-3 0.000305144 5
+EXP: B 14-13 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBWB.BW.WB.BBW W 100
+OUT: B None 0.00012538 15
+EXP: B None 0.0000 37
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBW.BWWWW.WBWWWWB.WWB.WB.BW B 100
+OUT: W None 0.000170985 32
+EXP: W None 0.0001 322
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBW.BWWWW.WBWWWWB.WWB.WB.BW W 100
+OUT: W 5-4 0.000135046 4
+EXP: W 26-25 0.0000 56
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.WBBWW.BW B 100
+OUT: B 5-6 0.000105726 5
+EXP: B 8-9 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BW.WBBWW.BW W 100
+OUT: B None 0.000122441 7
+EXP: B None 0.0000 16
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBBBWWBW.WWBBWW.BWW.BW B 100
+OUT: B 17-18 0.00023259 23
+EXP: B 14-15 0.0001 141
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWBBBWWBW.WWBBWW.BWW.BW W 100
+OUT: W 1-2 0.000568635 203
+EXP: W 22-21 0.0000 22
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWWBWBWWWWBBWBBWWBB.WB B 100
+OUT: B 4-3 0.00376901 488
+EXP: B 7-6 0.0004 815
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWWBWBWWWWBBWBBWWBB.WB W 100
+OUT: W 5-6 0.00118076 94
+EXP: W 20-21 0.0001 134
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBWWWW.BBBBWBBW.BW.WB.WBBB.BBWWWWW.BW B 100
+OUT: B 12-11 0.000251136 5
+EXP: B 35-36 0.0002 622
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBWWWW.BBBBWBBW.BW.WB.WBBB.BBWWWWW.BW W 100
+OUT: B None 0.000530306 69
+EXP: B None 0.0006 1562
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBWWWWBBBBWBWWBBW.BWW B 100
+OUT: B 18-19 0.00328428 481
+EXP: B 15-16 0.0000 38
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BBWWWWBBBBWBWWBBW.BWW W 100
+OUT: W 10-11 0.000128785 7
+EXP: W 20-19 0.0000 113
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWB.WWB.WWBBBWW.BWWBWW.BWBBB B 100
+OUT: W None 0.0019784 397
+EXP: W None 0.0002 822
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WWB.WWB.WWBBBWW.BWWBWW.BWBBB W 100
+OUT: W 24-23 0.00037275 12
+EXP: W 26-27 0.0001 178
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWWW.BBBW.BWBW.WBB.BWBB.BBW B 100
+OUT: B 20-21 0.00545536 2958
+EXP: B 23-24 0.0000 76
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers BWWWW.BBBW.BWBW.WBB.BWBB.BBW W 100
+OUT: W 9-8 0.0092472 3301
+EXP: W 27-26 0.0002 772
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBWB.WWWWB.BWBBWB.WBW.WWBBBBWWW B 100
+OUT: W None 0.00130963 238
+EXP: W None 0.0007 1932
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBWB.WWWWB.BWBBWB.WBW.WWBBBBWWW W 100
+OUT: W 2-1 0.000445867 45
+EXP: W 29-30 0.0003 685
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBBB.BWBBWBBBBB.WBWW.BW B 100
+OUT: B 19-20 0.000354527 9
+EXP: B 20-19 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/easy.txt_processed
+./TheSolvers WBBBBB.BWBBWBBBBB.WBWW.BW W 100
+OUT: B None 0.000326362 104
+EXP: B None 0.0000 116
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BW B 100
+OUT: B 0-1 0.000177761 3
+EXP: B 0-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BW W 100
+OUT: W 1-0 0.000235092 3
+EXP: W 1-0 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BB W 100
+OUT: B 0-0 0.000187594 1
+EXP: B None 0.000 0
+[WRONG MOVE]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBW B 100
+OUT: W None 0.00020326 14
+EXP: W None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBW W 100
+OUT: B None 0.000121484 15
+EXP: B None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BBBW.BWW B 100
+OUT: B 5-6 0.000255257 9
+EXP: B 5-6 0.0000 6
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BBBW.BWW W 100
+OUT: W 3-2 0.000227204 3
+EXP: W 7-6 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBW B 100
+OUT: B 6-5 0.000530816 263
+EXP: B 6-5 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBW W 100
+OUT: W 5-6 0.000519627 260
+EXP: W 5-6 0.0000 51
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000118969 4
+EXP: B 14-15 0.0006 1431
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW W 100
+OUT: W 15-16 0.000446847 20
+EXP: W 15-16 0.0004 1047
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWB.WBWBWBW B 100
+OUT: W None 0.000262827 74
+EXP: W None 0.0000 137
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWB.WBWBWBW W 100
+OUT: B None 0.000279799 83
+EXP: B None 0.0000 137
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.019889 9114
+EXP: W None 0.0128 29692
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.000151694 9
+EXP: W 19-20 0.0029 6490
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BW B 100
+OUT: B 0-1 0.000108409 3
+EXP: B 0-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BW W 100
+OUT: W 1-0 9.0005e-05 3
+EXP: W 1-0 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BB W 100
+OUT: B 0-0 0.00021129 1
+EXP: B None 0.000 0
+[WRONG MOVE]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBW B 100
+OUT: W None 9.8313e-05 14
+EXP: W None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBW W 100
+OUT: B None 0.000272172 15
+EXP: B None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BBBW.BWW B 100
+OUT: B 5-6 0.000264355 9
+EXP: B 5-6 0.0000 6
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BBBW.BWW W 100
+OUT: W 3-2 0.000250427 3
+EXP: W 7-6 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWBWBWBW B 100
+OUT: B 6-5 0.000839244 263
+EXP: B 6-5 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWBWBWBW W 100
+OUT: W 5-6 0.000565494 260
+EXP: W 5-6 0.0000 51
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000277915 4
+EXP: B 14-15 0.0006 1431
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW W 100
+OUT: W 15-16 0.000156367 20
+EXP: W 15-16 0.0004 1047
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWB.WBWBWBW B 100
+OUT: W None 0.000242466 74
+EXP: W None 0.0000 137
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWB.WBWBWBW W 100
+OUT: B None 0.000329951 83
+EXP: B None 0.0000 137
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0273285 9114
+EXP: W None 0.0127 29692
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/tests_small.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.00016008 9
+EXP: W 19-20 0.0041 6490
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BW B 100
+OUT: B 0-1 9.3989e-05 3
+EXP: B 0-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BW W 100
+OUT: W 1-0 0.000235945 3
+EXP: W 1-0 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWB B 100
+OUT: B 0-1 0.000107851 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWB W 100
+OUT: W 1-0 0.000227082 3
+EXP: W 1-2 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBW B 100
+OUT: B 0-1 0.00012316 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBW W 100
+OUT: W 1-2 0.000254927 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWB B 100
+OUT: W None 0.000266256 6
+EXP: W None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWB W 100
+OUT: W 1-2 0.000143881 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBW B 100
+OUT: W None 0.000287052 14
+EXP: W None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBW W 100
+OUT: B None 0.000292146 15
+EXP: B None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWB B 100
+OUT: W None 0.00024449 18
+EXP: W None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWB W 100
+OUT: W 1-0 0.000124953 3
+EXP: W 5-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBW B 100
+OUT: B 0-1 9.4809e-05 3
+EXP: B 6-7 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBW W 100
+OUT: W 1-0 0.000247151 3
+EXP: W 7-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWB B 100
+OUT: B 2-1 0.000268629 4
+EXP: B 6-7 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWB W 100
+OUT: W 1-0 0.000136399 3
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBW B 100
+OUT: B 2-1 8.3303e-05 4
+EXP: B 6-7 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBW W 100
+OUT: W 3-2 0.000130569 5
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWB B 100
+OUT: W None 0.000921224 211
+EXP: W None 0.0000 21
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWB W 100
+OUT: W 3-2 0.000300214 5
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBW B 100
+OUT: B 6-5 0.000449346 263
+EXP: B 6-5 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBW W 100
+OUT: W 5-6 0.000571335 260
+EXP: W 5-6 0.0000 51
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWB B 100
+OUT: W None 0.00153888 381
+EXP: W None 0.0000 59
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000252633 3
+EXP: W 11-12 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000278478 4
+EXP: B 8-7 0.0000 125
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBW W 100
+OUT: W 7-6 0.000335036 10
+EXP: W 11-12 0.0000 19
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWB B 100
+OUT: W None 0.00436577 1461
+EXP: W None 0.0001 343
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWB W 100
+OUT: W 1-0 0.00011971 3
+EXP: W 13-14 0.0000 60
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000137033 4
+EXP: B 12-13 0.0001 237
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.000259858 17
+EXP: W 13-14 0.0001 192
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.00741084 3274
+EXP: W None 0.0006 1650
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000168957 3
+EXP: W 15-16 0.0001 344
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000120125 4
+EXP: B 14-15 0.0006 1431
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW W 100
+OUT: W 15-16 0.000149428 20
+EXP: W 15-16 0.0004 1047
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0144397 4536
+EXP: W None 0.0028 6489
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWB W 100
+OUT: W 3-2 0.000298584 5
+EXP: W 17-18 0.0007 1651
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.00987141 4846
+EXP: B 16-17 0.0026 6141
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.0184012 6175
+EXP: W 17-18 0.0018 4360
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0332847 9114
+EXP: W None 0.0122 29692
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.000152302 9
+EXP: W 19-20 0.0029 6490
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0152462 7962
+EXP: B 18-19 0.0111 25298
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.0130731 7181
+EXP: W 19-20 0.0069 15847
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0441721 20335
+EXP: W None 0.0639 144039
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.000119247 9
+EXP: W 21-22 0.0133 29693
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0392335 24926
+EXP: B 20-21 0.0536 119051
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.0773511 20860
+EXP: W 21-22 0.0301 67846
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0834337 40822
+EXP: W None 0.3142 696059
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.0362581 13042
+EXP: W 23-24 0.0650 144040
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0533977 27439
+EXP: B 22-23 0.2419 537203
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.0930864 46430
+EXP: W 23-24 0.1946 430018
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.287674 91879
+EXP: W None 1.6692 3624890
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-16 0.0556163 26288
+EXP: W 25-26 0.3225 696060
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 10-11 0.159993 55982
+EXP: B 24-25 1.2898 2731589
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.125849 41491
+EXP: W 27-26 1.1117 2040951
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.510054 195043
+EXP: W None 7.8047 16627230
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.0660235 23527
+EXP: W 27-28 1.6987 3624891
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.426265 149616
+EXP: B 26-27 6.2652 13665210
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.517702 188064
+EXP: W 27-28 3.5742 7525449
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.994514 382464
+EXP: W None 43.5644 92633366
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.244716 83854
+EXP: W 29-30 7.9440 16627231
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 10-9 0.715602 237044
+EXP: B 28-29 32.7304 67189125
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 1.12789 446820
+EXP: W 29-30 18.6991 38206161
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 2.02259 806284
+EXP: W None 215.1149 442700450
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-16 0.410929 159141
+EXP: W 31-32 44.3705 92633367
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 10-9 1.50423 558676
+EXP: B 30-31 180.3379 363223678
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 15-14 1.17857 420060
+EXP: W 31-32 135.9819 274234183
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 4.24841 1628695
+EXP: W None 1177.2247 -1896188135
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-16 0.792099 301050
+EXP: W 33-34 221.3819 442700451
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BW B 100
+OUT: B 0-1 8.9323e-05 3
+EXP: B 0-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BW W 100
+OUT: W 1-0 0.000109685 3
+EXP: W 1-0 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWB B 100
+OUT: B 0-1 9.2956e-05 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWB W 100
+OUT: W 1-0 0.000122198 3
+EXP: W 1-2 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBW B 100
+OUT: B 0-1 0.000245267 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBW W 100
+OUT: W 1-2 0.00011416 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWB B 100
+OUT: W None 0.00025407 6
+EXP: W None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWB W 100
+OUT: W 1-2 0.000224525 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBW B 100
+OUT: W None 0.000288941 14
+EXP: W None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBW W 100
+OUT: B None 0.000273392 15
+EXP: B None 0.0000 3
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWB B 100
+OUT: W None 0.000285748 18
+EXP: W None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWB W 100
+OUT: W 1-0 0.00013425 3
+EXP: W 5-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBW B 100
+OUT: B 0-1 0.000113329 3
+EXP: B 6-7 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBW W 100
+OUT: W 1-0 8.6166e-05 3
+EXP: W 7-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWB B 100
+OUT: B 2-1 9.8829e-05 4
+EXP: B 6-7 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWB W 100
+OUT: W 1-0 0.000126643 3
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBW B 100
+OUT: B 2-1 0.00012121 4
+EXP: B 6-7 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBW W 100
+OUT: W 3-2 0.000135206 5
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWB B 100
+OUT: W None 0.000764732 211
+EXP: W None 0.0000 21
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWB W 100
+OUT: W 3-2 0.000256865 5
+EXP: W 7-8 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBW B 100
+OUT: B 6-5 0.000624234 263
+EXP: B 6-5 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBW W 100
+OUT: W 5-6 0.000787103 260
+EXP: W 5-6 0.0000 51
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWB B 100
+OUT: W None 0.000563719 381
+EXP: W None 0.0000 59
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000112839 3
+EXP: W 11-12 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000214574 4
+EXP: B 8-7 0.0000 125
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBW W 100
+OUT: W 7-6 0.000226867 10
+EXP: W 11-12 0.0000 19
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWB B 100
+OUT: W None 0.0027729 1461
+EXP: W None 0.0001 343
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWB W 100
+OUT: W 1-0 9.7854e-05 3
+EXP: W 13-14 0.0000 60
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.000124687 4
+EXP: B 12-13 0.0001 237
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.000386929 17
+EXP: W 13-14 0.0001 192
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.00709235 3274
+EXP: W None 0.0006 1650
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWB W 100
+OUT: W 1-0 0.000130424 3
+EXP: W 15-16 0.0001 344
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.00020104 4
+EXP: B 14-15 0.0006 1431
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBW W 100
+OUT: W 15-16 0.000334061 20
+EXP: W 15-16 0.0005 1047
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0077708 4536
+EXP: W None 0.0028 6489
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWB W 100
+OUT: W 3-2 0.000112714 5
+EXP: W 17-18 0.0007 1651
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.00871483 4846
+EXP: B 16-17 0.0026 6141
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.0223159 6175
+EXP: W 17-18 0.0018 4360
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.018053 9114
+EXP: W None 0.0123 29692
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.000195435 9
+EXP: W 19-20 0.0028 6490
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0182466 7962
+EXP: B 18-19 0.0108 25298
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.0158076 7181
+EXP: W 19-20 0.0069 15847
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0327842 20335
+EXP: W None 0.0636 144039
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.000163128 9
+EXP: W 21-22 0.0132 29693
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0456794 24926
+EXP: B 20-21 0.0534 119051
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.047703 20860
+EXP: W 21-22 0.0302 67846
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0982684 40822
+EXP: W None 0.3225 696059
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.0519188 13042
+EXP: W 23-24 0.0652 144040
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0726518 27439
+EXP: B 22-23 0.2488 537203
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.123346 46430
+EXP: W 23-24 0.1946 430018
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.313597 91879
+EXP: W None 1.7082 3624890
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-16 0.0895046 26288
+EXP: W 25-26 0.3226 696060
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 10-11 0.153613 55982
+EXP: B 24-25 1.2857 2731589
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/standard_more_time.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.0991764 41491
+EXP: W 27-26 0.9623 2040951
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.00944871 4846
+EXP: B 16-17 0.0026 6141
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.0126142 6175
+EXP: W 17-18 0.0018 4360
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0271953 9114
+EXP: W None 0.0126 29692
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.00026077 9
+EXP: W 19-20 0.0029 6490
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0224929 7962
+EXP: B 18-19 0.0112 25298
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.0205444 7181
+EXP: W 19-20 0.0070 15847
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0459803 20335
+EXP: W None 0.0634 144039
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 7-6 0.000170468 9
+EXP: W 21-22 0.0132 29693
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.051833 24926
+EXP: B 20-21 0.0535 119051
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.0471583 20860
+EXP: W 21-22 0.0304 67846
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.0957116 40822
+EXP: W None 0.3146 696059
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.0350849 13042
+EXP: W 23-24 0.0654 144040
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.0840283 27439
+EXP: B 22-23 0.2518 537203
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.106875 46430
+EXP: W 23-24 0.2234 430018
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BW.WBB.WBWBW.WWBB.BBW.WB.BW.BWBWWW.WB B 100
+OUT: B 33-34 0.000208553 16
+EXP: B 39-38 0.0098 31764
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BW.WBB.WBWBW.WWBB.BBW.WB.BW.BWBWWW.WB W 100
+OUT: B None 0.00331587 765
+EXP: B None 0.0414 138274
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BBBWBB.BBW.BWBWB.WWBWBWBB.BW.BBWW.BWW B 100
+OUT: B 22-23 0.00395022 1273
+EXP: B 36-35 0.0058 17889
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BBBWBB.BBW.BWBWB.WWBWBWBB.BW.BBWW.BWW W 100
+OUT: W 6-7 0.0024691 1252
+EXP: W 37-38 0.0025 7557
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWWBWWWBWBBBWBW.WB.WB.BBBWB.WWBW B 100
+OUT: B 0-1 0.0171445 8403
+EXP: B 30-31 0.0098 29606
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWWBWWWBWBBBWBW.WB.WB.BBBWB.WWBW W 100
+OUT: W 8-9 0.0182572 7068
+EXP: W 25-26 0.0354 94333
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.BBBW.WBW.WWB.WBWB.WB.BBBBW.BW.WWB.WB B 100
+OUT: B 14-13 0.00447852 2235
+EXP: B 37-38 0.0034 13961
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.BBBW.WBW.WWB.WBWB.WB.BBBBW.BW.WWB.WB W 100
+OUT: B None 0.00525045 1570
+EXP: B None 0.0148 57148
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBWWW.BW.WB.BBWWWWWWB.BW.BW.WB.WWBWBBB B 100
+OUT: W None 0.0017158 367
+EXP: W None 0.4260 1714130
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBWWW.BW.WB.BBWWWWWWB.BW.BW.WB.WWBWBBB W 100
+OUT: W 32-33 0.00321542 1114
+EXP: W 35-34 0.0011 3506
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBBB.BW.WBBBWBWBBWW.WWWB.WBBW B 100
+OUT: B 12-13 0.0080344 3043
+EXP: B 28-29 0.0020 5399
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBBB.BW.WBBBWBWBBWW.WWWB.WBBW W 100
+OUT: B None 0.0103446 2263
+EXP: B None 0.0053 14851
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWB.WBBW.WBB.BBWBBBWBWWWBWBBWBWB B 100
+OUT: B 29-30 0.000443366 21
+EXP: B 31-30 0.0204 49408
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWB.WBBW.WBB.BBWBBBWBWWWBWBBWBWB W 100
+OUT: W 15-16 0.000421242 9
+EXP: W 29-30 0.0553 127549
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBWWBB.BBWW.BBBWBBB.BWBWWBB.BW.BBBWWWW B 100
+OUT: B 23-24 0.00202419 689
+EXP: B 37-36 0.0067 16772
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBWWBB.BBWW.BBBWBBB.BWBWWBB.BW.BBBWWWW W 100
+OUT: B None 0.0031733 764
+EXP: B None 0.0153 37782
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWB.WB.BWB.WB.BBW.BBBBBW.WWB.WWWWB.WBB.WWB B 100
+OUT: B 33-32 0.0104974 5388
+EXP: B 41-40 0.0032 10911
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWB.WB.BWB.WB.BBW.BBBBBW.WWB.WWWWB.WBB.WWB W 100
+OUT: W 23-22 0.00052922 205
+EXP: W 41-40 0.0831 261057
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBW.WBBBBB.BBW.WB.WWWBB.WB.BW.WWWBWB.BW B 100
+OUT: B 1-0 0.001324 633
+EXP: B 37-38 0.0051 15984
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBW.WBBBBB.BBW.WB.WWWBB.WB.BW.WWWBWB.BW W 100
+OUT: B None 0.000841427 368
+EXP: B None 0.0194 65309
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.WBBBWWWWBWWBB.WWBW.WB.BBWWBWBW B 100
+OUT: B 31-32 0.0121743 3905
+EXP: B 31-30 0.0027 7480
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.WBBBWWWWBWWBB.WWBW.WB.BBWWBWBW W 100
+OUT: B None 0.0226183 7018
+EXP: B None 0.0049 13173
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBW.BWBW.BW.WBWWBBBW.WWB.WWBBWB B 100
+OUT: B 4-5 0.001557 150
+EXP: B 29-28 0.0011 3428
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBW.BWBW.BW.WBWWBBBW.WWB.WWBBWB W 100
+OUT: W 5-6 0.000578834 51
+EXP: W 30-29 0.0007 1905
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBBWBB.WB.WBWWBB.WWWBB.BBBBWBBWBWBW.BW.BWW B 100
+OUT: B 2-3 0.0177243 6497
+EXP: B 40-39 0.0580 155557
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBBWBB.WB.WBWWBB.WWWBB.BBBBWBBWBWBW.BW.BWW W 100
+OUT: B None 0.0101736 2977
+EXP: B None 0.2514 691218
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWW.WBWBWWBBW.WB.WWB.BW.WB.BW.BWBW B 100
+OUT: B 30-31 0.0117367 3384
+EXP: B 31-32 0.0012 3922
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWW.WBWBWWBBW.WB.WWB.BW.WB.BW.BWBW W 100
+OUT: W 6-7 0.00158619 145
+EXP: W 33-32 0.0314 114177
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBWB.WBWWBBB.BWWB.BW.WBBBWB.BW.BW B 100
+OUT: B 9-8 0.000816605 115
+EXP: B 32-31 0.0004 1122
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBWB.WBWWBBB.BWWB.BW.WBBBWB.BW.BW W 100
+OUT: B None 0.00414013 1095
+EXP: B None 0.0052 15373
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBW.BBBBBW.BWB.BWWWWBBBW.WWBWWWWB.BW B 100
+OUT: B 27-28 0.0130003 3584
+EXP: B 34-35 0.0401 108349
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBW.BBBBBW.BWB.BWWWWBBBW.WWBWWWWB.BW W 100
+OUT: B None 0.0305805 15634
+EXP: B None 0.0176 47812
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BBW.WBBWWWB.WBB.WWBBW.BW.WBBWB B 100
+OUT: B 4-5 0.000248188 4
+EXP: B 32-31 0.0041 10677
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BBW.WBBWWWB.WBB.WWBBW.BW.WBBWB W 100
+OUT: B None 0.000773247 43
+EXP: B None 0.0317 85677
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBWWBW.BW.BWWBWWBBBBWB.BWWB.WWWBB B 100
+OUT: B 10-11 0.00124363 84
+EXP: B 31-32 0.0026 6997
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBWWBW.BW.BWWBWWBBBBWB.BWWB.WWWBB W 100
+OUT: W 20-21 0.00070846 188
+EXP: W 32-31 0.0010 2581
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWW.WWBWBWWBBWBBBBBBB.BWWB.BW.WB.WBBB.BWWB.WBWBW.BBW B 100
+OUT: B 6-7 0.000160333 5
+EXP: B 49-50 0.0101 25483
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWW.WWBWBWWBBWBBBBBBB.BWWB.BW.WB.WBBB.BWWB.WBWBW.BBW W 100
+OUT: B None 0.0102894 2576
+EXP: B None 0.0895 220021
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.BBWB.WB.WWBWWBBWBBBBWBBB.BWW.BWWBBW B 100
+OUT: W None 0.0876536 16978
+EXP: W None 0.1709 445699
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.BBWB.WB.WWBWWBBWBBBBWBBB.BWW.BWWBBW W 100
+OUT: B None 0.0657228 26159
+EXP: B None 0.0874 214580
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWBWBBWBBWBBB.WWB.WWBWBBWWBWWWB B 100
+OUT: B 26-27 0.067981 27736
+EXP: B 26-27 0.0309 69391
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWBWBBWBBWBBB.WWB.WWBWBBWWBWWWB W 100
+OUT: W 25-26 0.063217 17833
+EXP: W 27-26 0.0062 14031
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBB.WBBW.WBBWWBBWBBW.BWWB.WB B 100
+OUT: B 5-4 0.000322883 4
+EXP: B 26-25 0.0009 2639
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBB.WBBW.WBBWWBBWBBW.BWWB.WB W 100
+OUT: B None 0.00246179 654
+EXP: B None 0.0003 704
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBWBWBW.WBBBB.WBB.WB B 100
+OUT: B 20-19 0.000397505 11
+EXP: B 19-20 0.0000 59
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBWBWBW.WBBBB.WBB.WB W 100
+OUT: B None 0.000762921 116
+EXP: B None 0.0001 266
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BWWW.WBWBWWBW.BWBWB.BW B 100
+OUT: W None 0.00309488 706
+EXP: W None 0.0006 1649
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BWWW.WBWBWWBW.BWBWB.BW W 100
+OUT: W 10-9 0.00030092 6
+EXP: W 23-24 0.0002 666
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.WWBBBWW.BBW.BWBBB.WB.BW.BWBWWW B 100
+OUT: B 27-28 0.000832989 88
+EXP: B 29-28 0.0053 17484
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BW.WWBBBWW.BBW.BWBBB.WB.BW.BWBWWW W 100
+OUT: W 30-29 0.000500666 211
+EXP: W 32-31 0.0033 12483
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BW.WWWWWWWBB.BBBWBWWBBBB.BW B 100
+OUT: B 20-21 0.000502307 168
+EXP: B 23-24 0.0006 1544
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WB.BW.WWWWWWWBB.BBBWBWWBBBB.BW W 100
+OUT: B None 0.000178821 49
+EXP: B None 0.0005 1281
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWB.WBBBBBWWBWWBWBBWBBWWW.BW.WWB.BWW.BW B 100
+OUT: B 2-1 0.0751638 34939
+EXP: B 38-37 0.0254 56646
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWB.WBBBBBWWBWWBWBBWBBWWW.BW.WWB.BWW.BW W 100
+OUT: W 19-20 0.031835 11028
+EXP: W 36-35 0.3970 978574
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBWWBWWB.BBBWWWWW.WBBBBWBW.WB.WBBWWW B 100
+OUT: B 28-27 0.00983067 2286
+EXP: B 35-34 0.0157 36220
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBWWBWWB.BBBWWWWW.WBBBBWBW.WB.WBBWWW W 100
+OUT: W 23-22 0.00634376 2290
+EXP: W 33-32 0.0103 24530
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWWBWWWBWB.WBBBWBWBBW.WWB.BW.BWW.BBW B 100
+OUT: B 7-8 0.0359855 12883
+EXP: B 35-34 0.0001 370
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWWBWWWBWB.WBBBWBWBBW.WWB.BW.BWW.BBW W 100
+OUT: W 2-3 0.0133411 5667
+EXP: W 34-33 0.0829 189050
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWW.BBBWBBWBBWW.WBW.BWW.WB.BBW.WWWWWB B 100
+OUT: W None 0.015743 4731
+EXP: W None 0.0090 24213
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BWW.BBBWBBWBBWW.WBW.BWW.WB.BBW.WWWWWB W 100
+OUT: W 35-36 0.004956 2277
+EXP: W 35-34 0.0029 7579
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWB.WB.BBW.WWWWBBW.WB.WB B 100
+OUT: B 2-1 0.000136117 3
+EXP: B 23-22 0.0000 39
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWB.WB.BBW.WWWWBBW.WB.WB W 100
+OUT: W 4-5 0.000173987 5
+EXP: W 22-23 0.0000 110
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBBWBWBW.WB.BW.BWWWBBBW.BWW B 100
+OUT: B 20-19 0.000225349 19
+EXP: B 26-25 0.0006 1709
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WBBBWBWBW.WB.BW.BWWWBBBW.BWW W 100
+OUT: W 4-3 0.00188296 695
+EXP: W 23-22 0.0009 2553
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBWBBWBBW B 100
+OUT: B 1-2 0.000129078 3
+EXP: B 4-5 0.0000 4
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBWBBWBBW W 100
+OUT: B None 0.00015178 10
+EXP: B None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers ..BWBW B 100
+OUT: B 2-3 0.000124732 3
+EXP: B 2-1 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers ..BWBW W 100
+OUT: W 3-4 0.000152297 4
+EXP: W 3-2 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBBBBW.BWWWWW B 100
+OUT: W None 0.00041957 10
+EXP: W None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers BBBBBW.BWWWWW W 100
+OUT: B None 0.000279776 11
+EXP: B None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWBWBWWBBWBWWBWBWWBBWB.BBWBWBBWWBWBBWBWBBWWBW B 100
+OUT: W None 63.4441 28397101
+EXP: W None 0.0000 0
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/hard.txt_processed
+./TheSolvers WWBWBWWBBWBWWBWBWWBBWB.BBWBWBBWWBWBBWBWBBWWBW W 100
+OUT: B None 68.5916 30840575
+EXP: B None 0.0000 0
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBWBBWBWW.WB.BWWBBWW B 100
+OUT: W None 0.0033162 1569
+EXP: W None 0.0001 221
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBWBBWBWW.WB.BWWBBWW W 100
+OUT: W 12-13 0.000576872 11
+EXP: W 18-17 0.0001 212
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BW.WBB.WBWBW.WWBB.BBW.WB.BW.BWBWWW.WB B 100
+OUT: B 33-34 0.00036933 16
+EXP: B 39-38 0.0097 31764
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BW.WBB.WBWBW.WWBB.BBW.WB.BW.BWBWWW.WB W 100
+OUT: B None 0.00340177 765
+EXP: B None 0.0416 138274
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBB.BWW.WWWB.BWWW B 100
+OUT: W None 0.00024992 16
+EXP: W None 0.0000 73
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBB.BWW.WWWB.BWWW W 100
+OUT: W 1-0 0.000170757 3
+EXP: W 16-17 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBBWBB.BBW.BWBWB.WWBWBWBB.BW.BBWW.BWW B 100
+OUT: B 22-23 0.00466525 1273
+EXP: B 36-35 0.0055 17889
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBBWBB.BBW.BWBWB.WWBWBWBB.BW.BBWW.BWW W 100
+OUT: W 6-7 0.00238889 1252
+EXP: W 37-38 0.0023 7557
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBWWWBWBBBWBW.WB.WB.BBBWB.WWBW B 100
+OUT: B 0-1 0.0282417 8403
+EXP: B 30-31 0.0098 29606
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBWWWBWBBBWBW.WB.WB.BBBWB.WWBW W 100
+OUT: W 8-9 0.030166 7068
+EXP: W 25-26 0.0355 94333
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWW.BW.BWBWWB.WBW B 100
+OUT: W None 0.000344753 166
+EXP: W None 0.0000 86
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWW.BW.BWBWWB.WBW W 100
+OUT: W 8-7 0.000176049 36
+EXP: W 16-15 0.0000 161
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWB.WBB.BBWWWBBBBWB.BW B 100
+OUT: B 9-10 0.000549394 43
+EXP: B 21-20 0.0000 16
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWB.WBB.BBWWWBBBBWB.BW W 100
+OUT: W 17-16 0.000717992 101
+EXP: W 20-19 0.0000 22
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBWWBB.BBWW.BBBWBBB.BWBWWBB.BW.BBBWWWW B 100
+OUT: B 23-24 0.00201238 689
+EXP: B 37-36 0.0070 16772
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBWWBB.BBWW.BBBWBBB.BWBWWBB.BW.BBBWWWW W 100
+OUT: B None 0.00272598 764
+EXP: B None 0.0152 37782
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWW.WBBWBWBWW.WB B 100
+OUT: B 9-8 0.000634233 50
+EXP: B 13-14 0.0000 58
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWW.WBBWBWBWW.WB W 100
+OUT: W 8-9 0.00144733 272
+EXP: W 15-14 0.0000 36
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.BBBW.WBW.WWB.WBWB.WB.BBBBW.BW.WWB.WB B 100
+OUT: B 14-13 0.00842231 2235
+EXP: B 37-38 0.0034 13961
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.BBBW.WBW.WWB.WBWB.WB.BBBBW.BW.WWB.WB W 100
+OUT: B None 0.00282038 1570
+EXP: B None 0.0145 57148
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBBBWB.WBW.BBBBWBWWWWBBBBB B 100
+OUT: B 16-17 0.00114373 121
+EXP: B 27-26 0.0000 42
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBBBWB.WBW.BBBBWBWWWWBBBBB W 100
+OUT: B None 0.00229668 1106
+EXP: B None 0.0001 114
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBB.BW.WBBBWBWBBWW.WWWB.WBBW B 100
+OUT: B 12-13 0.00530274 3043
+EXP: B 28-29 0.0021 5399
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBB.BW.WBBBWBWBBWW.WWWB.WBBW W 100
+OUT: B None 0.00471067 2263
+EXP: B None 0.0051 14851
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB B 100
+OUT: W None 0.00587546 3799
+EXP: W None 0.0027 7743
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 100
+OUT: W 22-21 0.000186146 13
+EXP: W 26-25 0.0004 988
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBWWW.BW.WB.BBWWWWWWB.BW.BW.WB.WWBWBBB B 100
+OUT: W None 0.00103657 367
+EXP: W None 0.4406 1714130
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBWWW.BW.WB.BBWWWWWWB.BW.BW.WB.WWBWBBB W 100
+OUT: W 32-33 0.00208694 1114
+EXP: W 35-34 0.0011 3506
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBBWB.BWBWWW.WWB.WB.WB.WBBB B 100
+OUT: B 18-17 0.000904088 678
+EXP: B 26-27 0.0002 840
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBBWB.BWBWWW.WWB.WB.WB.WBBB W 100
+OUT: W 10-9 0.000864498 90
+EXP: W 25-24 0.0001 743
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWBBBWBB.WWB.BW.BW.WWB.WB B 100
+OUT: W None 0.000421017 327
+EXP: W None 0.0000 153
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWBBBWBB.WWB.BW.BW.WWB.WB W 100
+OUT: W 5-6 0.000152334 7
+EXP: W 22-23 0.0000 30
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWBBWBWBBBBBB B 100
+OUT: B 5-4 0.000151257 6
+EXP: B 7-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWBBWBWBBBBBB W 100
+OUT: W 4-5 0.000128255 5
+EXP: W 6-5 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBB.WB.WBWW.WB.BW.WWBWBBBBWWW.BW B 100
+OUT: B 25-26 0.00041729 110
+EXP: B 31-30 0.0019 7850
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBB.WB.WBWW.WB.BW.WWBWBBBBWWW.BW W 100
+OUT: B None 0.000664802 205
+EXP: B None 0.0027 13144
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBB.WBB.WBW.WBW.BW.BW B 100
+OUT: B 1-0 0.000796536 447
+EXP: B 19-18 0.0000 130
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBB.WBB.WBW.WBW.BW.BW W 100
+OUT: B None 0.000330552 156
+EXP: B None 0.0001 966
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.WBW.WB.BWWBB.BW.BW B 100
+OUT: B 13-12 0.000152784 10
+EXP: B 19-18 0.0000 288
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.WBW.WB.BWWBB.BW.BW W 100
+OUT: W 3-4 0.000117628 4
+EXP: W 19-20 0.0000 134
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.BWB.BBW.WBBWWBB B 100
+OUT: B 16-15 0.000654022 304
+EXP: B 16-17 0.0000 61
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.BWB.BBW.WBBWWBB W 100
+OUT: B None 0.000271251 62
+EXP: B None 0.0000 65
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.WB.WBW B 100
+OUT: B 7-6 0.000136921 5
+EXP: B 8-7 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.WB.WBW W 100
+OUT: W 6-7 0.00030013 5
+EXP: W 7-8 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBWBB.WB.BW.BBBBWBWWWB.WBBWB B 100
+OUT: B 5-4 0.00422699 1282
+EXP: B 28-27 0.0011 2487
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBBWBB.WB.BW.BBBBWBWWWB.WBBWB W 100
+OUT: B None 0.00908357 1916
+EXP: B None 0.0016 3586
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBB.BBBBWWBBW B 100
+OUT: B 1-0 0.000169631 3
+EXP: B 11-10 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBB.BBBBWWBBW W 100
+OUT: B None 0.000316049 10
+EXP: B None 0.0000 12
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBWWB.BWW.BBW.BWWB.BBW.BWBWBBBB B 100
+OUT: B 23-24 0.00411778 1488
+EXP: B 27-28 0.0013 4167
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBWWB.BWW.BBW.BWWB.BBW.BWBWBBBB W 100
+OUT: W 26-25 0.000450267 22
+EXP: W 26-25 0.0037 11172
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWB.WBBW.WBB.BBWBBBWBWWWBWBBWBWB B 100
+OUT: B 29-30 0.000201159 21
+EXP: B 31-30 0.0206 49408
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWB.WBBW.WBB.BBWBBBWBWWWBWBBWBWB W 100
+OUT: W 15-16 0.000171637 9
+EXP: W 29-30 0.0555 127549
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WBWBB.WWB B 100
+OUT: W None 0.000327811 9
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WBWBB.WWB W 100
+OUT: W 10-11 0.000222021 30
+EXP: W 10-11 0.0000 24
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBW.BBBWBWBB B 100
+OUT: B 0-1 0.000919227 291
+EXP: B 9-10 0.0000 28
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWWBW.BBBWBWBB W 100
+OUT: W 9-10 0.000312708 8
+EXP: W 11-12 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBWWWBWBBWBWB.WWBWWWBWW.BBBWW.BW B 100
+OUT: W None 0.0114527 3469
+EXP: W None 0.0024 6109
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBWWWBWBBWBWB.WWBWWWBWW.BBBWW.BW W 100
+OUT: W 31-30 0.000233275 18
+EXP: W 30-31 0.0006 1904
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBBBBBBBBBBWBW.BBBW.WB.BW B 100
+OUT: B 1-0 0.000188906 18
+EXP: B 27-26 0.0000 42
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBBBBBBBBBBWBW.BBBW.WB.BW W 100
+OUT: B None 0.000192474 47
+EXP: B None 0.0000 181
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWBWWWW.BBWWBW.WWWWWWB B 100
+OUT: W None 0.000387375 146
+EXP: W None 0.0000 47
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWBWWWW.BBWWBW.WWWWWWB W 100
+OUT: W 1-0 0.000318705 41
+EXP: W 18-17 0.0000 28
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWB.BBWWW.WWWB B 100
+OUT: W None 0.000193276 6
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWB.BBWWW.WWWB W 100
+OUT: W 1-2 0.000118901 3
+EXP: W 12-13 0.0000 7
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WWB.BWBWBBBB.WBB B 100
+OUT: B 9-10 0.000172448 7
+EXP: B 13-14 0.0000 44
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WWB.BWBWBBBB.WBB W 100
+OUT: W 8-7 0.00062017 23
+EXP: W 12-11 0.0000 52
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BWWWBWBBBWWB B 100
+OUT: W None 0.000264371 83
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BWWWBWBBBWWB W 100
+OUT: W 8-7 0.000229642 21
+EXP: W 8-7 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWB.WB.BWB.WB.BBW.BBBBBW.WWB.WWWWB.WBB.WWB B 100
+OUT: B 33-32 0.0059375 5388
+EXP: B 41-40 0.0034 10911
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWB.WB.BWB.WB.BBW.BBBBBW.WWB.WWWWB.WBB.WWB W 100
+OUT: W 23-22 0.000998917 205
+EXP: W 41-40 0.0813 261057
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWBBBWWBW B 100
+OUT: B 7-6 0.000189651 6
+EXP: B 7-6 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWBBBWWBW W 100
+OUT: B None 0.000186429 8
+EXP: B None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BWBWWB.WBB.BBWBWBBWW B 100
+OUT: B 5-4 0.00041728 100
+EXP: B 19-20 0.0002 620
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BWBWWB.WBB.BBWBWBBWW W 100
+OUT: W 10-11 0.00896509 1221
+EXP: W 21-22 0.0001 376
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WBBBWWWWBWWBB.WWBW.WB.BBWWBWBW B 100
+OUT: B 31-32 0.0078311 3905
+EXP: B 31-30 0.0027 7480
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WBBBWWWWBWWBB.WWBW.WB.BBWWBWBW W 100
+OUT: B None 0.0200054 7018
+EXP: B None 0.0051 13173
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBBW.BBBBBBBBW.BWWWB.BWW.WB.BWW B 100
+OUT: B 21-22 0.00188711 789
+EXP: B 29-30 0.0000 148
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBBW.BBBBBBBBW.BWWWB.BWW.WB.BWW W 100
+OUT: B None 0.00534871 2004
+EXP: B None 0.0001 470
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWBBBB.WWWWWB.WWWB.WWBW B 100
+OUT: W None 0.000256738 55
+EXP: W None 0.0000 100
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WWBBBB.WWWWWB.WWWB.WWBW W 100
+OUT: W 20-21 0.000137661 6
+EXP: W 18-19 0.0000 7
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBW.BW.BBW.WWB B 100
+OUT: B 4-5 0.000323579 4
+EXP: B 12-13 0.0000 18
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBW.BW.BBW.WWB W 100
+OUT: W 2-1 0.00012989 3
+EXP: W 13-12 0.0000 6
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBW.WWBB.BW B 100
+OUT: B 6-5 0.000272715 4
+EXP: B 9-8 0.0000 4
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBW.WWBB.BW W 100
+OUT: W 2-1 0.000208432 3
+EXP: W 10-9 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBB.WWB.BW.WB.BW.WB.BBWWWBB B 100
+OUT: W None 0.000407696 21
+EXP: W None 0.0001 653
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBB.WWB.BW.WB.BW.WB.BBWWWBB W 100
+OUT: B None 0.000221827 21
+EXP: B None 0.0001 421
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWW.WBWBWWBBW.WB.WWB.BW.WB.BW.BWBW B 100
+OUT: B 30-31 0.0139277 3384
+EXP: B 31-32 0.0013 3922
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWW.WBWBWWBBW.WB.WWB.BW.WB.BW.BWBW W 100
+OUT: W 6-7 0.00158717 145
+EXP: W 33-32 0.0325 114177
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBWB.BW.WB.BBW B 100
+OUT: B 4-3 0.000379469 5
+EXP: B 14-13 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WBBWB.BW.WB.BBW W 100
+OUT: B None 0.00029881 15
+EXP: B None 0.0000 37
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBW.BWWWW.WBWWWWB.WWB.WB.BW B 100
+OUT: W None 0.000540608 32
+EXP: W None 0.0001 322
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBW.BWWWW.WBWWWWB.WWB.WB.BW W 100
+OUT: W 5-4 0.000136165 4
+EXP: W 26-25 0.0000 56
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WBBWW.BW B 100
+OUT: B 5-6 0.000281288 5
+EXP: B 8-9 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BW.WBBWW.BW W 100
+OUT: B None 0.000313492 7
+EXP: B None 0.0000 16
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWBBBWWBW.WWBBWW.BWW.BW B 100
+OUT: B 17-18 0.000385493 23
+EXP: B 14-15 0.0001 141
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BWBBBWWBW.WWBBWW.BWW.BW W 100
+OUT: W 1-2 0.000983404 203
+EXP: W 22-21 0.0000 22
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBW.WBBWWWB.WBB.WWBBW.BW.WBBWB B 100
+OUT: B 4-5 0.000322074 4
+EXP: B 32-31 0.0041 10677
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers WB.BBW.WBBWWWB.WBB.WWBBW.BW.WBBWB W 100
+OUT: B None 0.000389328 43
+EXP: B None 0.0317 85677
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBWWBW.BW.BWWBWWBBBBWB.BWWB.WWWBB B 100
+OUT: B 10-11 0.00085152 84
+EXP: B 31-32 0.0026 6997
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random.txt_processed
+./TheSolvers BBWWBW.BW.BWWBWWBBBBWB.BWWB.WWWBB W 100
+OUT: W 20-21 0.0016431 188
+EXP: W 32-31 0.0010 2581
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/special.txt_processed
+./TheSolvers BBWBBWBBW B 100
+OUT: B 1-2 9.7314e-05 3
+EXP: B 4-5 0.0000 4
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/special.txt_processed
+./TheSolvers BBWBBWBBW W 100
+OUT: B None 0.000119879 10
+EXP: B None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/special.txt_processed
+./TheSolvers BBBBBW.BWWWWW B 100
+OUT: W None 0.000213316 10
+EXP: W None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/special.txt_processed
+./TheSolvers BBBBBW.BWWWWW W 100
+OUT: B None 0.00014107 11
+EXP: B None 0.0000 5
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB B 100
+OUT: W None 0.0429053 16178
+EXP: W None 0.0573 140690
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB W 100
+OUT: W 6-5 0.0159889 7975
+EXP: W 39-38 0.0290 70993
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB B 100
+OUT: W None 0.0755553 32805
+EXP: W None 0.3565 832878
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB W 100
+OUT: W 42-43 0.0584278 18303
+EXP: W 44-43 0.0778 194693
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWW B 100
+OUT: W None 0.106192 33990
+EXP: W None 1.3068 3096598
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWW W 100
+OUT: W 30-29 0.0822436 21565
+EXP: W 49-48 0.4741 1163111
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBB B 100
+OUT: W None 0.284521 88759
+EXP: W None 1.7513 4066724
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBB W 100
+OUT: W 30-29 0.0584437 23088
+EXP: W 51-50 0.7361 1729933
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBBWW B 100
+OUT: W None 0.588474 181392
+EXP: W None 6.6894 14097249
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBBWW W 100
+OUT: W 53-52 0.297029 104252
+EXP: W 53-52 2.9677 6207685
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBBWWWB B 100
+OUT: W None 0.233713 72119
+EXP: W None 37.8117 79631367
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBBWWWB W 100
+OUT: W 53-52 0.397985 134206
+EXP: W 55-54 6.9067 14651980
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBBWWWBBBW B 100
+OUT: W None 0.374218 117239
+EXP: W None 131.6996 255666585
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers BWW.WBWBW.WB.BBBWWWBWWBB.BWWBBW.BWWWW.WWB.WBBB.BWWWBBWWWBBBW W 100
+OUT: W 50-51 0.834537 280711
+EXP: W 58-57 25.9637 50843105
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB B 100
+OUT: W None 0.00178586 341
+EXP: W None 0.1432 346898
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB W 100
+OUT: W 1-2 0.00725149 2165
+EXP: W 38-39 0.0342 81411
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB.BBW B 100
+OUT: W None 0.0110429 3562
+EXP: W None 3.2185 7739929
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB.BBW W 100
+OUT: W 16-15 0.00943216 3723
+EXP: W 42-43 0.2660 623977
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB.BBWWWB B 100
+OUT: W None 0.00972649 2836
+EXP: W None 0.5214 1141029
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB.BBWWWB W 100
+OUT: W 21-22 0.00672704 2038
+EXP: W 45-46 0.1440 304046
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB.BBWWWB.BW.WWWB.BW B 100
+OUT: W None 0.0108316 3317
+EXP: W None 40.0587 85598466
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WWBB.WWBBWW.WWWBWBWWBWB.WB.BW.WB.BBWBWWWB.BBWWWB.BW.WWWB.BW W 100
+OUT: W 18-17 0.00927936 2513
+EXP: W 56-57 9.5511 20555110
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBW B 100
+OUT: B 17-16 0.0595023 18212
+EXP: B 45-44 0.1980 343826
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBW W 100
+OUT: B None 0.107603 28398
+EXP: B None 0.6931 1207108
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBB B 100
+OUT: B 11-10 0.209039 68704
+EXP: B 47-46 0.7257 1297229
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBB W 100
+OUT: B None 0.289023 71040
+EXP: B None 2.3827 4174563
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBBWB B 100
+OUT: B 17-16 0.262087 94099
+EXP: B 49-48 2.6050 4639372
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBBWB W 100
+OUT: B None 0.487297 157144
+EXP: B None 11.1522 19929212
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBBWBWWB B 100
+OUT: B 17-16 1.12363 385478
+EXP: B 52-51 36.8244 67504709
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBBWBWWB W 100
+OUT: B None 0.77287 274679
+EXP: B None 146.9862 267074345
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBBWBWWBWBB B 100
+OUT: B 11-10 3.36455 1145988
+EXP: B 55-54 154.9137 277447234
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_random.txt_processed
+./TheSolvers WBBBWB.WB.WBB.WWWBWWW.WBBBWWWBBWBBWBBBBBW.BWBWBBWBWWBWBB W 100
+OUT: B None 7.4306 2492766
+EXP: B None 558.6849 982908932
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBWBBWBWW.WB.BWWBBWW B 100
+OUT: W None 0.00714334 1569
+EXP: W None 0.0001 221
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBWBBWBWW.WB.BWWBBWW W 100
+OUT: W 12-13 0.000287548 11
+EXP: W 18-17 0.0001 212
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BW.WBB.WBWBW.WWBB.BBW.WB.BW.BWBWWW.WB B 100
+OUT: B 33-34 0.000199499 16
+EXP: B 39-38 0.0094 31764
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BW.WBB.WBWBW.WWBB.BBW.WB.BW.BWBWWW.WB W 100
+OUT: B None 0.00414571 765
+EXP: B None 0.0411 138274
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBB.BWW.WWWB.BWWW B 100
+OUT: W None 0.000180188 16
+EXP: W None 0.0000 73
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBB.BWW.WWWB.BWWW W 100
+OUT: W 1-0 0.000201232 3
+EXP: W 16-17 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBBWBB.BBW.BWBWB.WWBWBWBB.BW.BBWW.BWW B 100
+OUT: B 22-23 0.00666456 1273
+EXP: B 36-35 0.0057 17889
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBBWBB.BBW.BWBWB.WWBWBWBB.BW.BBWW.BWW W 100
+OUT: W 6-7 0.00797866 1252
+EXP: W 37-38 0.0023 7557
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBWWWBWBBBWBW.WB.WB.BBBWB.WWBW B 100
+OUT: B 0-1 0.035071 8403
+EXP: B 30-31 0.0095 29606
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBWWWBWBBBWBW.WB.WB.BBBWB.WWBW W 100
+OUT: W 8-9 0.0237559 7068
+EXP: W 25-26 0.0342 94333
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWW.BW.BWBWWB.WBW B 100
+OUT: W None 0.000341958 166
+EXP: W None 0.0000 86
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWW.BW.BWBWWB.WBW W 100
+OUT: W 8-7 0.000170444 36
+EXP: W 16-15 0.0000 161
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWB.WBB.BBWWWBBBBWB.BW B 100
+OUT: B 9-10 0.000196547 43
+EXP: B 21-20 0.0000 16
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWB.WBB.BBWWWBBBBWB.BW W 100
+OUT: W 17-16 0.000289901 101
+EXP: W 20-19 0.0000 22
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBWWBB.BBWW.BBBWBBB.BWBWWBB.BW.BBBWWWW B 100
+OUT: B 23-24 0.00242357 689
+EXP: B 37-36 0.0067 16772
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBWWBB.BBWW.BBBWBBB.BWBWWBB.BW.BBBWWWW W 100
+OUT: B None 0.00236142 764
+EXP: B None 0.0153 37782
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWW.WBBWBWBWW.WB B 100
+OUT: B 9-8 0.000295293 50
+EXP: B 13-14 0.0000 58
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWW.WBBWBWBWW.WB W 100
+OUT: W 8-9 0.000854502 272
+EXP: W 15-14 0.0000 36
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.BBBW.WBW.WWB.WBWB.WB.BBBBW.BW.WWB.WB B 100
+OUT: B 14-13 0.00700497 2235
+EXP: B 37-38 0.0035 13961
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.BBBW.WBW.WWB.WBWB.WB.BBBBW.BW.WWB.WB W 100
+OUT: B None 0.0036376 1570
+EXP: B None 0.0153 57148
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBBBWB.WBW.BBBBWBWWWWBBBBB B 100
+OUT: B 16-17 0.000846027 121
+EXP: B 27-26 0.0000 42
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBBBWB.WBW.BBBBWBWWWWBBBBB W 100
+OUT: B None 0.00184249 1106
+EXP: B None 0.0001 114
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBB.BW.WBBBWBWBBWW.WWWB.WBBW B 100
+OUT: B 12-13 0.0103198 3043
+EXP: B 28-29 0.0020 5399
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBB.BW.WBBBWBWBBWW.WWWB.WBBW W 100
+OUT: B None 0.00354875 2263
+EXP: B None 0.0053 14851
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB B 100
+OUT: W None 0.0074046 3799
+EXP: W None 0.0028 7743
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 100
+OUT: W 22-21 0.000406583 13
+EXP: W 26-25 0.0004 988
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBWWW.BW.WB.BBWWWWWWB.BW.BW.WB.WWBWBBB B 100
+OUT: W None 0.000908434 367
+EXP: W None 0.4437 1714130
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBWWW.BW.WB.BBWWWWWWB.BW.BW.WB.WWBWBBB W 100
+OUT: W 32-33 0.00183759 1114
+EXP: W 35-34 0.0012 3506
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBBWB.BWBWWW.WWB.WB.WB.WBBB B 100
+OUT: B 18-17 0.00123559 678
+EXP: B 26-27 0.0002 840
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBBWB.BWBWWW.WWB.WB.WB.WBBB W 100
+OUT: W 10-9 0.000533976 90
+EXP: W 25-24 0.0001 743
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWBBBWBB.WWB.BW.BW.WWB.WB B 100
+OUT: W None 0.000627611 327
+EXP: W None 0.0000 153
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWBBBWBB.WWB.BW.BW.WWB.WB W 100
+OUT: W 5-6 0.000121822 7
+EXP: W 22-23 0.0000 30
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWBBWBWBBBBBB B 100
+OUT: B 5-4 0.000255432 6
+EXP: B 7-6 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWBBWBWBBBBBB W 100
+OUT: W 4-5 0.000145796 5
+EXP: W 6-5 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBB.WB.WBWW.WB.BW.WWBWBBBBWWW.BW B 100
+OUT: B 25-26 0.000347037 110
+EXP: B 31-30 0.0019 7850
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBB.WB.WBWW.WB.BW.WWBWBBBBWWW.BW W 100
+OUT: B None 0.000538365 205
+EXP: B None 0.0027 13144
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBB.WBB.WBW.WBW.BW.BW B 100
+OUT: B 1-0 0.00200647 447
+EXP: B 19-18 0.0000 130
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBB.WBB.WBW.WBW.BW.BW W 100
+OUT: B None 0.000812451 156
+EXP: B None 0.0001 966
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.WBW.WB.BWWBB.BW.BW B 100
+OUT: B 13-12 0.000150699 10
+EXP: B 19-18 0.0000 288
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.WBW.WB.BWWBB.BW.BW W 100
+OUT: W 3-4 0.000314313 4
+EXP: W 19-20 0.0000 134
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.BWB.BBW.WBBWWBB B 100
+OUT: B 16-15 0.000852021 304
+EXP: B 16-17 0.0000 61
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.BWB.BBW.WBBWWBB W 100
+OUT: B None 0.000494137 62
+EXP: B None 0.0000 65
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.WB.WBW B 100
+OUT: B 7-6 0.00013483 5
+EXP: B 8-7 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.WB.WBW W 100
+OUT: W 6-7 0.000350923 5
+EXP: W 7-8 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBWBB.WB.BW.BBBBWBWWWB.WBBWB B 100
+OUT: B 5-4 0.00499417 1282
+EXP: B 28-27 0.0011 2487
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBBWBB.WB.BW.BBBBWBWWWB.WBBWB W 100
+OUT: B None 0.0109921 1916
+EXP: B None 0.0016 3586
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBB.BBBBWWBBW B 100
+OUT: B 1-0 0.000336102 3
+EXP: B 11-10 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBB.BBBBWWBBW W 100
+OUT: B None 0.00031228 10
+EXP: B None 0.0000 12
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBWWB.BWW.BBW.BWWB.BBW.BWBWBBBB B 100
+OUT: B 23-24 0.00508647 1488
+EXP: B 27-28 0.0013 4167
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBWWB.BWW.BBW.BWWB.BBW.BWBWBBBB W 100
+OUT: W 26-25 0.000226506 22
+EXP: W 26-25 0.0037 11172
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWB.WBBW.WBB.BBWBBBWBWWWBWBBWBWB B 100
+OUT: B 29-30 0.000497518 21
+EXP: B 31-30 0.0206 49408
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWB.WBBW.WBB.BBWBBBWBWWWBWBBWBWB W 100
+OUT: W 15-16 0.000414966 9
+EXP: W 29-30 0.0555 127549
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WBWBB.WWB B 100
+OUT: W None 0.000348378 9
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WBWBB.WWB W 100
+OUT: W 10-11 0.000593882 30
+EXP: W 10-11 0.0000 24
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBW.BBBWBWBB B 100
+OUT: B 0-1 0.000619022 291
+EXP: B 9-10 0.0000 28
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWWBW.BBBWBWBB W 100
+OUT: W 9-10 0.00031772 8
+EXP: W 11-12 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBWWWBWBBWBWB.WWBWWWBWW.BBBWW.BW B 100
+OUT: W None 0.00933134 3469
+EXP: W None 0.0024 6109
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBWWWBWBBWBWB.WWBWWWBWW.BBBWW.BW W 100
+OUT: W 31-30 0.000557354 18
+EXP: W 30-31 0.0006 1904
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBBBBBBBBBBWBW.BBBW.WB.BW B 100
+OUT: B 1-0 0.000433559 18
+EXP: B 27-26 0.0000 42
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBBBBBBBBBBWBW.BBBW.WB.BW W 100
+OUT: B None 0.00016347 47
+EXP: B None 0.0000 181
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWBWWWW.BBWWBW.WWWWWWB B 100
+OUT: W None 0.000353646 146
+EXP: W None 0.0000 47
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWBWWWW.BBWWBW.WWWWWWB W 100
+OUT: W 1-0 0.000255073 41
+EXP: W 18-17 0.0000 28
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWB.BBWWW.WWWB B 100
+OUT: W None 0.000264679 6
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWB.BBWWW.WWWB W 100
+OUT: W 1-2 9.8554e-05 3
+EXP: W 12-13 0.0000 7
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WWB.BWBWBBBB.WBB B 100
+OUT: B 9-10 0.000146313 7
+EXP: B 13-14 0.0000 44
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WWB.BWBWBBBB.WBB W 100
+OUT: W 8-7 0.000176031 23
+EXP: W 12-11 0.0000 52
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BWWWBWBBBWWB B 100
+OUT: W None 0.00022639 83
+EXP: W None 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BWWWBWBBBWWB W 100
+OUT: W 8-7 0.000168746 21
+EXP: W 8-7 0.0000 11
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWB.WB.BWB.WB.BBW.BBBBBW.WWB.WWWWB.WBB.WWB B 100
+OUT: B 33-32 0.0148562 5388
+EXP: B 41-40 0.0034 10911
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWB.WB.BWB.WB.BBW.BBBBBW.WWB.WWWWB.WBB.WWB W 100
+OUT: W 23-22 0.000702968 205
+EXP: W 41-40 0.0831 261057
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWBBBWWBW B 100
+OUT: B 7-6 0.000121011 6
+EXP: B 7-6 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWBBBWWBW W 100
+OUT: B None 0.000116532 8
+EXP: B None 0.0000 1
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BWBWWB.WBB.BBWBWBBWW B 100
+OUT: B 5-4 0.00103029 100
+EXP: B 19-20 0.0002 620
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BWBWWB.WBB.BBWBWBBWW W 100
+OUT: W 10-11 0.0066521 1221
+EXP: W 21-22 0.0001 376
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WBBBWWWWBWWBB.WWBW.WB.BBWWBWBW B 100
+OUT: B 31-32 0.00952275 3905
+EXP: B 31-30 0.0026 7480
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WBBBWWWWBWWBB.WWBW.WB.BBWWBWBW W 100
+OUT: B None 0.0297633 7018
+EXP: B None 0.0051 13173
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBBW.BBBBBBBBW.BWWWB.BWW.WB.BWW B 100
+OUT: B 21-22 0.00161806 789
+EXP: B 29-30 0.0000 148
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBBW.BBBBBBBBW.BWWWB.BWW.WB.BWW W 100
+OUT: B None 0.00655243 2004
+EXP: B None 0.0001 470
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWBBBB.WWWWWB.WWWB.WWBW B 100
+OUT: W None 0.000737195 55
+EXP: W None 0.0000 100
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WWBBBB.WWWWWB.WWWB.WWBW W 100
+OUT: W 20-21 0.00015259 6
+EXP: W 18-19 0.0000 7
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBW.BW.BBW.WWB B 100
+OUT: B 4-5 0.000141365 4
+EXP: B 12-13 0.0000 18
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBW.BW.BBW.WWB W 100
+OUT: W 2-1 0.000123102 3
+EXP: W 13-12 0.0000 6
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBW.WWBB.BW B 100
+OUT: B 6-5 0.000349864 4
+EXP: B 9-8 0.0000 4
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBW.WWBB.BW W 100
+OUT: W 2-1 0.000209408 3
+EXP: W 10-9 0.0000 2
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBB.WWB.BW.WB.BW.WB.BBWWWBB B 100
+OUT: W None 0.000148836 21
+EXP: W None 0.0001 653
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBB.WWB.BW.WB.BW.WB.BBWWWBB W 100
+OUT: B None 0.000187286 21
+EXP: B None 0.0001 421
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWW.WBWBWWBBW.WB.WWB.BW.WB.BW.BWBW B 100
+OUT: B 30-31 0.0122179 3384
+EXP: B 31-32 0.0013 3922
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWW.WBWBWWBBW.WB.WWB.BW.WB.BW.BWBW W 100
+OUT: W 6-7 0.000721629 145
+EXP: W 33-32 0.0314 114177
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBWB.BW.WB.BBW B 100
+OUT: B 4-3 0.000274069 5
+EXP: B 14-13 0.0000 14
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WBBWB.BW.WB.BBW W 100
+OUT: B None 0.000320442 15
+EXP: B None 0.0000 37
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBW.BWWWW.WBWWWWB.WWB.WB.BW B 100
+OUT: W None 0.000335694 32
+EXP: W None 0.0001 322
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBW.BWWWW.WBWWWWB.WWB.WB.BW W 100
+OUT: W 5-4 0.000107243 4
+EXP: W 26-25 0.0000 56
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WBBWW.BW B 100
+OUT: B 5-6 9.4966e-05 5
+EXP: B 8-9 0.0000 8
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BW.WBBWW.BW W 100
+OUT: B None 0.000277822 7
+EXP: B None 0.0000 16
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWBBBWWBW.WWBBWW.BWW.BW B 100
+OUT: B 17-18 0.000425323 23
+EXP: B 14-15 0.0001 141
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BWBBBWWBW.WWBBWW.BWW.BW W 100
+OUT: W 1-2 0.00137039 203
+EXP: W 22-21 0.0000 22
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBW.WBBWWWB.WBB.WWBBW.BW.WBBWB B 100
+OUT: B 4-5 0.000304726 4
+EXP: B 32-31 0.0042 10677
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers WB.BBW.WBBWWWB.WBB.WWBBW.BW.WBBWB W 100
+OUT: B None 0.00062212 43
+EXP: B None 0.0321 85677
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBWWBW.BW.BWWBWWBBBBWB.BWWB.WWWBB B 100
+OUT: B 10-11 0.000647947 84
+EXP: B 31-32 0.0026 6997
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_more_time.txt_processed
+./TheSolvers BBWWBW.BW.BWWBWWBBBBWB.BWWB.WWWBB W 100
+OUT: W 20-21 0.000661127 188
+EXP: W 32-31 0.0010 2581
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.215281 91879
+EXP: W None 1.6681 3624890
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-16 0.0776957 26288
+EXP: W 25-26 0.3214 696060
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 10-11 0.144344 55982
+EXP: B 24-25 1.2624 2731589
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 13-14 0.117701 41491
+EXP: W 27-26 0.9655 2040951
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.57389 195043
+EXP: W None 7.7246 16627230
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.077998 23527
+EXP: W 27-28 1.6727 3624891
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 2-1 0.429065 149616
+EXP: B 26-27 6.4238 13665210
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 0.477095 188064
+EXP: W 27-28 3.5278 7525449
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB B 100
+OUT: W None 0.937346 382464
+EXP: W None 44.5596 92633366
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWB W 100
+OUT: W 15-14 0.252115 83854
+EXP: W 29-30 8.1349 16627231
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+OUT: B 10-9 0.709075 237044
+EXP: B 28-29 32.6719 67189125
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW W 100
+OUT: W 3-2 1.2442 446820
+EXP: W 29-30 18.5669 38206161
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BBWBBWBBWBBWBBWBBWBBWBBWBBWBBW B 100
+OUT: B 22-23 0.0426068 9510
+EXP: B 28-29 0.0142 20785
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BBWBBWBBWBBWBBWBBWBBWBBWBBWBBW W 100
+OUT: B None 0.0490726 14007
+EXP: B None 0.0712 127839
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBW B 100
+OUT: B 19-20 0.0439571 13118
+EXP: B 34-35 0.5276 884703
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBW W 100
+OUT: B None 0.272695 77823
+EXP: B None 2.9935 5068104
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBW B 100
+OUT: B 25-26 0.183305 48674
+EXP: B 40-41 24.8484 40347998
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers BBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBWBBW W 100
+OUT: B None 1.2068 338306
+EXP: B None 148.8621 243927564
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers WBBWWBWW.BBBBW.BWWW.BWWB.BW.WWB.WB.WBB.WB.BBWWB.BBBBWWW.WB B 100
+OUT: B 5-6 0.0328506 8105
+EXP: B 55-56 0.0034 9839
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/added_hard.txt_processed
+./TheSolvers WBBWWBWW.BBBBW.BWWW.BWWB.BW.WWB.WB.WBB.WB.BBWWB.BBBBWWW.WB W 100
+OUT: B None 0.0231368 7072
+EXP: B None 3.7813 9244995
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBW.WBBBBB.BBW.WB.WWWBB.WB.BW.WWWBWB.BW B 100
+OUT: B 1-0 0.00223261 633
+EXP: B 37-38 0.0051 15984
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBW.WBBBBB.BBW.WB.WWWBB.WB.BW.WWWBWB.BW W 100
+OUT: B None 0.00183141 368
+EXP: B None 0.0189 65309
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBW.BWBW.BW.WBWWBBBW.WWB.WWBBWB B 100
+OUT: B 4-5 0.000499026 150
+EXP: B 29-28 0.0011 3428
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBW.BWBW.BW.WBWWBBBW.WWB.WWBBWB W 100
+OUT: W 5-6 0.000684548 51
+EXP: W 30-29 0.0007 1905
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBBWBB.WB.WBWWBB.WWWBB.BBBBWBBWBWBW.BW.BWW B 100
+OUT: B 2-3 0.0186805 6497
+EXP: B 40-39 0.0577 155557
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBBWBB.WB.WBWWBB.WWWBB.BBBBWBBWBWBW.BW.BWW W 100
+OUT: B None 0.00981582 2977
+EXP: B None 0.2522 691218
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWWWBWBWWWWBBWBBWWBB.WB B 100
+OUT: B 4-3 0.00184655 488
+EXP: B 7-6 0.0004 815
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWWWBWBWWWWBBWBBWWBB.WB W 100
+OUT: W 5-6 0.00127765 94
+EXP: W 20-21 0.0001 134
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBWWWW.BBBBWBBW.BW.WB.WBBB.BBWWWWW.BW B 100
+OUT: B 12-11 0.000247075 5
+EXP: B 35-36 0.0002 622
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBWWWW.BBBBWBBW.BW.WB.WBBB.BBWWWWW.BW W 100
+OUT: B None 0.000288612 69
+EXP: B None 0.0006 1562
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBWWWWBBBBWBWWBBW.BWW B 100
+OUT: B 18-19 0.00332106 481
+EXP: B 15-16 0.0000 38
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BBWWWWBBBBWBWWBBW.BWW W 100
+OUT: W 10-11 0.000231479 7
+EXP: W 20-19 0.0000 113
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBWB.WBWWBBB.BWWB.BW.WBBBWB.BW.BW B 100
+OUT: B 9-8 0.00117146 115
+EXP: B 32-31 0.0004 1122
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBWB.WBWWBBB.BWWB.BW.WBBBWB.BW.BW W 100
+OUT: B None 0.00386446 1095
+EXP: B None 0.0050 15373
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBW.BBBBBW.BWB.BWWWWBBBW.WWBWWWWB.BW B 100
+OUT: B 27-28 0.0113311 3584
+EXP: B 34-35 0.0382 108349
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBW.BBBBBW.BWB.BWWWWBBBW.WWBWWWWB.BW W 100
+OUT: B None 0.0708136 15634
+EXP: B None 0.0178 47812
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWB.WWB.WWBBBWW.BWWBWW.BWBBB B 100
+OUT: W None 0.00167855 397
+EXP: W None 0.0002 822
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWB.WWB.WWBBBWW.BWWBWW.BWBBB W 100
+OUT: W 24-23 0.00014982 12
+EXP: W 26-27 0.0001 178
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWW.WWBWBWWBBWBBBBBBB.BWWB.BW.WB.WBBB.BWWB.WBWBW.BBW B 100
+OUT: B 6-7 0.000105026 5
+EXP: B 49-50 0.0102 25483
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWW.WWBWBWWBBWBBBBBBB.BWWB.BW.WB.WBBB.BWWB.WBWBW.BBW W 100
+OUT: B None 0.0153611 2576
+EXP: B None 0.0889 220021
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BW.BBWB.WB.WWBWWBBWBBBBWBBB.BWW.BWWBBW B 100
+OUT: W None 0.0541583 16978
+EXP: W None 0.1704 445699
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BW.BBWB.WB.WWBWWBBWBBBBWBBB.BWW.BWWBBW W 100
+OUT: B None 0.0830194 26159
+EXP: B None 0.0861 214580
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWBWBBWBBWBBB.WWB.WWBWBBWWBWWWB B 100
+OUT: B 26-27 0.0716616 27736
+EXP: B 26-27 0.0297 69391
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWBWBBWBBWBBB.WWB.WWBWBBWWBWWWB W 100
+OUT: W 25-26 0.037992 17833
+EXP: W 27-26 0.0059 14031
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWWWW.BBBW.BWBW.WBB.BWBB.BBW B 100
+OUT: B 20-21 0.00528667 2958
+EXP: B 23-24 0.0000 76
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWWWW.BBBW.BWBW.WBB.BWBB.BBW W 100
+OUT: W 9-8 0.0092014 3301
+EXP: W 27-26 0.0002 772
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBB.WBBW.WBBWWBBWBBW.BWWB.WB B 100
+OUT: B 5-4 0.000176063 4
+EXP: B 26-25 0.0009 2639
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBB.WBBW.WBBWWBBWBBW.BWWB.WB W 100
+OUT: B None 0.00274089 654
+EXP: B None 0.0003 704
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBBWBWBW.WBBBB.WBB.WB B 100
+OUT: B 20-19 0.000180428 11
+EXP: B 19-20 0.0000 59
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBBWBWBW.WBBBB.WBB.WB W 100
+OUT: B None 0.000356674 116
+EXP: B None 0.0001 266
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WB.BWWW.WBWBWWBW.BWBWB.BW B 100
+OUT: W None 0.00138286 706
+EXP: W None 0.0005 1649
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WB.BWWW.WBWBWWBW.BWBWB.BW W 100
+OUT: W 10-9 0.000379104 6
+EXP: W 23-24 0.0002 666
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBWB.WWWWB.BWBBWB.WBW.WWBBBBWWW B 100
+OUT: W None 0.00169505 238
+EXP: W None 0.0006 1932
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBWB.WWWWB.BWBBWB.WBW.WWBBBBWWW W 100
+OUT: W 2-1 0.000307877 45
+EXP: W 29-30 0.0002 685
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBBBBB.BWBBWBBBBB.WBWW.BW B 100
+OUT: B 19-20 0.000180855 9
+EXP: B 20-19 0.0000 34
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBBBBB.BWBBWBBBBB.WBWW.BW W 100
+OUT: B None 0.000441892 104
+EXP: B None 0.0000 116
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BW.WWBBBWW.BBW.BWBBB.WB.BW.BWBWWW B 100
+OUT: B 27-28 0.000328424 88
+EXP: B 29-28 0.0054 17484
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BW.WWBBBWW.BBW.BWBBB.WB.BW.BWBWWW W 100
+OUT: W 30-29 0.000988602 211
+EXP: W 32-31 0.0034 12483
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WB.BW.WWWWWWWBB.BBBWBWWBBBB.BW B 100
+OUT: B 20-21 0.000486352 168
+EXP: B 23-24 0.0006 1544
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WB.BW.WWWWWWWBB.BBBWBWWBBBB.BW W 100
+OUT: B None 0.000293769 49
+EXP: B None 0.0007 1281
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWB.WBBBBBWWBWWBWBBWBBWWW.BW.WWB.BWW.BW B 100
+OUT: B 2-1 0.104953 34939
+EXP: B 38-37 0.0255 56646
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWB.WBBBBBWWBWWBWBBWBBWWW.BW.WWB.BWW.BW W 100
+OUT: W 19-20 0.0376615 11028
+EXP: W 36-35 0.4178 978574
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBWWBWWB.BBBWWWWW.WBBBBWBW.WB.WBBWWW B 100
+OUT: B 28-27 0.00453872 2286
+EXP: B 35-34 0.0167 36220
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBWWBWWB.BBBWWWWW.WBBBBWBW.WB.WBBWWW W 100
+OUT: W 23-22 0.00813952 2290
+EXP: W 33-32 0.0108 24530
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWWBWWWBWB.WBBBWBWBBW.WWB.BW.BWW.BBW B 100
+OUT: B 7-8 0.0299781 12883
+EXP: B 35-34 0.0001 370
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWWBWWWBWB.WBBBWBWBBW.WWB.BW.BWW.BBW W 100
+OUT: W 2-3 0.0210693 5667
+EXP: W 34-33 0.0836 189050
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWW.BBBWBBWBBWW.WBW.BWW.WB.BBW.WWWWWB B 100
+OUT: W None 0.0107714 4731
+EXP: W None 0.0091 24213
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers BWW.BBBWBBWBBWW.WBW.BWW.WB.BBW.WWWWWB W 100
+OUT: W 35-36 0.00800904 2277
+EXP: W 35-34 0.0028 7579
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWB.WB.BBW.WWWWBBW.WB.WB B 100
+OUT: B 2-1 0.000319298 3
+EXP: B 23-22 0.0000 39
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WWB.WB.BBW.WWWWBBW.WB.WB W 100
+OUT: W 4-5 0.00017799 5
+EXP: W 22-23 0.0000 110
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBBBWBWBW.WB.BW.BWWWBBBW.BWW B 100
+OUT: B 20-19 0.000274045 19
+EXP: B 26-25 0.0006 1709
+[PASS]
+
+/home/user2/Desktop/One-Dimensional-Clobber-Solver/src/instructorSolution/tests/modified/random_hard.txt_processed
+./TheSolvers WBBBWBWBW.WB.BW.BWWWBBBW.BWW W 100
+OUT: W 4-3 0.00158234 695
+EXP: W 23-22 0.0009 2553
+[PASS]
+
+{'totalTime': 183.13442828514962, 'totalTests': 675, 'correct': 672, 'failed': 0, 'wrongMove': 3}

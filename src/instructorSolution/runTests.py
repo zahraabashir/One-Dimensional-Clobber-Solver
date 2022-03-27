@@ -59,6 +59,7 @@ instructorClobber = baseDir + "/sample_c++/code/clobber"
 print("Test files (%d):" % (len(testFiles),))
 for x in testFiles:
     print(x)
+print("")
 
 def runTest(inputLine, outputLine):
     testStats["totalTests"] += 1
@@ -158,7 +159,6 @@ def runTest(inputLine, outputLine):
 
 
 for f in testFiles:
-    print("f\n")
     file = open(f, "r")
 
     line1 = ""
@@ -174,6 +174,7 @@ for f in testFiles:
 
         #Run test
         if line2.find("#?") == 0:
+            print(f)
             runTest(line1, line2)
 
         line1 = line2

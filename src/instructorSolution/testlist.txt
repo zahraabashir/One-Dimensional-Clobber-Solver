@@ -1,3 +1,5 @@
+# This is a comment
+
 modified/easy.txt_processed
 modified/tests_small_more_time.txt_processed
 modified/tests_small.txt_processed

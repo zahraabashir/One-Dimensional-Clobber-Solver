@@ -18,8 +18,12 @@ DBManage: dbmanage.o database.o utils.o state.o solver.o
 %.o: %.cpp %.h
 	$(CC) $(FLAGS) $< -o $@ -c
 
+%.o: %.cpp
+	$(CC) $(FLAGS) $< -o $@ -c
+
 clean:
 	-rm *.o TheSolvers DBManage
+	-make clean -C instructorSolution/sample_c++/code
 
 rmdb:
 	-rm database.bin
@@ -39,6 +43,8 @@ db: DBManage
 	touch database.bin
 	./DBManage
 
+instructorSolver:
+	make -C instructorSolution/sample_c++/code
 
 hardtest: TheSolvers
 	time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500

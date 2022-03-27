@@ -1,0 +1,50 @@
+1xn clobber
+
+√ simplify(game g, game simplerG)
+√store in cache: (g, simpleG)
+√? simpleG can be zero = game(0,0)?
+
+do it for harder games beyond up,down
+
+search larger games to get status?
+search subgames that could prove sum?
+==> order move generation by subgame size
+
+simplifySum(g1, g2, s)
+
+cache for sums of two games - transposition table
+
+
+store good moves from g in cache
+- use cache everywhere
+
+hash table for frequently used larger games
+e.g. bb(wb)^n
+check their values in CGSuite
+
+try different move orderings?
+suppress half the moves for symmetrical positions
+
+write test cases
+- bits
+- game, play, undo
+    - different kinds of pruning
+    - with/without cache
+do ablation study. measure speed. what works? what works only for larger games?
+
+store: is g+* positive, negative?
+store sums g+x for small x.
+compute  sums g+x for small x? IF x is in same sum?
+
+towards 2xn, general clobber
+======================
+
+generalized strips - other embedding in 2-space
+trees
+loops - 2x2 loops, 3x3 loops, larger?
+loops with trees attached
+
+make sure basic solver works with general subgames, even if few optimizations.
+
+precompute 2xn strips up to say 2x6
+

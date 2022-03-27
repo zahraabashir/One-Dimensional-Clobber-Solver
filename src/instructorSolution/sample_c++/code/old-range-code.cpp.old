@@ -1,0 +1,80 @@
+//---------------------------------------------------------------------------
+struct range
+{
+    range(int begin, int end);
+    bool operator==(const range& rhs) const;
+    bool operator!=(const range& rhs) const;
+    // EVIL: current state of board is implicitly part of state
+    void computeCodes();
+    bool isZero() const;
+    bool isInverse(const range& other) const;
+    int size() const;
+    
+    // not so private:
+    int rangeBegin, rangeEnd, code, inversecode1, inversecode2;
+};
+
+inline range::range(int rangeBegin, int rangeEnd) : rangeBegin(rangeBegin), rangeEnd(rangeEnd)
+{
+    computeCodes();
+}
+
+inline bool range::operator==(const range& rhs) const
+{
+    return rangeBegin == rhs.rangeBegin
+        && rangeEnd == rhs.rangeEnd
+        && code == rhs.code;
+}
+
+inline bool range::operator!=(const range& rhs) const
+{
+    return ! (*this == rhs);
+}
+
+void range::computeCodes()
+{
+    code = inversecode1 = inversecode2 = 0;
+    for (int i = rangeBegin; i < rangeEnd; ++i)
+    {
+        assert(i>=0);
+        assert(i<MAX);
+        assert(IsBlackWhite(board[i]));
+        code <<= 1;
+        code += board[i];
+        inversecode1 <<= 1;
+        inversecode1 += Opp(board[i]);
+    }
+    for (int i = rangeEnd - 1; i >= rangeBegin; --i)
+    {
+        assert(i>=0);
+        assert(i<MAX);
+        assert(IsBlackWhite(board[i]));
+        inversecode2 <<= 1;
+        inversecode2 += Opp(board[i]);
+    }
+}
+
+bool range::isZero() const
+{
+    const int rsize = size();
+    if (rsize == 0) return true;
+    if (rsize > CACHE_ENTRY_SIZE) return false;
+    const int index = rsize - 1;
+    return isZeroCache[index][code].isZero();
+}
+
+bool range::isInverse(const range& other) const
+{
+    return size() == other.size() 
+        && (   inversecode1 == other.code
+            || inversecode2 == other.code
+           );
+}
+
+inline int range::size() const
+{
+    const int size = rangeEnd - rangeBegin;
+    assert(size >= 0);
+    assert(size <= MAX);
+    return size;
+}

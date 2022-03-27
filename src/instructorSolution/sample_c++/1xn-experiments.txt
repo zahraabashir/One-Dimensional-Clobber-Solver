@@ -1,0 +1,1067 @@
+1xn Clobber experiments
+
+==============================================================================
+clobber, naive
+
+Size 1 Board X Result 0 Time 2
+Size 2 Board Xo Result 1 Time 15
+Size 3 Board XoX Result 1 Time 1
+Size 4 Board XoXo Result 1 Time 1
+Size 5 Board XoXoX Result 0 Time 2
+Size 6 Board XoXoXo Result 0 Time 5
+Size 7 Board XoXoXoX Result 0 Time 7
+Size 8 Board XoXoXoXo Result 1 Time 7
+Size 9 Board XoXoXoXoX Result 1 Time 17
+Size 10 Board XoXoXoXoXo Result 1 Time 20
+Size 11 Board XoXoXoXoXoX Result 0 Time 115
+Size 12 Board XoXoXoXoXoXo Result 1 Time 331
+Size 13 Board XoXoXoXoXoXoX Result 0 Time 656
+Size 14 Board XoXoXoXoXoXoXo Result 1 Time 489
+Size 15 Board XoXoXoXoXoXoXoX Result 0 Time 5646
+Size 16 Board XoXoXoXoXoXoXoXo Result 1 Time 2417
+Size 17 Board XoXoXoXoXoXoXoXoX Result 0 Time 29975
+Size 18 Board XoXoXoXoXoXoXoXoXo Result 1 Time 24611
+Size 19 Board XoXoXoXoXoXoXoXoXoX Result 0 Time 175945
+Size 20 Board XoXoXoXoXoXoXoXoXoXo Result 1 Time 151692
+Size 21 Board XoXoXoXoXoXoXoXoXoXoX Result 0 Time 1643264
+Size 22 Board XoXoXoXoXoXoXoXoXoXoXo Result 1 Time 647090
+Size 23 Board XoXoXoXoXoXoXoXoXoXoXoX Result 0 Time 16871400
+Size 24 Board XoXoXoXoXoXoXoXoXoXoXoXo Result 1 Time 5085009
+Size 25 Board XoXoXoXoXoXoXoXoXoXoXoXoX Result 0 Time 130599991
+Size 26 Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result 1 Time 149906889
+
+==============================================================================
+With lower bound updates:
+Size 1 X to play  Board X Result 0 Time 6 sec 0
+Size 1 o to play  Board X Result 0 Time 0 sec 0
+Second player win
+Size 2 X to play  Board Xo Result 1 Time 7 sec 0
+First player win
+Size 3 X to play  Board XoX Result 1 Time 1 sec 0
+Size 3 o to play  Board XoX Result 1 Time 0 sec 0
+First player win
+Size 4 X to play  Board XoXo Result 1 Time 3 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result 0 Time 2 sec 0
+Size 5 o to play  Board XoXoX Result 1 Time 2 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result 0 Time 6 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result 0 Time 8 sec 0
+Size 7 o to play  Board XoXoXoX Result 1 Time 2 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result 1 Time 9 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result 1 Time 14 sec 0
+Size 9 o to play  Board XoXoXoXoX Result 1 Time 8 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result 1 Time 21 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result 0 Time 120 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result 1 Time 57 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result 1 Time 312 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result 0 Time 640 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result 1 Time 119 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result 1 Time 465 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result 0 Time 6116 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result 1 Time 634 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result 1 Time 2335 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result 0 Time 32422 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result 1 Time 5829 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result 1 Time 25668 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result 0 Time 183700 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result 1 Time 32168 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result 1 Time 157046 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result 0 Time 1684092 sec 1
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result 1 Time 183295 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result 1 Time 644581 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result 0 Time 17158775 sec 17
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result 1 Time 1685353 sec 1
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result 1 Time 4999620 sec 4
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result 0 Time 132104831 sec 132
+
+
+==============================================================================
+rangebased, no zero pruning
+Size 1 X to play  Board X Result false Time 2 sec 0
+Size 1 o to play  Board X Result false Time 2 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 1 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 0 sec 0
+Size 3 o to play  Board XoX Result true Time 1 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 3 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 7 sec 0
+Size 5 o to play  Board XoXoX Result true Time 4 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 16 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 27 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 8 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 37 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 59 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 29 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 88 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 443 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 213 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 1052 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 2221 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 432 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 1485 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 17131 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 2274 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 7672 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 77085 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 16805 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 67898 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 484093 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 77430 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 339620 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 4246068 sec 4
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 483802 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 1691923 sec 1
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 29967451 sec 29
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 4248229 sec 4
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 12256538 sec 12
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 241764861 sec 241
+^C
+
+==============================================================================
+rangebased, zero pruning
+
+Size 1 X to play  Board X Result false Time 3 sec 0
+Size 1 o to play  Board X Result false Time 1 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 1 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 1 sec 0
+Size 3 o to play  Board XoX Result true Time 1 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 3 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 7 sec 0
+Size 5 o to play  Board XoXoX Result true Time 6 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 17 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 26 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 9 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 22 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 31 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 27 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 49 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 345 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 159 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 670 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 1680 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 355 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 801 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 10146 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 1697 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 4735 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 50550 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 10333 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 38065 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 315204 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 50257 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 202077 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 2464087 sec 2
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 315420 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 889682 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 17171585 sec 17
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 2463418 sec 2
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 6113587 sec 6
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 134564960 sec 134
+Size 25 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 17174147 sec 17
+White win
+Size 26 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 100078988 sec 100
+First player win
+
+2^15 cache
+Size 1 X to play  Board X Result false Time 2 sec 0
+Size 1 o to play  Board X Result false Time 0 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 2 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 1 sec 0
+Size 3 o to play  Board XoX Result true Time 1 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 14 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 8 sec 0
+Size 5 o to play  Board XoXoX Result true Time 5 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 16 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 34 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 17 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 58 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 31 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 36 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 47 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 375 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 167 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 671 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 1683 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 345 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 804 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 10167 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 1653 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 4751 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 49619 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 10127 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 37800 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 314062 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 49379 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 202913 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 2505538 sec 2
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 336491 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 890673 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 17239427 sec 17
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 2477287 sec 2
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 6174793 sec 6
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 135173983 sec 135
+Size 25 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 17317857 sec 17
+White win
+Size 26 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 100718334 sec 100
+First player win
+
+==============================================================================
+mid-interval-first move generation. Back to 2^10 cache,
+(2^12 cache almost same, not stored)
+
+Size 1 X to play  Board X Result false Time 3 sec 0
+Size 1 o to play  Board X Result false Time 1 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 1 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 1 sec 0
+Size 3 o to play  Board XoX Result true Time 1 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 0 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 7 sec 0
+Size 5 o to play  Board XoXoX Result true Time 4 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 17 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 26 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 31 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 29 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 22 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 40 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 58 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 297 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 159 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 127 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 1170 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 512 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 485 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 5179 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 1321 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 9768 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 19623 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 2639 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 19136 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 86089 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 14466 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 30688 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 538718 sec 0
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 72437 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 751155 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 2764871 sec 2
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 477745 sec 0
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 1929162 sec 1
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 20836701 sec 20
+Size 25 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 2612429 sec 2
+White win
+Size 26 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 39282194 sec 39
+First player win
+Size 27 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 154040175 sec 154
+Size 27 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 19618307 sec 19
+White win
+Size 28 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 77377951 sec 77
+First player win
+Size 29 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 1107106060 sec 1107
+Size 29 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 138087850 sec 138
+White win
+
+==============================================================================
+prune if two new games are inverses, 12:44am Mar 19
+
+Size 1 X to play  Board X Result false Time 3 sec 0
+Size 1 o to play  Board X Result false Time 2 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 2 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 2 sec 0
+Size 3 o to play  Board XoX Result true Time 1 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 1 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 10 sec 0
+Size 5 o to play  Board XoXoX Result true Time 5 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 15 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 27 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 34 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 33 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 26 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 40 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 59 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 282 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 152 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 137 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 1191 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 347 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 523 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 5168 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 1449 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 9869 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 19373 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 2460 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 17341 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 85236 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 13830 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 32389 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 510549 sec 0
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 51494 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 740683 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 2681430 sec 2
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 407701 sec 0
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 1887543 sec 1
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 18166406 sec 18
+Size 25 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 1772595 sec 1
+White win
+Size 26 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 36504729 sec 36
+First player win
+Size 27 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 134486897 sec 134
+Size 27 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 14538867 sec 14
+White win
+Size 28 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 68221444 sec 68
+First player win
+Size 29 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 979549491 sec 979
+Size 29 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 99449183 sec 99
+White win
+
+==============================================================================
+1:03 am Mar 19
+prune inverses
+
+Size 1 X to play  Board X Result false Time 2 sec 0
+Size 1 o to play  Board X Result false Time 2 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 2 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 1 sec 0
+Size 3 o to play  Board XoX Result true Time 1 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 2 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 11 sec 0
+Size 5 o to play  Board XoXoX Result true Time 7 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 17 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 29 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 30 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 32 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 36 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 35 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 70 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 308 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 149 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 131 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 904 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 332 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 268 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 2683 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 711 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 3670 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 8585 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 1830 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 4806 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 30071 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 5189 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 7127 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 129131 sec 0
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 14770 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 116634 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 434192 sec 0
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 81381 sec 0
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 149476 sec 0
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 2047424 sec 2
+Size 25 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 286487 sec 0
+White win
+Size 26 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 2509159 sec 2
+First player win
+Size 27 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 8941911 sec 8
+Size 27 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 1046403 sec 1
+White win
+Size 28 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 2593735 sec 2
+First player win
+Size 29 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 40995233 sec 40
+Size 29 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 3932694 sec 3
+White win
+Size 30 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 41290566 sec 41
+First player win
+
+==============================================================================
+11:01 am Mar 19
+prune inverses, last run
+
+Size 1 X to play  Board X Result false Time 3 sec 0
+Size 1 o to play  Board X Result false Time 1 sec 0
+Second player win
+Size 2 X to play  Board Xo Result true Time 3 sec 0
+First player win
+Size 3 X to play  Board XoX Result true Time 1 sec 0
+Size 3 o to play  Board XoX Result true Time 2 sec 0
+First player win
+Size 4 X to play  Board XoXo Result true Time 2 sec 0
+First player win
+Size 5 X to play  Board XoXoX Result false Time 11 sec 0
+Size 5 o to play  Board XoXoX Result true Time 6 sec 0
+White win
+Size 6 X to play  Board XoXoXo Result false Time 16 sec 0
+Second player win
+Size 7 X to play  Board XoXoXoX Result false Time 30 sec 0
+Size 7 o to play  Board XoXoXoX Result true Time 39 sec 0
+White win
+Size 8 X to play  Board XoXoXoXo Result true Time 33 sec 0
+First player win
+Size 9 X to play  Board XoXoXoXoX Result true Time 36 sec 0
+Size 9 o to play  Board XoXoXoXoX Result true Time 36 sec 0
+First player win
+Size 10 X to play  Board XoXoXoXoXo Result true Time 71 sec 0
+First player win
+Size 11 X to play  Board XoXoXoXoXoX Result false Time 309 sec 0
+Size 11 o to play  Board XoXoXoXoXoX Result true Time 153 sec 0
+White win
+Size 12 X to play  Board XoXoXoXoXoXo Result true Time 131 sec 0
+First player win
+Size 13 X to play  Board XoXoXoXoXoXoX Result false Time 921 sec 0
+Size 13 o to play  Board XoXoXoXoXoXoX Result true Time 409 sec 0
+White win
+Size 14 X to play  Board XoXoXoXoXoXoXo Result true Time 264 sec 0
+First player win
+Size 15 X to play  Board XoXoXoXoXoXoXoX Result false Time 2711 sec 0
+Size 15 o to play  Board XoXoXoXoXoXoXoX Result true Time 717 sec 0
+White win
+Size 16 X to play  Board XoXoXoXoXoXoXoXo Result true Time 3682 sec 0
+First player win
+Size 17 X to play  Board XoXoXoXoXoXoXoXoX Result false Time 8618 sec 0
+Size 17 o to play  Board XoXoXoXoXoXoXoXoX Result true Time 1881 sec 0
+White win
+Size 18 X to play  Board XoXoXoXoXoXoXoXoXo Result true Time 4926 sec 0
+First player win
+Size 19 X to play  Board XoXoXoXoXoXoXoXoXoX Result false Time 30243 sec 0
+Size 19 o to play  Board XoXoXoXoXoXoXoXoXoX Result true Time 5216 sec 0
+White win
+Size 20 X to play  Board XoXoXoXoXoXoXoXoXoXo Result true Time 7185 sec 0
+First player win
+Size 21 X to play  Board XoXoXoXoXoXoXoXoXoXoX Result false Time 129194 sec 0
+Size 21 o to play  Board XoXoXoXoXoXoXoXoXoXoX Result true Time 14761 sec 0
+White win
+Size 22 X to play  Board XoXoXoXoXoXoXoXoXoXoXo Result true Time 117228 sec 0
+First player win
+Size 23 X to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result false Time 436115 sec 0
+Size 23 o to play  Board XoXoXoXoXoXoXoXoXoXoXoX Result true Time 81326 sec 0
+White win
+Size 24 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXo Result true Time 150649 sec 0
+First player win
+Size 25 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 2081986 sec 2
+Size 25 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 296576 sec 0
+White win
+Size 26 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 2511784 sec 2
+First player win
+Size 27 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 8778838 sec 8
+Size 27 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 1031979 sec 1
+White win
+Size 28 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 2585477 sec 2
+First player win
+Size 29 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 41146391 sec 41
+Size 29 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 3947135 sec 3
+White win
+Size 30 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 41496319 sec 41
+First player win
+Size 31 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 177759653 sec 177
+Size 31 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 10608820 sec 10
+White win
+Size 32 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 66167056 sec 66
+First player win
+Size 33 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 839275607 sec 839
+Size 33 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 39403329 sec 39
+White win
+Size 34 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 446057696 sec 446
+First player win
+Size 35 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result false Time 3699066699 sec 3699
+Size 35 o to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Result true Time 133108048 sec 133
+White win
+Size 36 X to play  Board XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Result true Time 1273737615 sec 1273
+First player win
+==============================================================================
+am Mar 30 with cache re-enabled BUGGY
+Size 2 X to play  Sumgame Xo Status F  Result true Time 3 sec 0
+First player win
+Size 3 X to play  Sumgame XoX Status F  Result true Time 1 sec 0
+Size 3 o to play  Sumgame XoX Status F  Result true Time 2 sec 0
+First player win
+Size 4 X to play  Sumgame XoXo Status F  Result true Time 2 sec 0
+First player win
+Size 5 X to play  Sumgame XoXoX Status W  Result false Time 3 sec 0
+Size 5 o to play  Sumgame XoXoX Status W  Result true Time 2 sec 0
+White win
+Size 6 X to play  Sumgame XoXoXo Status 0  Result false Time 6 sec 0
+Second player win
+Size 7 X to play  Sumgame XoXoXoX Status W  Result false Time 7 sec 0
+Size 7 o to play  Sumgame XoXoXoX Status W  Result true Time 3 sec 0
+White win
+Size 8 X to play  Sumgame XoXoXoXo Status F  Result true Time 1 sec 0
+First player win
+Size 9 X to play  Sumgame XoXoXoXoX Status F  Result true Time 7 sec 0
+Size 9 o to play  Sumgame XoXoXoXoX Status F  Result true Time 7 sec 0
+First player win
+Size 10 X to play  Sumgame XoXoXoXoXo Status F  Result true Time 12 sec 0
+First player win
+Size 11 X to play  Sumgame XoXoXoXoXoX Status W  Result false Time 87 sec 0
+Size 11 o to play  Sumgame XoXoXoXoXoX Status W  Result true Time 29 sec 0
+White win
+Size 12 X to play  Sumgame XoXoXoXoXoXo Status ?  Result true Time 75 sec 0
+First player win
+Size 13 X to play  Sumgame XoXoXoXoXoXoX Status ?  Result false Time 213 sec 0
+Size 13 o to play  Sumgame XoXoXoXoXoXoX Status ?  Result true Time 143 sec 0
+White win
+Size 14 X to play  Sumgame XoXoXoXoXoXoXo Status ?  Result true Time 217 sec 0
+First player win
+Size 15 X to play  Sumgame XoXoXoXoXoXoXoX Status ?  Result false Time 746 sec 0
+Size 15 o to play  Sumgame XoXoXoXoXoXoXoX Status ?  Result true Time 229 sec 0
+White win
+Size 16 X to play  Sumgame XoXoXoXoXoXoXoXo Status ?  Result true Time 1217 sec 0
+First player win
+Size 17 X to play  Sumgame XoXoXoXoXoXoXoXoX Status ?  Result false Time 2507 sec 0
+Size 17 o to play  Sumgame XoXoXoXoXoXoXoXoX Status ?  Result true Time 817 sec 0
+White win
+Size 18 X to play  Sumgame XoXoXoXoXoXoXoXoXo Status ?  Result true Time 2747 sec 0
+First player win
+Size 19 X to play  Sumgame XoXoXoXoXoXoXoXoXoX Status ?  Result false Time 10177 sec 0
+Size 19 o to play  Sumgame XoXoXoXoXoXoXoXoXoX Status ?  Result true Time 2398 sec 0
+White win
+Size 20 X to play  Sumgame XoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 11906 sec 0
+First player win
+Size 21 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoX Status ?  Result false Time 46425 sec 0
+Size 21 o to play  Sumgame XoXoXoXoXoXoXoXoXoXoX Status ?  Result true Time 10687 sec 0
+White win
+Size 22 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 54839 sec 0
+First player win
+Size 23 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoX Status ?  Result false Time 178929 sec 0
+Size 23 o to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoX Status ?  Result true Time 46397 sec 0
+White win
+Size 24 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 216180 sec 0
+First player win
+Size 25 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result false Time 746059 sec 0
+Size 25 o to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result true Time 246175 sec 0
+White win
+Size 26 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 1192312 sec 1
+First player win
+Size 27 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result false Time 3261618 sec 3
+Size 27 o to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result true Time 723144 sec 0
+White win
+Size 28 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 2972605 sec 2
+First player win
+Size 29 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result false Time 11438561 sec 11
+Size 29 o to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result true Time 3272431 sec 3
+White win
+Size 30 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 13110623 sec 13
+First player win
+Size 31 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result false Time 43334999 sec 43
+Size 31 o to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoX Status ?  Result true Time 11154920 sec 11
+White win
+Size 32 X to play  Sumgame XoXoXoXoXoXoXoXoXoXoXoXoXoXoXoXo Status ?  Result true Time 48552267 sec 48
+First player win
+
+==============================================================================
+11pm Mar 30 find static winners BUGGY
+
+Size 2 X to play  Result true Time 2 sec 0
+First player win
+Size 3 X to play  Result true Time 2 sec 0
+Size 3 o to play  Result true Time 0 sec 0
+First player win
+Size 4 X to play  Result true Time 0 sec 0
+First player win
+Size 5 X to play  Result true Time 2 sec 0
+Size 5 o to play  Result true Time 1 sec 0
+First player win
+Size 6 X to play  Result true Time 1 sec 0
+First player win
+Size 7 X to play  Result true Time 3 sec 0
+Size 7 o to play  Result true Time 0 sec 0
+First player win
+Size 8 X to play  Result true Time 1 sec 0
+First player win
+Size 9 X to play  Result true Time 1 sec 0
+Size 9 o to play  Result true Time 2 sec 0
+First player win
+Size 10 X to play  Result true Time 3 sec 0
+First player win
+Size 11 X to play  Result true Time 2 sec 0
+Size 11 o to play  Result true Time 3 sec 0
+First player win
+Size 12 X to play  Result true Time 1 sec 0
+First player win
+Size 13 X to play  Result true Time 3 sec 0
+Size 13 o to play  Result true Time 1 sec 0
+First player win
+Size 14 X to play  Result true Time 13 sec 0
+First player win
+Size 15 X to play  Result false Time 103 sec 0
+Size 15 o to play  Result true Time 15 sec 0
+White win
+Size 16 X to play  Result true Time 42 sec 0
+First player win
+Size 17 X to play  Result false Time 430 sec 0
+Size 17 o to play  Result true Time 173 sec 0
+White win
+Size 18 X to play  Result true Time 345 sec 0
+First player win
+Size 19 X to play  Result false Time 1524 sec 0
+Size 19 o to play  Result true Time 491 sec 0
+White win
+Size 20 X to play  Result true Time 1758 sec 0
+First player win
+Size 21 X to play  Result false Time 8387 sec 0
+Size 21 o to play  Result true Time 1343 sec 0
+White win
+Size 22 X to play  Result true Time 8448 sec 0
+First player win
+Size 23 X to play  Result false Time 30392 sec 0
+Size 23 o to play  Result true Time 8891 sec 0
+White win
+Size 24 X to play  Result true Time 33577 sec 0
+First player win
+Size 25 X to play  Result false Time 127823 sec 0
+Size 25 o to play  Result true Time 26645 sec 0
+White win
+Size 26 X to play  Result true Time 144156 sec 0
+First player win
+Size 27 X to play  Result false Time 528917 sec 0
+Size 27 o to play  Result true Time 133104 sec 0
+White win
+Size 28 X to play  Result true Time 532675 sec 0
+First player win
+Size 29 X to play  Result false Time 2043798 sec 2
+Size 29 o to play  Result true Time 512939 sec 0
+White win
+Size 30 X to play  Result true Time 2380284 sec 2
+First player win
+Size 31 X to play  Result false Time 8186356 sec 8
+Size 31 o to play  Result true Time 2095670 sec 2
+White win
+Size 32 X to play  Result true Time 9110028 sec 9
+First player win
+Size 33 X to play  Result false Time 34633633 sec 34
+Size 33 o to play  Result true Time 8335044 sec 8
+White win
+Size 34 X to play  Result true Time 38844051 sec 38
+First player win
+Size 35 X to play  Result false Time 133346736 sec 133
+Size 35 o to play  Result true Time 34450131 sec 34
+White win
+Size 36 X to play  Result true Time 150516272 sec 150
+First player win
+Size 37 X to play  Result false Time 509262037 sec 509
+Size 37 o to play  Result true Time 132248431 sec 132
+White win
+Size 38 X to play  Result true Time 633573585 sec 633
+First player win
+
+==============================================================================
+11pm Mar 30 cache size 16 BUGGY
+
+Size 2 X to play  Result true Time 2 sec 0
+First player win
+Size 3 X to play  Result true Time 19 sec 0
+Size 3 o to play  Result true Time 1 sec 0
+First player win
+Size 4 X to play  Result true Time 1 sec 0
+First player win
+Size 5 X to play  Result true Time 2 sec 0
+Size 5 o to play  Result true Time 2 sec 0
+First player win
+Size 6 X to play  Result true Time 1 sec 0
+First player win
+Size 7 X to play  Result true Time 2 sec 0
+Size 7 o to play  Result true Time 1 sec 0
+First player win
+Size 8 X to play  Result true Time 1 sec 0
+First player win
+Size 9 X to play  Result true Time 2 sec 0
+Size 9 o to play  Result true Time 2 sec 0
+First player win
+Size 10 X to play  Result true Time 1 sec 0
+First player win
+Size 11 X to play  Result true Time 2 sec 0
+Size 11 o to play  Result true Time 3 sec 0
+First player win
+Size 12 X to play  Result true Time 1 sec 0
+First player win
+Size 13 X to play  Result true Time 1 sec 0
+Size 13 o to play  Result true Time 2 sec 0
+First player win
+Size 14 X to play  Result true Time 2 sec 0
+First player win
+Size 15 X to play  Result true Time 1 sec 0
+Size 15 o to play  Result true Time 1 sec 0
+First player win
+Size 16 X to play  Result true Time 3 sec 0
+First player win
+Size 17 X to play  Result true Time 4 sec 0
+Size 17 o to play  Result true Time 1 sec 0
+First player win
+Size 18 X to play  Result true Time 15 sec 0
+First player win
+Size 19 X to play  Result false Time 1151 sec 0
+Size 19 o to play  Result true Time 43 sec 0
+White win
+Size 20 X to play  Result true Time 115 sec 0
+First player win
+Size 21 X to play  Result false Time 4175 sec 0
+Size 21 o to play  Result true Time 1037 sec 0
+White win
+Size 22 X to play  Result true Time 1559 sec 0
+First player win
+Size 23 X to play  Result false Time 16198 sec 0
+Size 23 o to play  Result true Time 5843 sec 0
+White win
+Size 24 X to play  Result true Time 11617 sec 0
+First player win
+Size 25 X to play  Result false Time 97962 sec 0
+Size 25 o to play  Result true Time 16266 sec 0
+White win
+Size 26 X to play  Result true Time 121353 sec 0
+First player win
+Size 27 X to play  Result false Time 391132 sec 0
+Size 27 o to play  Result true Time 84995 sec 0
+White win
+Size 28 X to play  Result true Time 428977 sec 0
+First player win
+Size 29 X to play  Result false Time 1425637 sec 1
+Size 29 o to play  Result true Time 372163 sec 0
+White win
+Size 30 X to play  Result true Time 1690114 sec 1
+First player win
+Size 31 X to play  Result false Time 5568363 sec 5
+Size 31 o to play  Result true Time 1451949 sec 1
+White win
+Size 32 X to play  Result true Time 6586398 sec 6
+First player win
+Size 33 X to play  Result false Time 22578862 sec 22
+Size 33 o to play  Result true Time 5638766 sec 5
+White win
+Size 34 X to play  Result true Time 28322245 sec 28
+First player win
+Size 35 X to play  Result false Time 92913511 sec 92
+Size 35 o to play  Result true Time 22773122 sec 22
+White win
+Size 36 X to play  Result true Time 108206207 sec 108
+First player win
+Size 37 X to play  Result false Time 367468511 sec 367
+Size 37 o to play  Result true Time 94892416 sec 94
+White win
+Size 38 X to play  Result true Time 459171653 sec 459
+First player win
+
+==============================================================================
+9pm Mar 31 after bugfix, cache size 16, simplify on (not working?)
+Size 2 X to play  Result true Time 3 sec 0
+First player win
+Size 3 X to play  Result true Time 15 sec 0
+Size 3 o to play  Result true Time 2 sec 0
+First player win
+Size 4 X to play  Result true Time 1 sec 0
+First player win
+Size 5 X to play  Result false Time 2 sec 0
+Size 5 o to play  Result true Time 2 sec 0
+White win
+Size 6 X to play  Result false Time 3 sec 0
+Second player win
+Size 7 X to play  Result false Time 5 sec 0
+Size 7 o to play  Result true Time 1 sec 0
+White win
+Size 8 X to play  Result true Time 0 sec 0
+First player win
+Size 9 X to play  Result true Time 1 sec 0
+Size 9 o to play  Result true Time 1 sec 0
+First player win
+Size 10 X to play  Result true Time 1 sec 0
+First player win
+Size 11 X to play  Result false Time 41 sec 0
+Size 11 o to play  Result true Time 4 sec 0
+White win
+Size 12 X to play  Result true Time 29 sec 0
+First player win
+Size 13 X to play  Result false Time 55 sec 0
+Size 13 o to play  Result true Time 3 sec 0
+White win
+Size 14 X to play  Result true Time 240 sec 0
+First player win
+Size 15 X to play  Result false Time 322 sec 0
+Size 15 o to play  Result true Time 1 sec 0
+White win
+Size 16 X to play  Result true Time 161 sec 0
+First player win
+Size 17 X to play  Result false Time 1048 sec 0
+Size 17 o to play  Result true Time 2 sec 0
+White win
+Size 18 X to play  Result true Time 1015 sec 0
+First player win
+Size 19 X to play  Result false Time 4373 sec 0
+Size 19 o to play  Result true Time 1060 sec 0
+White win
+Size 20 X to play  Result true Time 4358 sec 0
+First player win
+Size 21 X to play  Result false Time 28214 sec 0
+Size 21 o to play  Result true Time 4821 sec 0
+White win
+Size 22 X to play  Result true Time 31609 sec 0
+First player win
+Size 23 X to play  Result false Time 143054 sec 0
+Size 23 o to play  Result true Time 32681 sec 0
+White win
+Size 24 X to play  Result true Time 126679 sec 0
+First player win
+Size 25 X to play  Result false Time 916822 sec 0
+Size 25 o to play  Result true Time 151512 sec 0
+White win
+Size 26 X to play  Result true Time 755774 sec 0
+First player win
+Size 27 X to play  Result false Time 5221906 sec 5
+Size 27 o to play  Result true Time 934886 sec 0
+White win
+Size 28 X to play  Result true Time 4076738 sec 4
+First player win
+Size 29 X to play  Result false Time 27310497 sec 27
+Size 29 o to play  Result true Time 5467826 sec 5
+White win
+Size 30 X to play  Result true Time 25177366 sec 25
+First player win
+Size 31 X to play  Result false Time 203811233 sec 203
+Size 31 o to play  Result true Time 31225727 sec 31
+White win
+
+==============================================================================
+00:20 Apr 1 simplify on.
+28354 simplified games
+Size 2 X to play  Result true Time 3 sec 0
+First player win
+Size 3 X to play  Result true Time 2 sec 0
+Size 3 o to play  Result true Time 1 sec 0
+First player win
+Size 4 X to play  Result true Time 2 sec 0
+First player win
+Size 5 X to play  Result false Time 2 sec 0
+Size 5 o to play  Result true Time 4 sec 0
+White win
+Size 6 X to play  Result false Time 6 sec 0
+Second player win
+Size 7 X to play  Result false Time 5 sec 0
+Size 7 o to play  Result true Time 3 sec 0
+White win
+Size 8 X to play  Result true Time 1 sec 0
+First player win
+Size 9 X to play  Result true Time 1 sec 0
+Size 9 o to play  Result true Time 1 sec 0
+First player win
+Size 10 X to play  Result true Time 3 sec 0
+First player win
+Size 11 X to play  Result false Time 21 sec 0
+Size 11 o to play  Result true Time 2 sec 0
+White win
+Size 12 X to play  Result true Time 24 sec 0
+First player win
+Size 13 X to play  Result false Time 53 sec 0
+Size 13 o to play  Result true Time 3 sec 0
+White win
+Size 14 X to play  Result true Time 113 sec 0
+First player win
+Size 15 X to play  Result false Time 217 sec 0
+Size 15 o to play  Result true Time 3 sec 0
+White win
+Size 16 X to play  Result true Time 151 sec 0
+First player win
+Size 17 X to play  Result false Time 816 sec 0
+Size 17 o to play  Result true Time 1 sec 0
+White win
+Size 18 X to play  Result true Time 841 sec 0
+First player win
+Size 19 X to play  Result false Time 3195 sec 0
+Size 19 o to play  Result true Time 897 sec 0
+White win
+Size 20 X to play  Result true Time 2648 sec 0
+First player win
+Size 21 X to play  Result false Time 16518 sec 0
+Size 21 o to play  Result true Time 3317 sec 0
+White win
+Size 22 X to play  Result true Time 14751 sec 0
+First player win
+Size 23 X to play  Result false Time 80591 sec 0
+Size 23 o to play  Result true Time 14649 sec 0
+White win
+Size 24 X to play  Result true Time 67471 sec 0
+First player win
+Size 25 X to play  Result false Time 384284 sec 0
+Size 25 o to play  Result true Time 69328 sec 0
+White win
+Size 26 X to play  Result true Time 322913 sec 0
+First player win
+Size 27 X to play  Result false Time 2119177 sec 2
+Size 27 o to play  Result true Time 418851 sec 0
+White win
+Size 28 X to play  Result true Time 1654280 sec 1
+First player win
+Size 29 X to play  Result false Time 10150867 sec 10
+Size 29 o to play  Result true Time 2165118 sec 2
+White win
+Size 30 X to play  Result true Time 9263721 sec 9
+First player win
+Size 31 X to play  Result false Time 58824675 sec 58
+Size 31 o to play  Result true Time 10199454 sec 10
+White win
+Size 32 X to play  Result true Time 43613810 sec 43
+First player win
+Size 33 X to play  Result false Time 291006872 sec 291
+Size 33 o to play  Result true Time 64104085 sec 64
+White win
+Size 34 X to play  Result true Time 252116812 sec 252
+First player win
+Size 35 X to play  Result false Time 1734701575 sec 1734
+Size 35 o to play  Result true Time 321301846 sec 321
+White win
+Size 36 X to play  Result true Time 1443940392 sec 1443
+First player win

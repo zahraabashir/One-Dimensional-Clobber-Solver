@@ -23,15 +23,21 @@ DBManage: dbmanage.o database.o utils.o state.o solver.o
 
 clean:
 	-rm *.o TheSolvers DBManage
+
+cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code
 
 rmdb:
 	-rm database.bin
 
-corr: TheSolvers
-	@echo "This is a W position"
-	./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 1
-	./TheSolvers W.W.BW.WB.WBWWWWWBWWBBWBBBB B 1
+#@echo "This is a W position"
+#./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 1
+#./TheSolvers W.W.BW.WB.WBWWWWWBWWBBWBBBB B 1
+corr: TheSolvers instructorSolver
+	python3 instructorSolution/test.py
+
+fcorr: TheSolvers instructorSolver
+	python3 instructorSolution/test.py --fast
 
 test: TheSolvers
 	python3 TheSolvers.py

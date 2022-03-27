@@ -31,9 +31,18 @@ int main() {
         char boardText[length];
         char board[length];
 
+        char mirrorBoard[length];
+
         for (int game = 0; game <= maxGame; game++) {
             cout << "Length - Game: " << length << " " << game << endl;
             printBits(game, length);
+
+
+            bool mirror = false;
+
+            if (game > (maxGame + 2) / 2) {
+                mirror = true;
+            }
 
             for (int i = 0; i < length; i++) {
                 if ((game >> i) & 1) {
@@ -45,19 +54,53 @@ int main() {
                 }
             }
 
+            if (mirror) {
+                for (int i = 0; i < length; i++) {
+                    if ((game >> i) & 1) {
+                        mirrorBoard[i] = BLACK;
+                    } else {
+                        mirrorBoard[i] = WHITE;
+                    }
+                }
+            }
+
+
+
+            
             for (int i = 0; i < length; i++) {
                 cout << boardText[i];
             }
             cout << endl;
 
+            int outcome = 0;
+
+            if (mirror) {
+                outcome = db.get(length, mirrorBoard);
+
+                switch (outcome) {
+                    case OC_B:
+                        outcome = OC_W;
+                        break;
+
+                    case OC_W:
+                        outcome = OC_B;
+                        break;
+
+                    case OC_N:
+                        outcome = OC_N;
+                        break;
+
+                    case OC_P:
+                        outcome = OC_P;
+                        break;
+                }
 
 
-            // check for game in database and maybe solve it
-            int outcome = db.get(length, board);
-            if (outcome != 0) {
+                db.set(length, board, outcome);
                 cout << endl;
                 continue;
             }
+
 
             cout << "solving" << endl;
             int result1, result2;

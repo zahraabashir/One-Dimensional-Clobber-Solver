@@ -78,6 +78,8 @@ int main() {
                 mirror = true;
             }
 
+            mirror = false;
+
             for (int i = 0; i < length; i++) {
                 if ((game >> i) & 1) {
                     boardText[i] = 'W';
@@ -216,22 +218,37 @@ int main() {
 
                         memcpy(sumBoard, s1.board, length);
                         memcpy(&sumBoard[length + 1], s2.board, length);
+
+
                         for (int k = length + 1; k < 2 * length + 1; k++) {
                             sumBoard[k] = opponentNumber(sumBoard[k]);
                         }
+                        std::cout << std::endl;
+
 
                         int bFirst = gameResult(db, sumBoard, 2 * length + 1, 1);
                         int wFirst = gameResult(db, sumBoard, 2 * length + 1, 2);
 
                         memcpy(s2.board, boardCopy, length);
 
+
+                        std::cout << "(" << bFirst << "," << wFirst << ")" << std::endl;
+
+
+
                         if (bFirst == wFirst) {
+                            std::cout << "DOM: ";
                             if (bFirst == 1) { // I - J is positive for black --> I > J
                                 domBlack |= (((uint64_t) 1) << j);
+                                std::cout << j << std::endl;
                             } else { // I - J is negative for black --> I < J
                                 domBlack |= (((uint64_t) 1) << i);
+                                std::cout << i << std::endl;
                             }
+                            //while (1) {}
                         }
+
+
 
                         //s2.undo(undo2);
                     }
@@ -266,22 +283,34 @@ int main() {
 
                         memcpy(sumBoard, s1.board, length);
                         memcpy(&sumBoard[length + 1], s2.board, length);
+
+
                         for (int k = length + 1; k < 2 * length + 1; k++) {
                             sumBoard[k] = opponentNumber(sumBoard[k]);
                         }
+                        std::cout << std::endl;
+
 
                         int bFirst = gameResult(db, sumBoard, 2 * length + 1, 1);
                         int wFirst = gameResult(db, sumBoard, 2 * length + 1, 2);
 
                         memcpy(s2.board, boardCopy, length);
 
+                        std::cout << "(" << bFirst << "," << wFirst << ")" << std::endl;
+
                         if (bFirst == wFirst) {
+                            std::cout << "DOM: ";
                             if (bFirst == 2) { // I - J is positive for white --> I > J
                                 domWhite |= (((uint64_t) 1) << j);
+                                std::cout << j << std::endl;
                             } else { // I - J is negative for white --> I < J
                                 domWhite |= (((uint64_t) 1) << i);
+                                std::cout << i << std::endl;
                             }
+                            //while (1) {}
                         }
+
+
 
                         //s2.undo(undo2);
                     }
@@ -293,6 +322,7 @@ int main() {
                     delete[] moves;
                 }
             }
+
 
 
             entry = db.get(length, board);

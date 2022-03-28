@@ -9,8 +9,10 @@ using namespace std;
 int main() {
     Database db;
     db.load();
+    db.save();
+    return 0;
 
-    char boardText[] = "BWBWBWBW";
+    char boardText[] = "BWBWWWWWWW";
     int len = sizeof(boardText);
 
     cout << boardText << endl;
@@ -45,6 +47,16 @@ int main() {
             cout << i << endl;
         }
     }
+
+
+    bDom = DB_GET_DOMINATED(entry, 2);
+    cout << "Dominated moves:" << endl;
+    for (int i = 0; i < 64; i++) {
+        if ((bDom >> i) & ((uint64_t) 1)) {
+            cout << i << endl;
+        }
+    }
+
 
 
     return 0;

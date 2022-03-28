@@ -12,7 +12,7 @@
 
 #define DB_ENTRY_SIZE 1 + 2 * sizeof(uint64_t)
 
-#define DB_GET_OUTCOME(entry) entry == 0 ? 0 : *((unsigned char *) entry)
+#define DB_GET_OUTCOME(entry) (entry == 0 ? 0 : *((unsigned char *) entry))
 #define DB_SET_OUTCOME(entry, value) *((unsigned char *) entry) = value
 
 #define DB_GET_DOMINATED(entry, player) entry == 0 ? 0 : ((uint64_t *) (((unsigned char *) entry) + 1))[player - 1]

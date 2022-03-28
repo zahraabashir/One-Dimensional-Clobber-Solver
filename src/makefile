@@ -6,6 +6,8 @@ SHELL := /bin/bash
 CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
+.PHONY: dbtest
+
 run: TheSolvers
 	./TheSolvers BWBWBWBWBWBW W 200
 
@@ -55,6 +57,10 @@ ptest: TheSolvers
 db: DBManage
 	touch database.bin
 	./DBManage
+
+dbtest: database.o dbtest.o utils.o state.o
+	$(CC) $(FLAGS) $^ -o $@
+	./dbtest
 
 resetReferenceCache:
 	echo -e "{\n}" > instructorSolution/cachedOutcomes.json

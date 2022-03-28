@@ -192,12 +192,15 @@ int main() {
 
             //find dominated moves for B
             char sumBoard[length + 1 + length + 1];
-            sumBoard[2 * length + 1] = 0;
+            sumBoard[length + 1 + length] = 0;
             sumBoard[length] = E;
 
             {
                 State s1(boardText, 1);
                 State s2(boardText, 1);
+
+                char boardCopy[length];
+                memcpy(boardCopy, s2.board, length);
 
                 size_t moveCount = 0;
                 int *moves = s1.getMoves(1, 2, &moveCount);
@@ -213,12 +216,14 @@ int main() {
 
                         memcpy(sumBoard, s1.board, length);
                         memcpy(&sumBoard[length + 1], s2.board, length);
-                        for (int k = length; k < 2 * length; k++) {
+                        for (int k = length + 1; k < 2 * length + 1; k++) {
                             sumBoard[k] = opponentNumber(sumBoard[k]);
                         }
 
                         int bFirst = gameResult(db, sumBoard, 2 * length + 1, 1);
                         int wFirst = gameResult(db, sumBoard, 2 * length + 1, 2);
+
+                        memcpy(s2.board, boardCopy, length);
 
                         if (bFirst == wFirst) {
                             if (bFirst == 1) { // I - J is positive for black --> I > J
@@ -228,8 +233,7 @@ int main() {
                             }
                         }
 
-
-                        s2.undo(undo2);
+                        //s2.undo(undo2);
                     }
 
                     s1.undo(undo1);
@@ -245,6 +249,9 @@ int main() {
                 State s1(boardText, 2);
                 State s2(boardText, 2);
 
+                char boardCopy[length];
+                memcpy(boardCopy, s2.board, length);
+
                 size_t moveCount = 0;
                 int *moves = s1.getMoves(2, 1, &moveCount);
 
@@ -259,12 +266,14 @@ int main() {
 
                         memcpy(sumBoard, s1.board, length);
                         memcpy(&sumBoard[length + 1], s2.board, length);
-                        for (int k = length; k < 2 * length; k++) {
+                        for (int k = length + 1; k < 2 * length + 1; k++) {
                             sumBoard[k] = opponentNumber(sumBoard[k]);
                         }
 
                         int bFirst = gameResult(db, sumBoard, 2 * length + 1, 1);
                         int wFirst = gameResult(db, sumBoard, 2 * length + 1, 2);
+
+                        memcpy(s2.board, boardCopy, length);
 
                         if (bFirst == wFirst) {
                             if (bFirst == 2) { // I - J is positive for white --> I > J
@@ -274,8 +283,7 @@ int main() {
                             }
                         }
 
-
-                        s2.undo(undo2);
+                        //s2.undo(undo2);
                     }
 
                     s1.undo(undo1);
@@ -285,6 +293,7 @@ int main() {
                     delete[] moves;
                 }
             }
+
 
             entry = db.get(length, board);
             DB_SET_DOMINATED(entry, 1, domBlack);

@@ -676,11 +676,12 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     //Delete dominated moves
-    std::vector<std::pair<int, int>> subgames2 = generateSubgames(state);
+    std::vector<std::pair<int, int>> sg = generateSubgames(state);
 
-    for (int i = 0; i < subgames.size(); i++) {
-        int start = subgames2[i].first;
-        int end = subgames2[i].second; //index after end
+    for (int i = 0; i < sg.size(); i++) {
+        break;
+        int start = sg[i].first;
+        int end = sg[i].second; //index after end
         int len = end - start;
 
         unsigned char *dbEntry = db->get(len, &state->board[start]);
@@ -688,15 +689,15 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         uint64_t dominated = DB_GET_DOMINATED(dbEntry, p);
 
         int moveIndex = 0;
-        for (int i = 0; i < moveCount; i++) {
-            int from = moves[2 * i];
-            int to = moves[2 * i + 1];
+        for (int j = 0; j < moveCount; i++) {
+            int from = moves[2 * j];
+            int to = moves[2 * j + 1];
 
             if (from >= start && from < end) { //found move
                 if ((dominated >> moveIndex) & ((uint64_t) 1)) {
                     //std::cout << "FOUND" << std::endl;
-                    moves[2 * i] = -1;
-                    moves[2 * i + 1] = -1;
+                    moves[2 * j] = -1;
+                    moves[2 * j + 1] = -1;
                 }
                 moveIndex++;
             }
@@ -750,6 +751,10 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     for (int i = 0; i < moveCount; i++) {
+        if (moves[2 * i] == -1) {
+            continue;
+        }
+
         if (i == bestMove || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;
         }
@@ -759,13 +764,21 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     std::shuffle(moveOrder.begin(), moveOrder.end(), *rng);
 
     for (int i = 0; i < moveCount; i++) {
+        if (moves[2 * i] == -1) {
+            continue;
+        }
+
         if ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) {
             moveOrder.push_back(i);
         }
     }
 
     if (bestMove != -1) {
-        moveOrder.push_back(bestMove);
+        if (moves[2 * bestMove] != -1) {
+            moveOrder.push_back(bestMove);
+        } else {
+            bestMove = -1;
+        }
     }
 
 

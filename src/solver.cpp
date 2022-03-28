@@ -11,8 +11,8 @@
 
 
 int node_count = 0; //nodes visited
-int best_from = 0; //root player's move
-int best_to = 0;
+int best_from = -1; //root player's move
+int best_to = -1;
 
 //int collisions = 0; //transposition table collisions
 
@@ -611,7 +611,45 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         return std::pair<int, bool>(p, true); //current player wins
     }
+/*
+    //Only one N and others are all W
+    if ( (counts[OC_N] == 1) && counts[OC_W]== (subgames.size()-1)) {
+        // std::cout<<"R rule";
+        if (p == 2){
+        if (true  || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = WHITE;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = 127;
+        } 
+        }       
 
+        memcpy(state->board, oldBoard, state->boardSize);
+
+        return std::pair<int, bool>(p, true); //current player wins
+    }  
+
+    //Only one N and others are all B
+    if ( (counts[OC_N] == 1) && counts[OC_B]== (subgames.size()-1)) {
+        // std::cout<<"L rule";
+        if (p == 1){
+        if (true||depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = BLACK;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = 127;
+        } 
+        }       
+
+        memcpy(state->board, oldBoard, state->boardSize);
+
+        return std::pair<int, bool>(p, true); //current player wins
+    }
+*/
 
     //Use differences
     char boardCopy[state->boardSize];

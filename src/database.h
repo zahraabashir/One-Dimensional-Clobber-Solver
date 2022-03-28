@@ -10,6 +10,11 @@
 
 #define DB_MAX_BITS 16
 
+#define DB_ENTRY_SIZE 1 + 2 * sizeof(uint64_t)
+
+#define DB_GET_OUTCOME(entry) entry != 0 ? *((unsigned char *) entry) : 0;
+#define DB_SET_OUTCOME(entry, value) *((unsigned char *) entry) = value;
+
 class Database {
   private:
     FILE *file;
@@ -22,8 +27,8 @@ class Database {
 
     Database();
     ~Database();
-    int get(int len, char *board);
-    void set(int len, char *board, int outcome);
+    unsigned char *get(int len, char *board);
+    //void set(int len, char *board, int outcome);
 
     void load();
     void save();

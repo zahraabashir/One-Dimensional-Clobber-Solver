@@ -31,6 +31,8 @@ Database::Database() {
         size += maxGame + 1;
     }
 
+    size *= DB_ENTRY_SIZE;
+
     data = (unsigned char *) calloc(size, 1);
 }
 
@@ -39,20 +41,20 @@ Database::~Database() {
 	//std::cout << "DB destructor" << std::endl;
 }
 
-int Database::get(int len, char *board) {
+unsigned char *Database::get(int len, char *board) {
     if (len > DB_MAX_BITS) {
         return 0;
     }
 
 	int idx = getIdx(len, board);
-    return data[idx];
+    return &data[idx * DB_ENTRY_SIZE];
 }
 
-void Database::set(int len, char *board, int outcome) {
-	int idx = getIdx(len, board);
-	char outcomeByte = outcome;
-    data[idx] = outcomeByte;
-}
+//void Database::set(int len, char *board, int outcome) {
+//	int idx = getIdx(len, board);
+//	char outcomeByte = outcome;
+//    data[idx] = outcomeByte;
+//}
 
 void Database::load() {
     file = fopen("database.bin", "r+");

@@ -32,6 +32,7 @@ int main() {
         char board[length];
 
         char mirrorBoard[length];
+        unsigned char *entry;
 
         for (int game = 0; game <= maxGame; game++) {
             cout << "Length - Game: " << length << " " << game << endl;
@@ -75,7 +76,8 @@ int main() {
             int outcome = 0;
 
             if (mirror) {
-                outcome = db.get(length, mirrorBoard);
+                entry = db.get(length, mirrorBoard);
+                outcome = DB_GET_OUTCOME(entry);
 
                 switch (outcome) {
                     case OC_B:
@@ -96,7 +98,9 @@ int main() {
                 }
 
 
-                db.set(length, board, outcome);
+                entry = db.get(length, board);
+                DB_SET_OUTCOME(entry, outcome);
+
                 cout << endl;
                 continue;
             }
@@ -143,7 +147,8 @@ int main() {
                 outcome = OC_P;
             }
 
-            db.set(length, board, outcome);
+            entry = db.get(length, board);
+            DB_SET_OUTCOME(entry, outcome);
             cout << endl;
         }
 

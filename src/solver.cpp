@@ -442,7 +442,9 @@ void BasicSolver::simplify(State *state) {
 
         int length = e - s;
         std::string subBoard(&board[s], length);
-        int outcome = db->get(length, subBoard.data());
+        //int outcome = db->get(length, subBoard.data());
+        unsigned char *entry = db->get(length, subBoard.data());
+        int outcome = DB_GET_OUTCOME(entry);
 
         //std::cout << "Deleting" << std::endl;
         if (outcome == OC_P) {
@@ -543,7 +545,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         int length = it->second - it->first;
         lengths.push_back(length);
 
-        int outcome = db->get(length, &state->board[it->first]);
+        unsigned char *entry = db->get(length, &state->board[it->first]);
+        int outcome = DB_GET_OUTCOME(entry);
+        //int outcome = db->get(length, &state->board[it->first]);
         outcomes.push_back(outcome);
 
         counts[outcome] += 1;

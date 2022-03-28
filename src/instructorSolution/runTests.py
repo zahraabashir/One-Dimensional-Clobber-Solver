@@ -20,6 +20,8 @@ for f in ["-nc", "--nc", "-nocolor", "--nocolor", "-noColor", "--noColor"]:
         noColor = True
         break
 
+print("Fast mode (not checking moves)" if fastMode else "Normal mode (checking moves)")
+
 baseDir = os.path.dirname(__file__)
 
 cRed = "\u001b[31m"

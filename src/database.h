@@ -15,7 +15,7 @@
 #define DB_GET_OUTCOME(entry) (entry == 0 ? 0 : *((unsigned char *) entry))
 #define DB_SET_OUTCOME(entry, value) *((unsigned char *) entry) = value
 
-#define DB_GET_DOMINATED(entry, player) entry == 0 ? 0 : ((uint64_t *) (((unsigned char *) entry) + 1))[player - 1]
+#define DB_GET_DOMINATED(entry, player) (entry == 0 ? 0 : ((uint64_t *) (((unsigned char *) entry) + 1))[player - 1])
 #define DB_SET_DOMINATED(entry, player, mask) ((uint64_t *) (((unsigned char *) entry) + 1))[player - 1] = mask
 
 class Database {

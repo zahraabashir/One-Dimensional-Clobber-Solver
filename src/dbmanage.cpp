@@ -14,7 +14,15 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     solver->timeLimit = 1000000000.0;
     solver->startTime = start;
 
-    State *root = new State(board, player);
+
+    char boardText[boardSize + 1];
+    memcpy(boardText, board, boardSize);
+    boardText[boardSize] = 0;
+    for (int i = 0; i < boardSize; i++) {
+        boardText[i] = playerNumberToChar(boardText[i]);
+    }
+
+    State *root = new State(boardText, player);
 
     result = solver->solveID(root, player, opponentNumber(player));
 
@@ -183,8 +191,9 @@ int main() {
 
 
             //find dominated moves for B
-            char sumBoard[2 * length + 1];
-            sumBoard[2 * length] = 0;
+            char sumBoard[length + 1 + length + 1];
+            sumBoard[2 * length + 1] = 0;
+            sumBoard[length] = E;
 
             {
                 State s1(boardText, 1);
@@ -203,13 +212,13 @@ int main() {
                         s2.play(moves[2 * j], moves[2 * j + 1], undo2);
 
                         memcpy(sumBoard, s1.board, length);
-                        memcpy(&sumBoard[length], s2.board, length);
+                        memcpy(&sumBoard[length + 1], s2.board, length);
                         for (int k = length; k < 2 * length; k++) {
                             sumBoard[k] = opponentNumber(sumBoard[k]);
                         }
 
-                        int bFirst = gameResult(db, sumBoard, 2 * length, 1);
-                        int wFirst = gameResult(db, sumBoard, 2 * length, 2);
+                        int bFirst = gameResult(db, sumBoard, 2 * length + 1, 1);
+                        int wFirst = gameResult(db, sumBoard, 2 * length + 1, 2);
 
                         if (bFirst == wFirst) {
                             if (bFirst == 1) { // I - J is positive for black --> I > J
@@ -246,13 +255,13 @@ int main() {
                         s2.play(moves[2 * j], moves[2 * j + 1], undo2);
 
                         memcpy(sumBoard, s1.board, length);
-                        memcpy(&sumBoard[length], s2.board, length);
+                        memcpy(&sumBoard[length + 1], s2.board, length);
                         for (int k = length; k < 2 * length; k++) {
                             sumBoard[k] = opponentNumber(sumBoard[k]);
                         }
 
-                        int bFirst = gameResult(db, sumBoard, 2 * length, 1);
-                        int wFirst = gameResult(db, sumBoard, 2 * length, 2);
+                        int bFirst = gameResult(db, sumBoard, 2 * length + 1, 1);
+                        int wFirst = gameResult(db, sumBoard, 2 * length + 1, 2);
 
                         if (bFirst == wFirst) {
                             if (bFirst == 2) { // I - J is positive for white --> I > J

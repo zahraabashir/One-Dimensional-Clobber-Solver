@@ -675,6 +675,36 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         return std::pair<int, bool>(n, true);
     }
 
+    //Delete dominated moves
+    std::vector<std::pair<int, int>> subgames2 = generateSubgames(state);
+
+    for (int i = 0; i < subgames.size(); i++) {
+        int start = subgames2[i].first;
+        int end = subgames2[i].second; //index after end
+        int len = end - start;
+
+        unsigned char *dbEntry = db->get(len, &state->board[start]);
+
+        uint64_t dominated = DB_GET_DOMINATED(dbEntry, p);
+
+        int moveIndex = 0;
+        for (int i = 0; i < moveCount; i++) {
+            int from = moves[2 * i];
+            int to = moves[2 * i + 1];
+
+            if (from >= start && from < end) { //found move
+                if ((dominated >> moveIndex) & ((uint64_t) 1)) {
+                    //std::cout << "FOUND" << std::endl;
+                    moves[2 * i] = -1;
+                    moves[2 * i + 1] = -1;
+                }
+                moveIndex++;
+            }
+        }
+
+    }
+
+
 
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
@@ -761,6 +791,10 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
+
+        if (from == -1) { //this move was pruned
+            continue;
+        }
 
         state->play(from, to, undoBuffer);
         std::pair<int, bool> result = searchID(state, n, p, depth + 1);

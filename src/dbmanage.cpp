@@ -234,7 +234,10 @@ int main() {
 
                     s1.undo(undo1);
                 }
-                delete[] moves;
+
+                if (moveCount > 0) {
+                    delete[] moves;
+                }
             }
 
             //find dominated moves for W
@@ -277,7 +280,10 @@ int main() {
 
                     s1.undo(undo1);
                 }
-                delete[] moves;
+
+                if (moveCount > 0) {
+                    delete[] moves;
+                }
             }
 
             entry = db.get(length, board);

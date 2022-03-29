@@ -11,8 +11,8 @@
 
 
 int node_count = 0; //nodes visited
-int best_from = 0; //root player's move
-int best_to = 0;
+int best_from = -1; //root player's move
+int best_to = -1;
 
 //int collisions = 0; //transposition table collisions
 

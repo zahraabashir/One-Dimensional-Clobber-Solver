@@ -188,7 +188,12 @@ int main() {
                 outcome = OC_P;
             }
 
+            std::cout << "Lookup" << std::endl;
             entry = db.get(length, board);
+            if (DB_GET_OUTCOME(entry) != 0) {
+                cout << "Overwriting outcome: " << DB_GET_OUTCOME(entry) << endl;
+                while(1){}
+            }
             DB_SET_OUTCOME(entry, outcome);
 
 
@@ -312,6 +317,17 @@ int main() {
 
 
             entry = db.get(length, board);
+            {
+                int o = DB_GET_OUTCOME(entry);
+                uint64_t b = DB_GET_DOMINATED(entry, 1);
+                uint64_t w = DB_GET_DOMINATED(entry, 2);
+
+                if (DB_GET_DOMINATED(entry, 1) != 0 || DB_GET_DOMINATED(entry, 2) != 0) {
+                    cout << "Overwriting dominated set" << endl;
+                    //while(1){}
+                }
+            }
+
             DB_SET_DOMINATED(entry, 1, domBlack);
             DB_SET_DOMINATED(entry, 2, domWhite);
             std::cout << domBlack << " " << domWhite << std::endl;

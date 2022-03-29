@@ -24,7 +24,7 @@ DBManage: dbmanage.o database.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o TheSolvers DBManage
+	-rm *.o TheSolvers DBManage dbtest
 
 cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code

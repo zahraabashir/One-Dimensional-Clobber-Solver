@@ -11,7 +11,7 @@ int main() {
     db.load();
 
     char boardText[] = "BWBWWWWWWW";
-    int len = sizeof(boardText);
+    int len = sizeof(boardText) - 1;
 
     cout << boardText << endl;
 
@@ -25,7 +25,19 @@ int main() {
 
     unsigned char *entry = db.get(len, board);
 
-    cout << "Outcome: " << DB_GET_OUTCOME(entry) << endl;
+    cout << "-----" << endl;
+    for (int i = 0; i < 1 + 2 * sizeof(uint64_t); i++) {
+        cout << (int) entry[i] << " ";
+    }
+    cout << endl;
+    cout << "-----" << endl;
+
+
+    cout << "Len: " << len << endl;
+    cout << "Entry: " << (int *) entry << endl;
+    uint64_t bDom = DB_GET_DOMINATED(entry, 1);
+    uint64_t wDom = DB_GET_DOMINATED(entry, 2);
+    cout << "Outcome, domBlack, domWhite: " << DB_GET_OUTCOME(entry) << " " << bDom << " " << wDom << endl;
 
 
     State state(boardText, 1);
@@ -38,7 +50,6 @@ int main() {
         cout << moves[2 * i] << + " - " << moves[2 * i + 1] << endl;
     }
 
-    uint64_t bDom = DB_GET_DOMINATED(entry, 1);
     cout << "Dominated moves:" << endl;
     for (int i = 0; i < 64; i++) {
         if ((bDom >> i) & ((uint64_t) 1)) {
@@ -47,7 +58,6 @@ int main() {
     }
 
 
-    std::cout << DB_GET_DOMINATED(entry, 1) << " " << DB_GET_DOMINATED(entry, 2) << std::endl;
 
 
 

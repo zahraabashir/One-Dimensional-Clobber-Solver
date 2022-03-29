@@ -93,5 +93,4 @@ class BasicSolver {
 
 
 
-
-
+std::vector<std::pair<int, int>> generateSubgames(State *state);

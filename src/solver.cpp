@@ -185,7 +185,6 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
 
 
 
-
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;

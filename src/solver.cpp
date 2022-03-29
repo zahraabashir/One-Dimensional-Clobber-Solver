@@ -679,7 +679,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     std::vector<std::pair<int, int>> sg = generateSubgames(state);
 
     for (int i = 0; i < sg.size(); i++) {
-        break;
         int start = sg[i].first;
         int end = sg[i].second; //index after end
         int len = end - start;
@@ -689,7 +688,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         uint64_t dominated = DB_GET_DOMINATED(dbEntry, p);
 
         int moveIndex = 0;
-        for (int j = 0; j < moveCount; i++) {
+        for (int j = 0; j < moveCount; j++) {
             int from = moves[2 * j];
             int to = moves[2 * j + 1];
 

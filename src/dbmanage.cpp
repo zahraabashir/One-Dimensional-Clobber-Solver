@@ -78,7 +78,7 @@ int main() {
                 mirror = true;
             }
 
-            mirror = false;
+            //mirror = false;
 
             for (int i = 0; i < length; i++) {
                 if ((game >> i) & 1) {

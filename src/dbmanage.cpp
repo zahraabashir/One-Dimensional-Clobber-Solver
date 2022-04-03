@@ -730,11 +730,11 @@ vector<string> string_list;
                 // std::cout << domBlack << " " << domWhite << std::endl;
             }
             //end of dominated
-
+            if(DB_GET_VALUE(entry)==VAL_UNK){
             //start of game value for left and right
             if(length>=2){
             // first check if it is one of the three patterns and has already a value
-            if(DB_GET_VALUE(entry)==VAL_UNK){
+            //
             // IF not:
             //calculate game values for R and L on this board
                 int Black_value = gameValue(db, board, length, 1);
@@ -746,11 +746,12 @@ vector<string> string_list;
                 // cout<< "board value" <<board_value<<"\n";
                 DB_SET_VALUE(entry, board_value);
                 }
-            }
                 else{
                 DB_SET_VALUE(entry, VAL_UNK); 
-            }
-          }
+                }
+
+            } 
+        }
 
             // printing the final gameValue       
             a = DB_GET_VALUE(entry);

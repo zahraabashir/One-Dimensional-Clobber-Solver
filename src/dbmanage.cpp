@@ -7,6 +7,8 @@
 #include <chrono>
 #include <set>
 #include <string>
+#include <iostream>
+#include <algorithm>
 using namespace std;
 
 bool all_black(string s){
@@ -132,9 +134,216 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     return result;
 }
 
+int set_basic_value_rules(int L, int R){
+    if (L==-1 || R==-1)return 0; //{ | } = 0
+    int R_downs = int((R/10)%10);
+    if (L==0 & R==0) return 1;
+    else if (L==0 & R==1) return 100;
+    else if (L==1 & R==0) return 10;
+    else if (L==0 and R_downs==0){ //Rule 0 and 1
+        //rule 0
+        if(R%100==1){ // if R has one *
+            int ups = R/100;
+            return (ups+1)*100; //
+        }
+        //rule 1
+        if(R%100==0){// R has no star
+            int ups = R/100;
+            return ((ups+1)*100+1); //
+        }
+    }
+    else return VAL_UNK;
+}
+
+int compare(int value1, int value2, bool max){
+//implement comparision
+    int ups_1 =  int(value1/100);
+    int downs_1 = int((value1/10)%10);
+    int stars_1 = int(value1%100);
+
+    int ups_2 =  int(value2/100);
+    int downs_2 = int((value2/10)%10);
+    int stars_2 = int(value2%100);
+
+// it is just for testing -> should be well implemeneted
+ if (max){
+     //take max
+     // if we have star in both go according to comparision rule 2
+     if (stars_1>0 and stars_1>0){
+         if(ups_1>ups_2 && downs_2<downs_1){
+             // value1>value2
+            return value1;}
+        else return value2;
+         }
+    // if both do not have star follow rule 1
+    else if (stars_1==0 and stars_1==0){
+         if(ups_1>ups_2 && downs_2<downs_1){
+             // value1>value2
+            return value1;}
+        else return value2;
+         }
+    
+    else return -1; // not comparabale!!!
+    }
+ 
+ 
+ else{
+     //take min
+     // if we have star in both go according to comparision rule 2
+     if (stars_1>0 and stars_1>0){
+         if(ups_1<=ups_2 && downs_2<=downs_1){
+             // value1>value2
+            return value1;}
+        else return value2;
+         }
+    // if both do not have star follow rule 1
+    else if (stars_1==0 and stars_1==0){
+         if(ups_1>ups_2 && downs_2<downs_1){
+             // value1>value2
+            return value1;}
+        else return value2;
+    }
+    else return VAL_UNK; // not comparabale!!!
+ 
+ 
+ 
+ }
 
 
-using namespace std;
+}
+
+int simplifySumValue(int value){
+    int ups=  int(value/100);
+    int downs= int((value/10)%10);
+    int stars = int(value%100);
+
+    stars = stars%2;
+    if (ups >= downs){
+        ups = ups - downs;
+        downs = 0;
+    }else{
+        downs = downs - ups;
+        ups= 0;
+    }
+
+    int final_value = 100*ups + 10*downs + stars;
+
+    return final_value;
+
+}
+
+
+int gameValue(Database &db, char *board, int boardSize, int player){
+    // returns val_unk if the value cannot be computed, returns -1 if there are no options (empty options)
+    // cout<<"finding game value \n";
+    // play left or right base on the given player
+    std:: vector<int> optionValues ;
+    
+    BasicSolver *solver = new BasicSolver(player, boardSize, &db);
+
+    char boardText[boardSize + 1];
+    memcpy(boardText, board, boardSize);
+    boardText[boardSize] = 0;
+    for (int i = 0; i < boardSize; i++) {
+        
+        boardText[i] = playerNumberToChar(boardText[i]);
+        // cout<<boardText[i];
+        
+    }
+    // cout<<"\n";
+
+    State *state = new State(boardText, player);
+    // cout<<"board created\n";
+
+    size_t moveCount;
+    int *moves = state->getMoves(player, opponentNumber(player), &moveCount);
+    // -1 means there is no move (empty) not zero
+    if(moveCount==0){
+        return -1;
+    }
+    // cout<<"moves";
+
+    // first play
+
+    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
+    
+    bool No_value=false;
+
+    for (size_t i = 0; i < moveCount; i++) {
+        int from = moves[2 * i];
+        int to = moves[2 * i + 1];
+        // cout<<"from to"<< from<< to<<"\n";
+
+        state->play(from, to, undoBuffer);
+        // int result = solve(state, n, p);
+        //solve on level
+
+        //first simplify
+        solver->simplify(state);
+
+        // solve each move 1 leve;
+        uint64_t gameVal = 0;
+        std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+        int subgameCount = subgames.size();
+
+        if(subgameCount==0) {optionValues.push_back(0);
+        // cout<<"subgame is zero \n";
+        }
+        else{
+            //for each subgame (probably 2) get the value from db and add them
+        for (auto it = subgames.begin(); it != subgames.end(); it++) {
+            int length = it->second - it->first;
+
+            unsigned char *entry = db.get(length, &state->board[it->first]);
+            int SubgameVal = DB_GET_VALUE(entry);
+            // cout<<"subgame values "<< SubgameVal<<"\n";
+            // with the assumption that sum of 2 or many stars is star. (not sure?) 
+            // it won't support * ups and downs more than 9
+            if (SubgameVal!=VAL_UNK) {
+                int SubgameVal_simplified = simplifySumValue(SubgameVal);
+                gameVal+= SubgameVal_simplified; 
+            }
+            
+               //should be completed later : incorporate less than zero rule -> for now just says we can't get the value
+            else {optionValues.push_back(VAL_UNK); No_value=true;  return VAL_UNK; } // if no value then we cannot get a value for this game
+        }
+        // gameVal = Subgameval1 + Subgameval2
+        optionValues.push_back(gameVal);
+
+        }
+
+        state->undo(undoBuffer);
+
+    }
+        
+        int return_value = -1; // -> gets replaced fast
+
+                // if black return max lef
+            if(player==1){
+                return_value = optionValues[0];
+                for (int i =1; i<optionValues.size(); i++){
+                    // cout<<"return value B "<<return_value << "\n";
+                    // implement a way to compare values
+                    return_value = compare(optionValues[i],return_value,true);
+                    if (return_value== VAL_UNK) return VAL_UNK;
+
+                }
+
+            }
+            else{// if white return min right
+                return_value = optionValues[0];
+                for (int i =1; i<optionValues.size(); i++){
+                    // cout<<"return value W "<<return_value << "\n";
+                    // implement a way to compare values
+                    return_value = compare(optionValues[i],return_value,false);
+                    if (return_value== VAL_UNK) return VAL_UNK;
+                }
+            }
+        
+
+
+    return return_value;
+}
 
 void printBits(int x, int length) {
     for (int i = 0; i < length; i++) {
@@ -150,6 +359,8 @@ int main() {
 
     int maxLength = DB_MAX_BITS;
     int maxGame = 0;
+
+    // Initial patterns saving starts
     string s1 = "";
     string s2 = "";
 
@@ -237,6 +448,8 @@ vector<string> string_list;
 
     }
 
+    // initial pattern saving ends
+
     // cout<<"END \n\n\n\n";
     maxLength = DB_MAX_BITS;
     maxGame = 0;
@@ -292,12 +505,16 @@ vector<string> string_list;
             int outcome = 0;
             uint64_t domBlack = 0;
             uint64_t domWhite = 0;
+            uint64_t gameValue_mirror = 0;
 
             if (mirror) {
                 entry = db.get(length, mirrorBoard);
                 outcome = DB_GET_OUTCOME(entry);
                 domBlack = DB_GET_DOMINATED(entry, 1);
                 domWhite = DB_GET_DOMINATED(entry, 2);
+                // game_values
+                gameValue_mirror = DB_GET_VALUE(entry);
+                // cout<< "original game value: "<< gameValue_mirror<<"\n";
 
                 switch (outcome) {
                     case OC_B:
@@ -322,6 +539,17 @@ vector<string> string_list;
                 DB_SET_OUTCOME(entry, outcome);
                 DB_SET_DOMINATED(entry, 1, domWhite); //invert dominance
                 DB_SET_DOMINATED(entry, 2, domBlack);
+                //invert game values -> exchange ups and downs; stars remain the same
+                if (gameValue_mirror!=VAL_UNK){
+                    int ups =  int(gameValue_mirror/100);
+                    int downs = int((gameValue_mirror/10)%10);
+                    int stars = int(gameValue_mirror%100);
+                    uint64_t InverseValue = downs*100 + ups*10 + stars;
+                    // cout<< "mirror game value: "<< InverseValue<<"\n";
+                    DB_SET_VALUE(entry,InverseValue);
+                }
+                else DB_SET_VALUE(entry,VAL_UNK);
+
 
                 continue;
             }
@@ -375,15 +603,7 @@ vector<string> string_list;
                 while(1){}
             }
             uint64_t a = 0;
-            DB_SET_OUTCOME(entry, outcome);            
-            a = DB_GET_VALUE(entry);
-            if (a!=VAL_UNK){
-                for (int i = 0; i < length; i++) {
-                cout << boardText[i];
-                 }
-                cout << endl;
-                cout<<a<<"\tGAME VALUE\n";
-            }
+            DB_SET_OUTCOME(entry, outcome);              
 
 
             if (length <= DB_MAX_DOMINANCE_BITS ) {
@@ -511,6 +731,36 @@ vector<string> string_list;
             }
             //end of dominated
 
+            //start of game value for left and right
+            if(length>=2){
+            // first check if it is one of the three patterns and has already a value
+            if(DB_GET_VALUE(entry)==VAL_UNK){
+            // IF not:
+            //calculate game values for R and L on this board
+                int Black_value = gameValue(db, board, length, 1);
+                int White_value = gameValue(db, board, length, 2);
+                // cout<< "B value" <<Black_value<<"white:"<< White_value << "\n";
+
+                if (Black_value!=VAL_UNK & White_value!=VAL_UNK){
+                uint64_t board_value = set_basic_value_rules(Black_value,White_value);
+                // cout<< "board value" <<board_value<<"\n";
+                DB_SET_VALUE(entry, board_value);
+                }
+            }
+                else{
+                DB_SET_VALUE(entry, VAL_UNK); 
+            }
+          }
+
+            // printing the final gameValue       
+            a = DB_GET_VALUE(entry);
+            if (a!=VAL_UNK){
+                for (int i = 0; i < length; i++) {
+                cout << boardText[i];
+                 }
+                cout << endl;
+                cout<<a<<"\tGAME VALUE\n";
+            }
 
             // cout << endl;
         }

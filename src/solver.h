@@ -29,7 +29,7 @@ class BasicSolver {
 
     std::default_random_engine *rng;
 
-    void simplify(State *state);
+    
   public:
     int rootPlayer;
     int boardSize;
@@ -55,6 +55,8 @@ class BasicSolver {
 
     BasicSolver(int rootPlayer, int boardSize, Database *db);
     ~BasicSolver();
+
+    void simplify(State *state);
 
     //true if the given entry matches the state and player
     bool validateTableEntry(State *state, int p, char *entry);
@@ -88,6 +90,7 @@ class BasicSolver {
     void updateTime();
 
     //void setTableEntry(int code, char *board, char player, char outcome);
+    // std::vector<std::pair<int, int>> generateSubgames(State *state);
 
 };
 

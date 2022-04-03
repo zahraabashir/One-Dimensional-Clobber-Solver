@@ -8,6 +8,7 @@
 #define OC_P 3
 #define OC_N 4
 #define VAL_UNK 1000000
+
 #define DB_MAX_BITS 10
 #define DB_MAX_DOMINANCE_BITS 2
 
@@ -23,8 +24,6 @@
 #define DB_GET_DOMINATED(entry, player) (entry == 0 ? 0 : ((uint64_t *) (&entry[1]))[player - 1])
 #define DB_SET_DOMINATED(entry, player, mask) ((uint64_t *) (&entry[1]))[player - 1] = mask
 
-// #define DB_GET_VALUE(entry) (entry == 0 ? (0,0,0) : (((uint64_t *) (&entry[2]))[0] , ((uint64_t *) (&entry[2]))[1], ((uint64_t *) (&entry[2]))[2]))
-// #define DB_SET_VALUE(entry, value1, value2, value3) (((uint64_t *) (&entry[2]))[0]= value1, ((uint64_t *) (&entry[2]))[1]= value2, ((uint64_t *) (&entry[2]))[2]= value3)
 
 #define DB_GET_VALUE(entry) (entry == 0 ? 0 : ((uint64_t *) (&entry[2]))[0])
 #define DB_SET_VALUE(entry, value) ((uint64_t *) (&entry[2]))[0]= value

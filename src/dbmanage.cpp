@@ -550,7 +550,15 @@ vector<string> string_list;
                 }
                 else DB_SET_VALUE(entry,VAL_UNK);
 
-
+                    // printing the final gameValue       
+                    unsigned int a = DB_GET_VALUE(entry);
+                    if (a!=VAL_UNK){
+                        for (int i = 0; i < length; i++) {
+                        cout << boardText[i];
+                        }
+                        cout << endl;
+                        cout<<a<<"\tGAME VALUE\n";
+                    }
                 continue;
             }
 

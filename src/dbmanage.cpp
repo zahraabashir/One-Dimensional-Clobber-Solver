@@ -418,13 +418,6 @@ vector<string> string_list;
             }
 
             entry = db.get(length, board);
-            found = (std::find(string_list.begin(), string_list.end(), s) != string_list.end());
-            
-            if (found == true){
-                DB_SET_VALUE(entry, 0);
-                continue;
-
-            }
             
             if (mirror) {
                 for (int i = 0; i < length; i++) {
@@ -438,6 +431,13 @@ vector<string> string_list;
                 entry = db.get(length, mirrorBoard);
             }
             
+            found = (std::find(string_list.begin(), string_list.end(), s) != string_list.end());
+            
+            if (found == true){
+                DB_SET_VALUE(entry, 0);
+                continue;
+
+            }
 
             uint64_t gValue = VAL_UNK;
             gValue = get_pattern_value(boardText, length);
@@ -553,6 +553,7 @@ vector<string> string_list;
                     // printing the final gameValue       
                     unsigned int a = DB_GET_VALUE(entry);
                     if (a!=VAL_UNK){
+  
                         for (int i = 0; i < length; i++) {
                         cout << boardText[i];
                         }
@@ -764,11 +765,13 @@ vector<string> string_list;
             // printing the final gameValue       
             a = DB_GET_VALUE(entry);
             if (a!=VAL_UNK){
+
                 for (int i = 0; i < length; i++) {
                 cout << boardText[i];
                  }
                 cout << endl;
                 cout<<a<<"\tGAME VALUE\n";
+
             }
 
             // cout << endl;

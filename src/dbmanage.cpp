@@ -5,6 +5,106 @@
 #include "solver.h"
 #include "database.h"
 #include <chrono>
+#include <set>
+#include <string>
+using namespace std;
+
+bool all_black(string s){
+    set <char> s1;
+   
+    for ( int i=0 ; i < s.length() ; i++){
+        s1.insert(s[i]);}
+     
+    if ( s1.size() == 1 && s[0]=='B'){
+        // cout << "YES";
+        return true;
+    }
+    else{
+        // cout << "NO";
+        return false;
+    }
+}
+bool all_white(string s){
+    set <char> s1;
+   
+    for ( int i=0 ; i < s.length() ; i++){
+        s1.insert(s[i]);}
+     
+    if ( s1.size() == 1 && s[0]=='W'){
+        // cout << "YES";
+        return true;
+    }
+    else{
+        // cout << "NO";
+        return false;
+    }
+}
+
+int get_pattern_value(char* board, int length){
+    // all patterns
+    string s = "";
+    int up_count = 0;
+    int down_count = 0;
+    int star_count = 0;
+
+    for (int i = 0; i < length; i++) {
+        s += board[i];
+
+    }
+
+    if (s[0] =='W' && all_black(s.substr(1, length))){
+        //length-1 * up + lenth * star
+        up_count += length-2;
+        star_count += length-1;
+        star_count = star_count%2;
+        return (star_count + 10*down_count + 100*up_count);
+    }
+    else if(s[0] =='B' && all_white(s.substr(1, length))){
+        //length-1 * down + lenth * star
+        down_count += length-2;
+        star_count += length-1;
+        star_count = star_count%2;
+
+        return (star_count + 10*down_count + 100*up_count);
+
+    }
+    else if(length%3==0){
+        int count =0;
+        for (int i = 0; i < length/3 ; i++) {
+            if (s.substr(0+i*3, 3+i*3) =="BBW"){
+                count +=1;}
+        
+        }
+        if (count == length/3){
+            return ((length/3 +1)/2) *100;
+        }
+         else{
+            return VAL_UNK;
+        }
+
+        count = 0;
+        for (int i = 0; i < length/3 ; i++) {
+            if (s.substr(0+i*3, 3+i*3) =="WWB"){
+                count +=1;
+            }
+    
+        }
+        if (count == length/3){
+            return ((length/3 +1)/2) *100;
+        }
+        else{
+            return VAL_UNK;
+        }
+
+    }
+
+    else{
+
+        return VAL_UNK;
+    }
+}
+
+
 
 int gameResult(Database &db, char *board, int boardSize, int player) {
     int result;
@@ -48,10 +148,98 @@ int main() {
     Database db;
     //db.load(); //might be wrong to load here
 
-
     int maxLength = DB_MAX_BITS;
     int maxGame = 0;
+    string s1 = "";
+    string s2 = "";
 
+                
+//BLACK = 0
+vector<string> string_list;
+
+    for (int m = 2; m < DB_MAX_BITS/2; m++) {
+            
+        for (int n = 2; n < DB_MAX_BITS/2; n++) {
+                s1 = string(m, 'B') + string(n, 'W');
+                s2 = string(m, 'W') + string(n, 'B');
+                string_list.push_back(s1);
+                string_list.push_back(s2);
+                
+            }
+    }
+    
+    bool found = false;
+    string s ="";
+    for (int length = 1; length <= maxLength; length++) {
+        maxGame *= 2;
+        maxGame += 1;
+
+        char boardText[length + 1];
+        char board[length + 1];
+        char mirrorBoard[length + 1];
+
+        boardText[length] = 0;
+        board[length] = 0;
+        mirrorBoard[length] = 0;
+
+        unsigned char *entry;
+
+        for (int game = 0; game <= maxGame; game++) {
+            s = "";
+            bool mirror = false;
+
+            if (game > (maxGame + 2) / 2) {
+                mirror = true;
+            }
+
+            for (int i = 0; i < length; i++) {
+                if ((game >> i) & 1) {
+                    boardText[i] = 'W';
+                    
+                    board[i] = WHITE;
+                    s += 'W';
+                } else {
+                    boardText[i] = 'B';
+                    board[i] = BLACK;
+                    s += 'B';
+                }
+                
+            }
+
+            entry = db.get(length, board);
+            found = (std::find(string_list.begin(), string_list.end(), s) != string_list.end());
+            
+            if (found == true){
+                DB_SET_VALUE(entry, 0);
+                continue;
+
+            }
+            
+            if (mirror) {
+                for (int i = 0; i < length; i++) {
+                    if ((game >> i) & 1) {
+                        mirrorBoard[i] = BLACK;
+                        
+                    } else {
+                        mirrorBoard[i] = WHITE;
+                    }
+                }
+                entry = db.get(length, mirrorBoard);
+            }
+            
+
+            uint64_t gValue = VAL_UNK;
+            gValue = get_pattern_value(boardText, length);
+            DB_SET_VALUE(entry, gValue);
+
+        
+    }
+
+    }
+
+    // cout<<"END \n\n\n\n";
+    maxLength = DB_MAX_BITS;
+    maxGame = 0;
     for (int length = 1; length <= maxLength; length++) {
 
         maxGame *= 2;
@@ -68,8 +256,8 @@ int main() {
         unsigned char *entry;
 
         for (int game = 0; game <= maxGame; game++) {
-            cout << "Length - Game: " << length << " " << game << endl;
-            printBits(game, length);
+            // cout << "Length - Game: " << length << " " << game << endl;
+            // printBits(game, length);
 
 
             bool mirror = false;
@@ -100,13 +288,6 @@ int main() {
                 }
             }
 
-
-
-            
-            for (int i = 0; i < length; i++) {
-                cout << boardText[i];
-            }
-            cout << endl;
 
             int outcome = 0;
             uint64_t domBlack = 0;
@@ -142,12 +323,11 @@ int main() {
                 DB_SET_DOMINATED(entry, 1, domWhite); //invert dominance
                 DB_SET_DOMINATED(entry, 2, domBlack);
 
-                cout << endl;
                 continue;
             }
 
 
-            cout << "solving" << endl;
+            // cout << "solving" << endl;
             int result1, result2;
 
             {
@@ -188,13 +368,22 @@ int main() {
                 outcome = OC_P;
             }
 
-            std::cout << "Lookup" << std::endl;
+            // std::cout << "Lookup" << std::endl;
             entry = db.get(length, board);
             if (DB_GET_OUTCOME(entry) != 0) {
-                cout << "Overwriting outcome: " << DB_GET_OUTCOME(entry) << endl;
+                // cout << "Overwriting outcome: " << DB_GET_OUTCOME(entry) << endl;
                 while(1){}
             }
-            DB_SET_OUTCOME(entry, outcome);
+            uint64_t a = 0;
+            DB_SET_OUTCOME(entry, outcome);            
+            a = DB_GET_VALUE(entry);
+            if (a!=VAL_UNK){
+                for (int i = 0; i < length; i++) {
+                cout << boardText[i];
+                 }
+                cout << endl;
+                cout<<a<<"\tGAME VALUE\n";
+            }
 
 
             if (length <= DB_MAX_DOMINANCE_BITS ) {
@@ -318,11 +507,12 @@ int main() {
 
                 DB_SET_DOMINATED(entry, 1, domBlack);
                 DB_SET_DOMINATED(entry, 2, domWhite);
-                std::cout << domBlack << " " << domWhite << std::endl;
+                // std::cout << domBlack << " " << domWhite << std::endl;
             }
+            //end of dominated
 
 
-            cout << endl;
+            // cout << endl;
         }
 
     }

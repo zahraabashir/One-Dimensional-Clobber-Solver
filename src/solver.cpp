@@ -257,7 +257,15 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
         }
 
         state->play(from, to, undoBuffer);
+
+        // std::cout<<" starrting player "<<p<< "\n";
+        // for (int i = 0; i < state->boardSize; i++) {
+        // std::cout << playerNumberToChar(state->board[i]);
+        // }
+        // std::cout<<"\n";
+
         std::pair<int, bool> result = searchID(state, n, p, depth + 1);
+        // std::cout<<"Results first player"<< playerNumberToChar(result.first)<<"\n";
 
         if (outOfTime) {
             delete[] moves;
@@ -598,18 +606,25 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     int outcomeMask = 0;
 
+    // std::cout<<"player "<<p<< "\n";
+    // for (int i = 0; i < state->boardSize; i++) {
+    //    std::cout << playerNumberToChar(state->board[i]);
+    // }
+    // std::cout<<"\n";
 
     //this is OK because 64 is the maximum board size
     uint64_t opposingPositionMask = 0;
 
     for (auto it = subgames.begin(); it != subgames.end(); it++) {
         int length = it->second - it->first;
+        // std::cout<<it->first<<"\t"<<it->second<<"\n";
+
         lengths.push_back(length);
 
         unsigned char *entry = db->get(length, &state->board[it->first]);
         int outcome = DB_GET_OUTCOME(entry);
         int gameValue = DB_GET_VALUE(entry);
-        // std::cout<<gameValue<<"\n\n";
+        // std::cout<<"Subgame value "<<gameValue<<"\n";
 
         //int outcome = db->get(length, &state->board[it->first]);
         outcomes.push_back(outcome);
@@ -720,18 +735,15 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
     }
     int sum = 0;
+    // std::cout<<"\n \n using values \n";
     for (int i = 0; i < gamevalues.size(); i++) {
         // std::cout<<gamevalues[i]<<"\n";
-
         sum += gamevalues[i];
         
     }
-    // for (int i = 0; i < state->boardSize; i++) {
-    //         std::cout << playerNumberToChar(state->board[i]);
-    // }
 
     // std::cout<<"\nSUM GHABLI\t"<<sum<<"\n\n";
-    if (sum < VAL_UNK){
+    if (sum < VAL_UNK && gamevalues.size()>0){
        sum = simplifySumValues(sum);
     //    std::cout<<"SUM\t: "<<sum<<"\n";
        if (sum==0){
@@ -749,7 +761,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         return std::pair<int, bool>(n, true);
 
        }
-       else if (sum%10 ==0){
+       else if (sum%10 ==0 && gamevalues.size()>0){
 
            if (sum/100 > 0){ // BLACK
         //    std::cout<<"all up\n";
@@ -767,7 +779,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 return std::pair<int, bool>(OC_B, true);
            }
 
-           else{ // WHITE
+           else if (gamevalues.size()>0){ // WHITE
             // std::cout<<"all down\n";
                 if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                 memcpy(entry, state->board, boardSize);

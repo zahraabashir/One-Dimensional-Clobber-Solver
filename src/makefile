@@ -9,7 +9,7 @@ FLAGS = -Wall --std=c++17 -O3
 .PHONY: dbtest
 
 run: TheSolvers
-	./TheSolvers BWBWBW W 200
+	./TheSolvers BWBWBWB B 200
 
 TheSolvers: main.o database.o utils.o state.o solver.o
 	$(CC) $(FLAGS) $^ -o $@

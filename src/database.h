@@ -9,7 +9,7 @@
 #define OC_N 4
 #define VAL_UNK 1000000
 
-#define DB_MAX_BITS 8
+#define DB_MAX_BITS 5
 #define DB_MAX_DOMINANCE_BITS 2
 
 #define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t)+ sizeof(uint64_t))
@@ -25,7 +25,7 @@
 #define DB_SET_DOMINATED(entry, player, mask) ((uint64_t *) (&entry[1]))[player - 1] = mask
 
 
-#define DB_GET_VALUE(entry) (entry == 0 ? 0 : ((uint64_t *) (&entry[2]))[0])
+#define DB_GET_VALUE(entry) (entry == 0 ? 1000000 : ((uint64_t *) (&entry[2]))[0])
 #define DB_SET_VALUE(entry, value) ((uint64_t *) (&entry[2]))[0]= value
 
 class Database {

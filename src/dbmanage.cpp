@@ -135,7 +135,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 }
 
 int set_basic_value_rules(int L, int R){
-    if (L==-1 || R==-1)return 0; //{ | } = 0
+    if (L==-1 || R==-1) return 0; //{ | } = 0
     int R_downs = int((R/10)%10);
     if (L==0 & R==0) return 1;
     else if (L==0 & R==1) return 100;
@@ -156,6 +156,7 @@ int set_basic_value_rules(int L, int R){
 }
 
 int compare(int value1, int value2, bool max){
+    // cout<<"\ncompare"<<value1<<"  "<< value2 <<"\n";
 //implement comparision
     int ups_1 =  int(value1/100);
     int downs_1 = int((value1/10)%10);
@@ -167,16 +168,17 @@ int compare(int value1, int value2, bool max){
 
 // it is just for testing -> should be well implemeneted
  if (max){
+    //  cout<<"max\n";
      //take max
      // if we have star in both go according to comparision rule 2
-     if (stars_1>0 and stars_1>0){
+     if (stars_1>0 && stars_2>0){
          if(ups_1>ups_2 && downs_2<downs_1){
              // value1>value2
             return value1;}
         else return value2;
          }
     // if both do not have star follow rule 1
-    else if (stars_1==0 and stars_1==0){
+    else if (stars_1==0 && stars_2==0){
          if(ups_1>ups_2 && downs_2<downs_1){
              // value1>value2
             return value1;}
@@ -189,21 +191,25 @@ int compare(int value1, int value2, bool max){
  
  else{
      //take min
+    //  cout<<"min\n";
      // if we have star in both go according to comparision rule 2
-     if (stars_1>0 and stars_1>0){
+     if (stars_1>0 && stars_2>0){
          if(ups_1<=ups_2 && downs_2<=downs_1){
              // value1>value2
             return value1;}
         else return value2;
          }
     // if both do not have star follow rule 1
-    else if (stars_1==0 and stars_1==0){
+    else if (stars_1==0 && stars_2==0){
          if(ups_1>ups_2 && downs_2<downs_1){
              // value1>value2
             return value1;}
         else return value2;
     }
-    else return VAL_UNK; // not comparabale!!!
+    else{ 
+        // cout<<"not comparable";
+        return VAL_UNK; // not comparabale!!!
+    }
  
  
  
@@ -244,13 +250,12 @@ int gameValue(Database &db, char *board, int boardSize, int player){
     char boardText[boardSize + 1];
     memcpy(boardText, board, boardSize);
     boardText[boardSize] = 0;
-    for (int i = 0; i < boardSize; i++) {
-        
+
+    for (int i = 0; i < boardSize; i++) {      
         boardText[i] = playerNumberToChar(boardText[i]);
-        // cout<<boardText[i];
         
     }
-    // cout<<"\n";
+    
 
     State *state = new State(boardText, player);
     // cout<<"board created\n";
@@ -279,13 +284,15 @@ int gameValue(Database &db, char *board, int boardSize, int player){
         //solve on level
 
         //first simplify
-        solver->simplify(state);
+        // solver->simplify(state);
 
         // solve each move 1 leve;
         uint64_t gameVal = 0;
         std::vector<std::pair<int, int>> subgames = generateSubgames(state);
         int subgameCount = subgames.size();
+        
 
+        // cout<<"subgameCount  "<<subgameCount << "\n";
         if(subgameCount==0) {optionValues.push_back(0);
         // cout<<"subgame is zero \n";
         }
@@ -293,9 +300,11 @@ int gameValue(Database &db, char *board, int boardSize, int player){
             //for each subgame (probably 2) get the value from db and add them
         for (auto it = subgames.begin(); it != subgames.end(); it++) {
             int length = it->second - it->first;
+            
 
             unsigned char *entry = db.get(length, &state->board[it->first]);
             int SubgameVal = DB_GET_VALUE(entry);
+            
             // cout<<"subgame values "<< SubgameVal<<"\n";
             // with the assumption that sum of 2 or many stars is star. (not sure?) 
             // it won't support * ups and downs more than 9
@@ -360,7 +369,7 @@ int main() {
     int maxLength = DB_MAX_BITS;
     int maxGame = 0;
 
-    // Initial patterns saving starts
+ /*   // Initial patterns saving starts
     string s1 = "";
     string s2 = "";
 
@@ -453,7 +462,7 @@ vector<string> string_list;
 
     }
     // return 0;
-
+*/
     // initial pattern saving ends
 
     // cout<<"END \n\n\n\n";
@@ -468,6 +477,7 @@ vector<string> string_list;
         char boardText[length + 1];
         char board[length + 1];
         char mirrorBoard[length + 1];
+        char mirrorBoardText[length + 1];
 
         boardText[length] = 0;
         board[length] = 0;
@@ -502,8 +512,10 @@ vector<string> string_list;
                 for (int i = 0; i < length; i++) {
                     if ((game >> i) & 1) {
                         mirrorBoard[i] = BLACK;
+                        mirrorBoardText[i] = 'B';
                     } else {
                         mirrorBoard[i] = WHITE;
+                        mirrorBoardText[i] = 'W';
                     }
                 }
             }
@@ -560,13 +572,13 @@ vector<string> string_list;
                 else DB_SET_VALUE(entry,VAL_UNK);
 
                     // printing the final gameValue       
-                    unsigned int a = DB_GET_VALUE(entry);
-                    if (a!=VAL_UNK){
+                    unsigned int mir = DB_GET_VALUE(entry);
+                    if (mir!=VAL_UNK){
                         for (int i = 0; i < length; i++) {
-                        cout << boardText[i];
+                            std::cout<<mirrorBoardText[i];
                         }
                         cout << endl;
-                        cout<<a<<"\t mirror game value\n";
+                        cout<<mir<<"\t mirror game value\n";
         
                     }
                 continue;
@@ -620,7 +632,7 @@ vector<string> string_list;
                 // cout << "Overwriting outcome: " << DB_GET_OUTCOME(entry) << endl;
                 while(1){}
             }
-            uint64_t a = 0;
+            // uint64_t a = 0;
             DB_SET_OUTCOME(entry, outcome);              
 
 
@@ -748,7 +760,9 @@ vector<string> string_list;
                 // std::cout << domBlack << " " << domWhite << std::endl;
             }
             //end of dominated
-            if(DB_GET_VALUE(entry)==VAL_UNK){
+
+
+            // if(DB_GET_VALUE(entry)==VAL_UNK){
                 //start of game value for left and right
                 if(length>=2){
                 // first check if it is one of the three patterns and has already a value
@@ -776,20 +790,22 @@ vector<string> string_list;
                     DB_SET_VALUE(entry, VAL_UNK); 
                     }
 
-                } 
-        }
-        else { // if it is solved by patterns
-            // printing the final gameValue       
-            a = DB_GET_VALUE(entry);
-            if (a!=VAL_UNK){
-
-                for (int i = 0; i < length; i++) {
-                cout << boardText[i];
+                } else{
+                    DB_SET_VALUE(entry, 0);
                 }
-                cout << endl;
-                cout<<a<<"\t PATTERN GAME VALUE\n";
-            }
-        }
+        // }
+        // else { // if it is solved by patterns
+        //     // printing the final gameValue       
+        //     a = DB_GET_VALUE(entry);
+        //     if (a!=VAL_UNK){
+
+        //         for (int i = 0; i < length; i++) {
+        //         cout << boardText[i];
+        //         }
+        //         cout << endl;
+        //         cout<<a<<"\t PATTERN GAME VALUE\n";
+        //     }
+        // }
 
             // cout << endl;
         }

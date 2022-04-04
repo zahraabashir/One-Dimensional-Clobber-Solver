@@ -734,6 +734,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         }
     }
+
     int sum = 0;
     // std::cout<<"\n \n using values \n";
     for (int i = 0; i < gamevalues.size(); i++) {
@@ -798,9 +799,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
        }
        
     }
-
-
-
 
     //generate moves
     //check for terminal

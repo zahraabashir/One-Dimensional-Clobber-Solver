@@ -575,7 +575,9 @@ vector<string> string_list;
                     unsigned int mir = DB_GET_VALUE(entry);
                     if (mir!=VAL_UNK){
                         for (int i = 0; i < length; i++) {
-                            std::cout<<mirrorBoardText[i];
+                            if (mirrorBoardText[i]=='W'){
+                                std::cout<<'B';}
+                            else std::cout<<'W';
                         }
                         cout << endl;
                         cout<<mir<<"\t mirror game value\n";

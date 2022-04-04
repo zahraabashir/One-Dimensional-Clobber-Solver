@@ -9,8 +9,8 @@
 #define OC_N 4
 #define VAL_UNK 1000000
 
-#define DB_MAX_BITS 12
-#define DB_MAX_DOMINANCE_BITS 8
+#define DB_MAX_BITS 8
+#define DB_MAX_DOMINANCE_BITS 2
 
 #define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t)+ sizeof(uint64_t))
 

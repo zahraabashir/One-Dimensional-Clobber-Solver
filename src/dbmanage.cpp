@@ -142,12 +142,12 @@ int set_basic_value_rules(int L, int R){
     else if (L==1 & R==0) return 10;
     else if (L==0 and R_downs==0){ //Rule 0 and 1
         //rule 0
-        if(R%100==1){ // if R has one *
+        if(R%10==1){ // if R has one *
             int ups = R/100;
             return (ups+1)*100; //
         }
         //rule 1
-        if(R%100==0){// R has no star
+        if(R%10==0){// R has no star
             int ups = R/100;
             return ((ups+1)*100+1); //
         }
@@ -159,11 +159,11 @@ int compare(int value1, int value2, bool max){
 //implement comparision
     int ups_1 =  int(value1/100);
     int downs_1 = int((value1/10)%10);
-    int stars_1 = int(value1%100);
+    int stars_1 = int(value1%10);
 
     int ups_2 =  int(value2/100);
     int downs_2 = int((value2/10)%10);
-    int stars_2 = int(value2%100);
+    int stars_2 = int(value2%10);
 
 // it is just for testing -> should be well implemeneted
  if (max){
@@ -215,7 +215,7 @@ int compare(int value1, int value2, bool max){
 int simplifySumValue(int value){
     int ups=  int(value/100);
     int downs= int((value/10)%10);
-    int stars = int(value%100);
+    int stars = int(value%10);
 
     stars = stars%2;
     if (ups >= downs){
@@ -368,6 +368,7 @@ int main() {
 //BLACK = 0
 vector<string> string_list;
 
+
     for (int m = 2; m < DB_MAX_BITS/2; m++) {
             
         for (int n = 2; n < DB_MAX_BITS/2; n++) {
@@ -441,18 +442,24 @@ vector<string> string_list;
 
             uint64_t gValue = VAL_UNK;
             gValue = get_pattern_value(boardText, length);
+            // cout<<gValue<<"\tGVALUE\n";
             DB_SET_VALUE(entry, gValue);
-
+            // for (int i = 0; i < length; i++) {
+            //     cout << boardText[i];
+            // }cout << endl;
+            // cout<<gValue<<"\tGVALUE\n";
         
     }
 
     }
+    // return 0;
 
     // initial pattern saving ends
 
     // cout<<"END \n\n\n\n";
     maxLength = DB_MAX_BITS;
     maxGame = 0;
+    
     for (int length = 1; length <= maxLength; length++) {
 
         maxGame *= 2;
@@ -539,12 +546,14 @@ vector<string> string_list;
                 DB_SET_OUTCOME(entry, outcome);
                 DB_SET_DOMINATED(entry, 1, domWhite); //invert dominance
                 DB_SET_DOMINATED(entry, 2, domBlack);
+
                 //invert game values -> exchange ups and downs; stars remain the same
                 if (gameValue_mirror!=VAL_UNK){
                     int ups =  int(gameValue_mirror/100);
                     int downs = int((gameValue_mirror/10)%10);
-                    int stars = int(gameValue_mirror%100);
+                    int stars = int(gameValue_mirror%10);
                     uint64_t InverseValue = downs*100 + ups*10 + stars;
+
                     // cout<< "mirror game value: "<< InverseValue<<"\n";
                     DB_SET_VALUE(entry,InverseValue);
                 }
@@ -553,12 +562,12 @@ vector<string> string_list;
                     // printing the final gameValue       
                     unsigned int a = DB_GET_VALUE(entry);
                     if (a!=VAL_UNK){
-  
                         for (int i = 0; i < length; i++) {
                         cout << boardText[i];
                         }
                         cout << endl;
-                        cout<<a<<"\tGAME VALUE\n";
+                        cout<<a<<"\t mirror game value\n";
+        
                     }
                 continue;
             }
@@ -740,39 +749,47 @@ vector<string> string_list;
             }
             //end of dominated
             if(DB_GET_VALUE(entry)==VAL_UNK){
-            //start of game value for left and right
-            if(length>=2){
-            // first check if it is one of the three patterns and has already a value
-            //
-            // IF not:
-            //calculate game values for R and L on this board
-                int Black_value = gameValue(db, board, length, 1);
-                int White_value = gameValue(db, board, length, 2);
-                // cout<< "B value" <<Black_value<<"white:"<< White_value << "\n";
+                //start of game value for left and right
+                if(length>=2){
+                // first check if it is one of the three patterns and has already a value
+                //
+                // IF not:
+                //calculate game values for R and L on this board
+                    int Black_value = gameValue(db, board, length, 1);
+                    int White_value = gameValue(db, board, length, 2);
+                    // cout<< "B value" <<Black_value<<"white:"<< White_value << "\n";
 
-                if (Black_value!=VAL_UNK & White_value!=VAL_UNK){
-                uint64_t board_value = set_basic_value_rules(Black_value,White_value);
-                // cout<< "board value" <<board_value<<"\n";
-                DB_SET_VALUE(entry, board_value);
-                }
-                else{
-                DB_SET_VALUE(entry, VAL_UNK); 
-                }
+                    if (Black_value!=VAL_UNK & White_value!=VAL_UNK){
+                        uint64_t board_value = set_basic_value_rules(Black_value,White_value);
+                        DB_SET_VALUE(entry, board_value);
+                        //printing
+                        if(board_value!=VAL_UNK){
 
-            } 
+                            for (int i = 0; i < length; i++) {
+                            cout << boardText[i];
+                            }cout << endl;
+                            cout<< "board value R and L \n" <<board_value<<"\n";
+                        
+                        }
+                    }
+                    else{
+                    DB_SET_VALUE(entry, VAL_UNK); 
+                    }
+
+                } 
         }
-
+        else { // if it is solved by patterns
             // printing the final gameValue       
             a = DB_GET_VALUE(entry);
             if (a!=VAL_UNK){
 
                 for (int i = 0; i < length; i++) {
                 cout << boardText[i];
-                 }
+                }
                 cout << endl;
-                cout<<a<<"\tGAME VALUE\n";
-
+                cout<<a<<"\t PATTERN GAME VALUE\n";
             }
+        }
 
             // cout << endl;
         }
@@ -781,5 +798,6 @@ vector<string> string_list;
 
 
     db.save();
+    
     return 0;
 }

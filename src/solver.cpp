@@ -609,7 +609,8 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         unsigned char *entry = db->get(length, &state->board[it->first]);
         int outcome = DB_GET_OUTCOME(entry);
         int gameValue = DB_GET_VALUE(entry);
-        
+        // std::cout<<gameValue<<"\n\n";
+
         //int outcome = db->get(length, &state->board[it->first]);
         outcomes.push_back(outcome);
         gamevalues.push_back(gameValue);
@@ -721,10 +722,15 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     int sum = 0;
     for (int i = 0; i < gamevalues.size(); i++) {
         // std::cout<<gamevalues[i]<<"\n";
+
         sum += gamevalues[i];
         
     }
-    // std::cout<<"SUM GHABLI\t"<<sum<<"\n\n";
+    // for (int i = 0; i < state->boardSize; i++) {
+    //         std::cout << playerNumberToChar(state->board[i]);
+    // }
+
+    // std::cout<<"\nSUM GHABLI\t"<<sum<<"\n\n";
     if (sum < VAL_UNK){
        sum = simplifySumValues(sum);
     //    std::cout<<"SUM\t: "<<sum<<"\n";

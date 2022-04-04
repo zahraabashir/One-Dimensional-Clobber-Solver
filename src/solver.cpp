@@ -16,6 +16,8 @@ int best_to = -1;
 
 //int collisions = 0; //transposition table collisions
 
+//TODO: the new simplifies game value can be saved in the transposition table 
+
 BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     this->rootPlayer = rootPlayer;
     this->boardSize = boardSize;
@@ -529,9 +531,29 @@ void BasicSolver::simplify(State *state) {
 bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return (a.second - a.first) > (b.second - b.first);
 }
+int simplifySumValues(int value){
+    int ups=  int(value/100);
+    int downs= int((value/10)%10);
+    int stars = int(value%10);
+
+    stars = stars%2;
+    if (ups >= downs){
+        ups = ups - downs;
+        downs = 0;
+    }else{
+        downs = downs - ups;
+        ups= 0;
+    }
+
+    int final_value = 100*ups + 10*downs + stars;
+
+    return final_value;
+
+}
 
 std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     node_count += 1;
+    
     updateTime();
     if (outOfTime) {
         return std::pair<int, bool>(0, false);
@@ -567,7 +589,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     std::vector<int> lengths;
     std::vector<int> outcomes;
-
+    std::vector<int> gamevalues;
     //count outcomes
     int counts[5];
     for (int i = 0; i < 5; i++) {
@@ -586,8 +608,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         unsigned char *entry = db->get(length, &state->board[it->first]);
         int outcome = DB_GET_OUTCOME(entry);
+        int gameValue = DB_GET_VALUE(entry);
+        
         //int outcome = db->get(length, &state->board[it->first]);
         outcomes.push_back(outcome);
+        gamevalues.push_back(gameValue);
 
         counts[outcome] += 1;
         outcomeMask |= (1 << outcome);
@@ -693,6 +718,71 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         }
     }
+    int sum = 0;
+    for (int i = 0; i < gamevalues.size(); i++) {
+        // std::cout<<gamevalues[i]<<"\n";
+        sum += gamevalues[i];
+        
+    }
+    // std::cout<<"SUM GHABLI\t"<<sum<<"\n\n";
+    if (sum < VAL_UNK){
+       sum = simplifySumValues(sum);
+    //    std::cout<<"SUM\t: "<<sum<<"\n";
+       if (sum==0){
+            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            memcpy(entry, state->board, boardSize);
+            PLAYER(entry) = p;
+            OUTCOME(entry) = n;
+            BESTMOVE(entry) = 0;
+            DEPTH(entry) = depth;
+            HEURISTIC(entry) = -127;
+        }        
+
+        memcpy(state->board, oldBoard, state->boardSize);
+        // std::cout<<"SUM=0\n";
+        return std::pair<int, bool>(n, true);
+
+       }
+       else if (sum%10 ==0){
+
+           if (sum/100 > 0){ // BLACK
+        //    std::cout<<"all up\n";
+            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                memcpy(entry, state->board, boardSize);
+                PLAYER(entry) = p;
+                OUTCOME(entry) = BLACK;
+                BESTMOVE(entry) = 0;
+                DEPTH(entry) = depth;
+                HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
+                }        
+
+                memcpy(state->board, oldBoard, state->boardSize);
+
+                return std::pair<int, bool>(OC_B, true);
+           }
+
+           else{ // WHITE
+            // std::cout<<"all down\n";
+                if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                memcpy(entry, state->board, boardSize);
+                PLAYER(entry) = p;
+                OUTCOME(entry) = WHITE;
+                BESTMOVE(entry) = 0;
+                DEPTH(entry) = depth;
+                HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
+                }        
+
+                memcpy(state->board, oldBoard, state->boardSize);
+
+                return std::pair<int, bool>(OC_W, true);
+            
+           }
+       }
+       
+    }
+
+
+
 
     //generate moves
     //check for terminal

@@ -539,10 +539,33 @@ void BasicSolver::simplify(State *state) {
 bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return (a.second - a.first) > (b.second - b.first);
 }
+
+std::vector<int> Decode_GameValues(int encoded){
+    // calculated ups downs and stars from a int that has 5 integers (ex: 23456) -> 23 ups, 45 downs and 6 stars
+    // Starting from rom the left, two left most numbers are the number of ups
+    // then downs
+    // then the last integer is for #stars
+    // saves these values seperately in the output vector
+
+    std::vector <int> out;
+    int ups = int(encoded/1000);
+    out.push_back(ups);
+    int downs = int((encoded%1000)/10);
+    out.push_back(downs);
+    int stars = int(encoded%10);
+    out.push_back(stars);
+
+    return out;
+}
+
 int simplifySumValues(int value){
-    int ups=  int(value/100);
-    int downs= int((value/10)%10);
-    int stars = int(value%10);
+    // int ups=  int(value/100);
+    // int downs= int((value/10)%10);
+    // int stars = int(value%10);
+    std::vector<int> values = Decode_GameValues(value);
+    int ups = values.at(0);
+    int downs = values.at(1);
+    int stars = values.at(2);
 
     stars = stars%2;
     if (ups >= downs){
@@ -553,11 +576,12 @@ int simplifySumValues(int value){
         ups= 0;
     }
 
-    int final_value = 100*ups + 10*downs + stars;
+    int final_value = 1000*ups + 10*downs + stars;
 
     return final_value;
 
 }
+
 
 std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     node_count += 1;
@@ -734,20 +758,35 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         }
     }
+    // USING GAME VALUES STARTS HERE
 
-    int sum = 0;
+    int gameVal_sum = 0;
     // std::cout<<"\n \n using values \n";
     for (int i = 0; i < gamevalues.size(); i++) {
         // std::cout<<gamevalues[i]<<"\n";
-        sum += gamevalues[i];
+                    std::vector<int> values1 = Decode_GameValues(gamevalues[i]);
+                    int ups1 = values1.at(0);
+                    int downs1 = values1.at(1);
+                    int stars1 = values1.at(2);
+
+                    std::vector<int> values2 = Decode_GameValues(gameVal_sum);
+                    int ups2 = values2.at(0);
+                    int downs2 = values2.at(1);
+                    int stars2 = values2.at(2);
+
+                    ups2 += ups1;
+                    downs2+=downs1;
+                    stars2+=stars1;
+
+                gameVal_sum= ups2*1000 + downs2*10+ stars2; 
         
     }
 
     // std::cout<<"\nSUM GHABLI\t"<<sum<<"\n\n";
-    if (sum < VAL_UNK && gamevalues.size()>0){
-       sum = simplifySumValues(sum);
+    if (gameVal_sum < VAL_UNK && gamevalues.size()>0){
+       gameVal_sum = simplifySumValues(gameVal_sum);
     //    std::cout<<"SUM\t: "<<sum<<"\n";
-       if (sum==0){
+       if (gameVal_sum==0){
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
@@ -762,9 +801,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         return std::pair<int, bool>(n, true);
 
        }
-       else if (sum%10 ==0 && gamevalues.size()>0){
+       else if (int(gameVal_sum%10) ==0){ //no stars
 
-           if (sum/100 > 0){ // BLACK
+           if (int(gameVal_sum/1000) > 0){ // BLACK
         //    std::cout<<"all up\n";
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                 memcpy(entry, state->board, boardSize);
@@ -780,7 +819,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 return std::pair<int, bool>(OC_B, true);
            }
 
-           else if (gamevalues.size()>0){ // WHITE
+           else { // WHITE
             // std::cout<<"all down\n";
                 if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                 memcpy(entry, state->board, boardSize);
@@ -799,6 +838,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
        }
        
     }
+    // USING GAME VALUES ENDS HERE
+
+
 
     //generate moves
     //check for terminal

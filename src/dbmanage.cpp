@@ -134,22 +134,30 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     return result;
 }
 
+
+
 int set_basic_value_rules(int L, int R){
     if (L==-1 || R==-1) return 0; //{ | } = 0
-    int R_downs = int((R/10)%10);
+
+    // finding R's ups and downs
+    std::vector<int> values = Decode_GameValues(R);
+    int ups_R = values.at(0);
+    int downs_R = values.at(1);
+    int stars_R = values.at(2);
+
+
     if (L==0 & R==0) return 1;
-    else if (L==0 & R==1) return 100;
+    else if (L==0 & R==1) return 1000;
     else if (L==1 & R==0) return 10;
-    else if (L==0 and R_downs==0){ //Rule 0 and 1
+
+    else if (L==0 and downs_R==0){ //Rule 0 and 1
         //rule 0
-        if(R%10==1){ // if R has one *
-            int ups = R/100;
-            return (ups+1)*100; //
+        if(stars_R==1){ // if R has one *
+            return (ups_R+1)*1000; //
         }
         //rule 1
-        if(R%10==0){// R has no star
-            int ups = R/100;
-            return ((ups+1)*100+1); //
+        if(stars_R==0){// R has no star
+            return ((ups_R+1)*1000+1); //
         }
     }
     else return VAL_UNK;
@@ -158,13 +166,15 @@ int set_basic_value_rules(int L, int R){
 int compare(int value1, int value2, bool max){
     // cout<<"\ncompare"<<value1<<"  "<< value2 <<"\n";
 //implement comparision
-    int ups_1 =  int(value1/100);
-    int downs_1 = int((value1/10)%10);
-    int stars_1 = int(value1%10);
+    std::vector<int> values1 = Decode_GameValues(value1);
+    int ups_1 = values1.at(0);
+    int downs_1 = values1.at(1);
+    int stars_1 = values1.at(2);
 
-    int ups_2 =  int(value2/100);
-    int downs_2 = int((value2/10)%10);
-    int stars_2 = int(value2%10);
+    std::vector<int> values2 = Decode_GameValues(value2);
+    int ups_2 = values2.at(0);
+    int downs_2 = values2.at(1);
+    int stars_2 = values2.at(2);
 
 // it is just for testing -> should be well implemeneted
  if (max){
@@ -172,14 +182,14 @@ int compare(int value1, int value2, bool max){
      //take max
      // if we have star in both go according to comparision rule 2
      if (stars_1>0 && stars_2>0){
-         if(ups_1>ups_2 && downs_2<downs_1){
+         if(ups_1>=ups_2 && downs_2>=downs_1){
              // value1>value2
             return value1;}
         else return value2;
          }
     // if both do not have star follow rule 1
     else if (stars_1==0 && stars_2==0){
-         if(ups_1>ups_2 && downs_2<downs_1){
+         if(ups_1>=ups_2 && downs_2>=downs_1){
              // value1>value2
             return value1;}
         else return value2;
@@ -219,9 +229,10 @@ int compare(int value1, int value2, bool max){
 }
 
 int simplifySumValue(int value){
-    int ups=  int(value/100);
-    int downs= int((value/10)%10);
-    int stars = int(value%10);
+    std::vector<int> values = Decode_GameValues(value);
+    int ups = values.at(0);
+    int downs = values.at(1);
+    int stars = values.at(2);
 
     stars = stars%2;
     if (ups >= downs){
@@ -232,7 +243,7 @@ int simplifySumValue(int value){
         ups= 0;
     }
 
-    int final_value = 100*ups + 10*downs + stars;
+    int final_value = 1000*ups + 10*downs + stars;
 
     return final_value;
 
@@ -310,7 +321,22 @@ int gameValue(Database &db, char *board, int boardSize, int player){
             // it won't support * ups and downs more than 9
             if (SubgameVal!=VAL_UNK) {
                 int SubgameVal_simplified = simplifySumValue(SubgameVal);
-                gameVal+= SubgameVal_simplified; 
+                //summing two values
+                    std::vector<int> values1 = Decode_GameValues(SubgameVal_simplified);
+                    int ups1 = values1.at(0);
+                    int downs1 = values1.at(1);
+                    int stars1 = values1.at(2);
+
+                    std::vector<int> values2 = Decode_GameValues(gameVal);
+                    int ups2 = values2.at(0);
+                    int downs2 = values2.at(1);
+                    int stars2 = values2.at(2);
+
+                    ups2 += ups1;
+                    downs2+=downs1;
+                    stars2+=stars1;
+
+                gameVal= ups2*1000 + downs2*10+ stars2; 
             }
             
                //should be completed later : incorporate less than zero rule -> for now just says we can't get the value
@@ -561,10 +587,12 @@ vector<string> string_list;
 
                 //invert game values -> exchange ups and downs; stars remain the same
                 if (gameValue_mirror!=VAL_UNK){
-                    int ups =  int(gameValue_mirror/100);
-                    int downs = int((gameValue_mirror/10)%10);
-                    int stars = int(gameValue_mirror%10);
-                    uint64_t InverseValue = downs*100 + ups*10 + stars;
+                    vector<int> values =  Decode_GameValues(gameValue_mirror);
+                    int ups = values.at(0);
+                    int downs = values.at(1);
+                    int stars = values.at(2);
+
+                    uint64_t InverseValue = downs*1000 + ups*10 + stars;
 
                     // cout<< "mirror game value: "<< InverseValue<<"\n";
                     DB_SET_VALUE(entry,InverseValue);
@@ -775,7 +803,7 @@ vector<string> string_list;
                     int White_value = gameValue(db, board, length, 2);
                     // cout<< "B value" <<Black_value<<"white:"<< White_value << "\n";
 
-                    if (Black_value!=VAL_UNK & White_value!=VAL_UNK){
+                    if (Black_value!=VAL_UNK && White_value!=VAL_UNK){
                         uint64_t board_value = set_basic_value_rules(Black_value,White_value);
                         DB_SET_VALUE(entry, board_value);
                         //printing

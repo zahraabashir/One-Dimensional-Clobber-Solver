@@ -178,6 +178,12 @@ int set_basic_value_rules(int L, int R){
             return ((ups_R+1)*1000+1); //
         }
     }
+    else if (L == 1001 && R==0){//{up*|0} //TODOOOOO
+        return 10;
+    } 
+    else if (R==11 && L==0){
+        return 1000;
+    }
     else return VAL_UNK;
 }
 

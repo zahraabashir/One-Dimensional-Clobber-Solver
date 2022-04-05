@@ -1,4 +1,4 @@
-#include "solver.h"
+#include "validSolver.h"
 #include "utils.h"
 
 #include <iostream>
@@ -10,15 +10,13 @@
 #include <random>
 
 
-int node_count = 0; //nodes visited
-int best_from = -1; //root player's move
-int best_to = -1;
+int node_count2 = 0; //nodes visited
+int best_from2 = -1; //root player's move
+int best_to2 = -1;
 
 //int collisions = 0; //transposition table collisions
 
-//TODO: the new simplifies game value can be saved in the transposition table 
-
-BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
+BasicSolver2::BasicSolver2(int rootPlayer, int boardSize, Database *db) {
     this->rootPlayer = rootPlayer;
     this->boardSize = boardSize;
 
@@ -33,34 +31,34 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
         bits = 23;
     }
 
-    codeLength = bits;
+    codeLength2 = bits;
 
     //look at macros in header file
-    tableEntrySize = boardSize + 5 + 0 * sizeof(int);
+    tableEntrySize2 = boardSize + 5 + 0 * sizeof(int);
 
-    bitMask = 0;
+    bitMask2 = 0;
     for (int i = 0; i < bits; i++) {
-        bitMask <<= 1;
-        bitMask |= 1;
+        bitMask2 <<= 1;
+        bitMask2 |= 1;
     }
 
     size_t tableSize = 1;
     tableSize <<= (size_t) bits;
-    tableSize *= (size_t) tableEntrySize;
+    tableSize *= (size_t) tableEntrySize2;
 
-    //std::cout << "Entry size: " << tableEntrySize << std::endl;
+    //std::cout << "Entry size: " << tableEntrySize2 << std::endl;
     //std::cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << std::endl;
     //std::cout << "Board size: " << boardSize << std::endl;   
 
     table = (char *) calloc(tableSize, 1);
 }
 
-BasicSolver::~BasicSolver() {
+BasicSolver2::~BasicSolver2() {
     free(table);
     delete rng;
 }
 
-bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
+bool BasicSolver2::validateTableEntry2(State *state, int p, char *entry) {
     bool found = false;
     if (PLAYER(entry) == p) {
         found = true;
@@ -74,7 +72,7 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
     return found;
 }
 
-int BasicSolver::solveID(State *state, int p, int n) {
+int BasicSolver2::solveID2(State *state, int p, int n) {
     maxCompleted = 1;
 
     int depth = 0;
@@ -99,11 +97,11 @@ int BasicSolver::solveID(State *state, int p, int n) {
         //std::cout << depth << std::endl;
 
 
-        std::pair<int, bool> result = rootSearchID(state, p, n, 0);
+        std::pair<int, bool> result = rootSearchID2(state, p, n, 0);
 
         if (outOfTime) {
             return EMPTY;
-            best_from = -1;
+            best_from2 = -1;
         }
 
         //std::cout << depth << " " << collisions << std::endl;
@@ -117,9 +115,9 @@ int BasicSolver::solveID(State *state, int p, int n) {
 }
 
 
-std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth) {
-    node_count += 1;
-    updateTime();
+std::pair<int, bool> BasicSolver2::rootSearchID2(State *state, int p, int n, int depth) {
+    node_count2 += 1;
+    updateTime2();
     if (outOfTime) {
         return std::pair<int, bool>(0, false);
     }
@@ -127,9 +125,9 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
     //lookup entry
     //if solved, return
     int code = state->code(p);
-    char *entry = getTablePtr(code);
+    char *entry = getTablePtr2(code);
 
-    bool validEntry = validateTableEntry(state, p, entry);
+    bool validEntry = validateTableEntry2(state, p, entry);
     if (validEntry && OUTCOME(entry) != EMPTY) {
         return std::pair<int, bool>(OUTCOME(entry), true);
     }
@@ -157,7 +155,7 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
     }
 
     //Delete dominated moves
-    std::vector<std::pair<int, int>> sg = generateSubgames(state);
+    std::vector<std::pair<int, int>> sg = generateSubgames2(state);
 
     for (int i = 0; i < sg.size(); i++) {
         int start = sg[i].first;
@@ -257,15 +255,7 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
         }
 
         state->play(from, to, undoBuffer);
-
-        // std::cout<<" starrting player "<<p<< "\n";
-        // for (int i = 0; i < state->boardSize; i++) {
-        // std::cout << playerNumberToChar(state->board[i]);
-        // }
-        // std::cout<<"\n";
-
-        std::pair<int, bool> result = searchID(state, n, p, depth + 1);
-        // std::cout<<"Results first player"<< playerNumberToChar(result.first)<<"\n";
+        std::pair<int, bool> result = searchID2(state, n, p, depth + 1);
 
         if (outOfTime) {
             delete[] moves;
@@ -285,8 +275,8 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
                 DEPTH(entry) = depth;
                 HEURISTIC(entry) = 127;
             }
-            best_from = from;
-            best_to = to;
+            best_from2 = from;
+            best_to2 = to;
             delete[] moves;
             return std::pair<int, bool>(p, true);
         }
@@ -324,8 +314,8 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
             HEURISTIC(entry) = -127;
 
         }
-        best_from = -1;
-        best_to = -1;
+        best_from2 = -1;
+        best_to2 = -1;
         return std::pair<int, bool>(n, true);
     }
 
@@ -342,7 +332,7 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
     return std::pair<int, bool>(bestVal, false);
 }
 
-std::vector<std::pair<int, int>> generateSubgames(State *state) {
+std::vector<std::pair<int, int>> generateSubgames2(State *state) {
     char *board = state->board;
     std::vector<std::pair<int, int>> subgames;
 
@@ -379,9 +369,9 @@ std::vector<std::pair<int, int>> generateSubgames(State *state) {
 
 
 
-char *boardComparePtr;
-bool subgameCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
-    char *board = boardComparePtr;
+char *boardComparePtr2;
+bool subgameCompare2(const std::pair<int, int> &a, const std::pair<int, int> &b) {
+    char *board = boardComparePtr2;
 
     int s1 = a.first;
     int e1 = a.second;
@@ -409,11 +399,11 @@ bool subgameCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) 
 
 
 
-void BasicSolver::simplify(State *state) {
+void BasicSolver2::simplify(State *state) {
     char *board = state->board;
 
     //find subgames
-    std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+    std::vector<std::pair<int, int>> subgames = generateSubgames2(state);
 
     //print
     for (int i = 0; i < state->boardSize; i++) {
@@ -504,12 +494,12 @@ void BasicSolver::simplify(State *state) {
     }
 
     //now canonicalize the board
-    subgames = generateSubgames(state);
+    subgames = generateSubgames2(state);
     subgameCount = subgames.size();
 
     //sort subgames
-    boardComparePtr = board;
-    std::sort(subgames.begin(), subgames.end(), subgameCompare);
+    boardComparePtr2 = board;
+    std::sort(subgames.begin(), subgames.end(), subgameCompare2);
 
 
     int position = 0;
@@ -536,57 +526,13 @@ void BasicSolver::simplify(State *state) {
     //std::cout << std::endl;
 }
 
-bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
+bool subgameLengthCompare2(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return (a.second - a.first) > (b.second - b.first);
 }
 
-std::vector<int> Decode_GameValue(int encoded){
-    // calculated ups downs and stars from a int that has 5 integers (ex: 23456) -> 23 ups, 45 downs and 6 stars
-    // Starting from rom the left, two left most numbers are the number of ups
-    // then downs
-    // then the last integer is for #stars
-    // saves these values seperately in the output vector
-
-    std::vector <int> out;
-    int ups = int(encoded/1000);
-    out.push_back(ups);
-    int downs = int((encoded%1000)/10);
-    out.push_back(downs);
-    int stars = int(encoded%10);
-    out.push_back(stars);
-
-    return out;
-}
-
-int simplifySumValues(int value){
-    // int ups=  int(value/100);
-    // int downs= int((value/10)%10);
-    // int stars = int(value%10);
-    std::vector<int> values = Decode_GameValue(value);
-    int ups = values.at(0);
-    int downs = values.at(1);
-    int stars = values.at(2);
-
-    stars = stars%2;
-    if (ups >= downs){
-        ups = ups - downs;
-        downs = 0;
-    }else{
-        downs = downs - ups;
-        ups= 0;
-    }
-
-    int final_value = 1000*ups + 10*downs + stars;
-
-    return final_value;
-
-}
-
-
-std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
-    node_count += 1;
-    
-    updateTime();
+std::pair<int, bool> BasicSolver2::searchID2(State *state, int p, int n, int depth) {
+    node_count2 += 1;
+    updateTime2();
     if (outOfTime) {
         return std::pair<int, bool>(0, false);
     }
@@ -599,9 +545,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     //lookup entry
     //if solved, return
     int code = state->code(p);
-    char *entry = getTablePtr(code);
+    char *entry = getTablePtr2(code);
 
-    bool validEntry = validateTableEntry(state, p, entry);
+    bool validEntry = validateTableEntry2(state, p, entry);
     if (validEntry && OUTCOME(entry) != EMPTY) {
         memcpy(state->board, oldBoard, state->boardSize);
         return std::pair<int, bool>(OUTCOME(entry), true);
@@ -614,14 +560,14 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 
     //generate subgames, look them up in the database
-    std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+    std::vector<std::pair<int, int>> subgames = generateSubgames2(state);
 
     //sort subgames by length
-    std::sort(subgames.begin(), subgames.end(), subgameLengthCompare);
+    std::sort(subgames.begin(), subgames.end(), subgameLengthCompare2);
 
     std::vector<int> lengths;
     std::vector<int> outcomes;
-    std::vector<int> gamevalues;
+
     //count outcomes
     int counts[5];
     for (int i = 0; i < 5; i++) {
@@ -630,29 +576,18 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     int outcomeMask = 0;
 
-    // std::cout<<"player "<<p<< "\n";
-    // for (int i = 0; i < state->boardSize; i++) {
-    //    std::cout << playerNumberToChar(state->board[i]);
-    // }
-    // std::cout<<"\n";
 
     //this is OK because 64 is the maximum board size
     uint64_t opposingPositionMask = 0;
 
     for (auto it = subgames.begin(); it != subgames.end(); it++) {
         int length = it->second - it->first;
-        // std::cout<<it->first<<"\t"<<it->second<<"\n";
-
         lengths.push_back(length);
 
         unsigned char *entry = db->get(length, &state->board[it->first]);
         int outcome = DB_GET_OUTCOME(entry);
-        int gameValue = DB_GET_VALUE(entry);
-        // std::cout<<"Subgame value "<<gameValue<<"\n";
-
         //int outcome = db->get(length, &state->board[it->first]);
         outcomes.push_back(outcome);
-        gamevalues.push_back(gameValue);
 
         counts[outcome] += 1;
         outcomeMask |= (1 << outcome);
@@ -734,7 +669,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             }
            
             //Don't swap players or increase depth -- we haven't played a move
-            std::pair<int, bool> result = searchID(state, p, n, depth);
+            std::pair<int, bool> result = searchID2(state, p, n, depth);
             if (outOfTime) {
                 //memcpy(state->board, oldBoard, state->boardSize);
                 return result;
@@ -758,89 +693,6 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         }
     }
-    // USING GAME VALUES STARTS HERE
-
-    int gameVal_sum = 0;
-    // std::cout<<"\n \n using values \n";
-    for (int i = 0; i < gamevalues.size(); i++) {
-        // std::cout<<gamevalues[i]<<"\n";
-                    std::vector<int> values1 = Decode_GameValue(gamevalues[i]);
-                    int ups1 = values1.at(0);
-                    int downs1 = values1.at(1);
-                    int stars1 = values1.at(2);
-
-                    std::vector<int> values2 = Decode_GameValue(gameVal_sum);
-                    int ups2 = values2.at(0);
-                    int downs2 = values2.at(1);
-                    int stars2 = values2.at(2);
-
-                    ups2 += ups1;
-                    downs2+=downs1;
-                    stars2+=stars1;
-
-                gameVal_sum= ups2*1000 + downs2*10+ stars2; 
-        
-    }
-
-    // std::cout<<"\nSUM GHABLI\t"<<sum<<"\n\n";
-    if (gameVal_sum < VAL_UNK && gamevalues.size()>0){
-       gameVal_sum = simplifySumValues(gameVal_sum);
-    //    std::cout<<"SUM\t: "<<sum<<"\n";
-       if (gameVal_sum==0){
-            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = n;
-            BESTMOVE(entry) = 0;
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = -127;
-        }        
-
-        memcpy(state->board, oldBoard, state->boardSize);
-        // std::cout<<"SUM=0\n";
-        return std::pair<int, bool>(n, true);
-
-       }
-       else if (int(gameVal_sum%10) ==0){ //no stars
-
-           if (int(gameVal_sum/1000) > 0){ // BLACK
-        //    std::cout<<"all up\n";
-            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
-                PLAYER(entry) = p;
-                OUTCOME(entry) = BLACK;
-                BESTMOVE(entry) = 0;
-                DEPTH(entry) = depth;
-                HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
-                }        
-
-                memcpy(state->board, oldBoard, state->boardSize);
-
-                return std::pair<int, bool>(OC_B, true);
-           }
-
-           else { // WHITE
-            // std::cout<<"all down\n";
-                if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
-                PLAYER(entry) = p;
-                OUTCOME(entry) = WHITE;
-                BESTMOVE(entry) = 0;
-                DEPTH(entry) = depth;
-                HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
-                }        
-
-                memcpy(state->board, oldBoard, state->boardSize);
-
-                return std::pair<int, bool>(OC_W, true);
-            
-           }
-       }
-       
-    }
-    // USING GAME VALUES ENDS HERE
-
-
 
     //generate moves
     //check for terminal
@@ -863,7 +715,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     //Delete dominated moves
-    std::vector<std::pair<int, int>> sg = generateSubgames(state);
+    std::vector<std::pair<int, int>> sg = generateSubgames2(state);
 
     for (int i = 0; i < sg.size(); i++) {
         int start = sg[i].first;
@@ -996,7 +848,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
 
         state->play(from, to, undoBuffer);
-        std::pair<int, bool> result = searchID(state, n, p, depth + 1);
+        std::pair<int, bool> result = searchID2(state, n, p, depth + 1);
         if (outOfTime) {
             //memcpy(state->board, oldBoard, state->boardSize);
             delete[] moves;
@@ -1073,11 +925,11 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
 /*
 // to print the first best move
-int BasicSolver::solveRoot(State *state, int p, int n) {
+int BasicSolver2::solveRoot(State *state, int p, int n) {
 
     //Look up state in table
     int code = state->code(p);
-    char *entry = getTablePtr(code);
+    char *entry = getTablePtr2(code);
 
     bool found = false;
     if (PLAYER(entry) == p) {
@@ -1101,7 +953,7 @@ int BasicSolver::solveRoot(State *state, int p, int n) {
         memcpy(entry, state->board, boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = n;
-        node_count += 1;
+        node_count2 += 1;
         return n;
     }
 
@@ -1112,7 +964,7 @@ int BasicSolver::solveRoot(State *state, int p, int n) {
         int to = moves[2 * i + 1];
 
         state->play(from, to, undoBuffer);
-        node_count += 1;
+        node_count2 += 1;
         int result = solve(state, n, p);
         state->undo(undoBuffer);
 
@@ -1120,8 +972,8 @@ int BasicSolver::solveRoot(State *state, int p, int n) {
             memcpy(entry, state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = p;
-            best_from = from;
-            best_to=to;
+            best_from2 = from;
+            best_to2=to;
             delete[] moves;
             return p;
         }
@@ -1130,8 +982,8 @@ int BasicSolver::solveRoot(State *state, int p, int n) {
     memcpy(entry, state->board, boardSize);
     PLAYER(entry) = p;
     OUTCOME(entry) = n;
-    best_from=-1;
-    best_to=-1;
+    best_from2=-1;
+    best_to2=-1;
 
     delete[] moves;
     return n;
@@ -1139,11 +991,11 @@ int BasicSolver::solveRoot(State *state, int p, int n) {
 */
 
 /*
-int BasicSolver::solve(State *state, int p, int n) {
+int BasicSolver2::solve(State *state, int p, int n) {
 
     //Look up state in table
     int code = state->code(p);
-    char *entry = getTablePtr(code);
+    char *entry = getTablePtr2(code);
 
     bool found = false;
     if (PLAYER(entry) == p) {
@@ -1167,7 +1019,7 @@ int BasicSolver::solve(State *state, int p, int n) {
         memcpy(entry, state->board, boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = n;
-        node_count += 1;
+        node_count2 += 1;
         return n;
     }
 
@@ -1178,7 +1030,7 @@ int BasicSolver::solve(State *state, int p, int n) {
         int to = moves[2 * i + 1];
 
         state->play(from, to, undoBuffer);
-        node_count += 1;
+        node_count2 += 1;
         int result = solve(state, n, p);
         state->undo(undoBuffer);
 
@@ -1201,25 +1053,25 @@ int BasicSolver::solve(State *state, int p, int n) {
 }
 */
 
-char *BasicSolver::getTablePtr(int code) {
-    int idx = code & bitMask;
+char *BasicSolver2::getTablePtr2(int code) {
+    int idx = code & bitMask2;
     for (int i = 1; ; i++) {
-        int shift = i * codeLength;
+        int shift = i * codeLength2;
 
         if (shift >= sizeof(int) * 8) {
             break;
         }
 
         int add = code >> shift;
-        add &= bitMask;
+        add &= bitMask2;
         code += add;
     }
-    code &= bitMask;
+    code &= bitMask2;
 
-    return table + (idx * tableEntrySize);
+    return table + (idx * tableEntrySize2);
 }
 
-void BasicSolver::updateTime() {
+void BasicSolver2::updateTime2() {
     auto now = std::chrono::steady_clock::now();
     double elapsed = std::chrono::duration<double>(now - startTime).count();
 

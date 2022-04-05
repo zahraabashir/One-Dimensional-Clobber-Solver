@@ -16,7 +16,7 @@ extern int node_count;
 extern int best_from;
 extern int best_to;
 
-class BasicSolver {
+class BasicSolver2 {
   private:
     int maxDepth;
 
@@ -29,7 +29,7 @@ class BasicSolver {
 
     std::default_random_engine *rng;
 
-    
+    void simplify(State *state);
   public:
     int rootPlayer;
     int boardSize;
@@ -48,22 +48,20 @@ class BasicSolver {
     //transposition table data
     char *table;
 
-    int bitMask; //bit mask for State code used to index table
-    int codeLength; //how many bits to use as index from the State's code
-    int tableEntrySize; //size in bytes of 1 table entry
+    int bitMask2; //bit mask for State code used to index table
+    int codeLength2; //how many bits to use as index from the State's code
+    int tableEntrySize2; //size in bytes of 1 table entry
 
 
-    BasicSolver(int rootPlayer, int boardSize, Database *db);
-    ~BasicSolver();
-
-    void simplify(State *state);
+    BasicSolver2(int rootPlayer, int boardSize, Database *db);
+    ~BasicSolver2();
 
     //true if the given entry matches the state and player
-    bool validateTableEntry(State *state, int p, char *entry);
+    bool validateTableEntry2(State *state, int p, char *entry);
 
 
     //call this to run the iterative deepening solver
-    int solveID(State *state, int p, int n);
+    int solveID2(State *state, int p, int n);
 
 
     /*      rootSearchID, searchID
@@ -72,8 +70,8 @@ class BasicSolver {
 
     if the bool is true, the int is the player who wins, otherwise it is the heuristic score
     */
-    std::pair<int, bool> rootSearchID(State *state, int p, int n, int depth);
-    std::pair<int, bool> searchID(State *state, int p, int n, int depth);
+    std::pair<int, bool> rootSearchID2(State *state, int p, int n, int depth);
+    std::pair<int, bool> searchID2(State *state, int p, int n, int depth);
 
 
     //basic solver functions
@@ -83,18 +81,16 @@ class BasicSolver {
 
     //return a table entry pointer based on a State's code. Use validateTableEntry
     //to see if the entry is a match
-    char *getTablePtr(int code);
+    char *getTablePtr2(int code);
 
     //Call this when a node is being visited
     //check outOfTime to see if time is up
-    void updateTime();
+    void updateTime2();
 
     //void setTableEntry(int code, char *board, char player, char outcome);
-    // std::vector<std::pair<int, int>> generateSubgames(State *state);
 
 };
 
 
 
-std::vector<std::pair<int, int>> generateSubgames(State *state);
-std::vector<int> Decode_GameValue(int encoded);
+std::vector<std::pair<int, int>> generateSubgames2(State *state);

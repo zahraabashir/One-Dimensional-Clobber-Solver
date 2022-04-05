@@ -2,7 +2,7 @@
 #include <cstring>
 #include "utils.h"
 #include "state.h"
-#include "solver.h"
+#include "validSolver.h"
 #include "database.h"
 #include <chrono>
 #include <set>
@@ -112,7 +112,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     int result;
 
     auto start = std::chrono::steady_clock::now();
-    BasicSolver *solver = new BasicSolver(player, boardSize, &db);
+    BasicSolver2 *solver = new BasicSolver2(player, boardSize, &db);
     solver->timeLimit = 1000000000.0;
     solver->startTime = start;
 
@@ -126,7 +126,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 
     State *root = new State(boardText, player);
 
-    result = solver->solveID(root, player, opponentNumber(player));
+    result = solver->solveID2(root, player, opponentNumber(player));
 
     delete solver;
     delete root;
@@ -135,6 +135,24 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 }
 
 
+
+std::vector<int> Decode_GameValues(int encoded){
+    // calculated ups downs and stars from a int that has 5 integers (ex: 23456) -> 23 ups, 45 downs and 6 stars
+    // Starting from rom the left, two left most numbers are the number of ups
+    // then downs
+    // then the last integer is for #stars
+    // saves these values seperately in the output vector
+
+    std::vector <int> out;
+    int ups = int(encoded/1000);
+    out.push_back(ups);
+    int downs = int((encoded%1000)/10);
+    out.push_back(downs);
+    int stars = int(encoded%10);
+    out.push_back(stars);
+
+    return out;
+}
 
 int set_basic_value_rules(int L, int R){
     if (L==-1 || R==-1) return 0; //{ | } = 0
@@ -256,7 +274,7 @@ int gameValue(Database &db, char *board, int boardSize, int player){
     // play left or right base on the given player
     std:: vector<int> optionValues ;
     
-    BasicSolver *solver = new BasicSolver(player, boardSize, &db);
+    // BasicSolver2 *solver = new BasicSolver2(player, boardSize, &db);
 
     char boardText[boardSize + 1];
     memcpy(boardText, board, boardSize);
@@ -299,7 +317,7 @@ int gameValue(Database &db, char *board, int boardSize, int player){
 
         // solve each move 1 leve;
         uint64_t gameVal = 0;
-        std::vector<std::pair<int, int>> subgames = generateSubgames(state);
+        std::vector<std::pair<int, int>> subgames = generateSubgames2(state);
         int subgameCount = subgames.size();
         
 
@@ -620,13 +638,13 @@ vector<string> string_list;
 
             {
                 auto start = std::chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(1, length, &db);
+                BasicSolver2 *solver = new BasicSolver2(1, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
                 State *root = new State(boardText, 1);
                 
-                result1 = solver->solveID(root, 1, opponentNumber(1));
+                result1 = solver->solveID2(root, 1, opponentNumber(1));
 
                 delete solver;
                 delete root;
@@ -634,13 +652,13 @@ vector<string> string_list;
 
             {
                 auto start = std::chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(2, length, &db);
+                BasicSolver2 *solver = new BasicSolver2(2, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
                 State *root = new State(boardText, 2);
                 
-                result2 = solver->solveID(root, 2, opponentNumber(2));
+                result2 = solver->solveID2(root, 2, opponentNumber(2));
 
                 delete solver;
                 delete root;

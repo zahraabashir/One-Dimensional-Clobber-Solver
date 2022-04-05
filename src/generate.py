@@ -38,10 +38,10 @@ for line in testFile:
 all_s = time.clock_gettime(time.CLOCK_MONOTONIC)
 
 outputs = []
-new = open("new_test+result.txt", "w")
+new = open("final_test.txt", "w")
 index = 0
 for t in tests:
-    command = "./TheSolvers " + str(t) + " 1000000"
+    command = "./TheSolvers " + str(t) + " 200"
     # start = time.clock_gettime(time.CLOCK_MONOTONIC)
     result = subprocess.run(command, capture_output = True, shell = True)
     # end = time.clock_gettime(time.CLOCK_MONOTONIC)

@@ -13,7 +13,9 @@
 int node_count = 0; //nodes visited
 int best_from = -1; //root player's move
 int best_to = -1;
-
+//gamevalue mode, true=> with gamevalue
+bool dominated = true;
+bool gamevalue = true;
 //int collisions = 0; //transposition table collisions
 
 //TODO: the new simplifies game value can be saved in the transposition table 
@@ -760,6 +762,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
     // USING GAME VALUES STARTS HERE
 
+if (gamevalue == true){
+
+
     int gameVal_sum = 0;
     // std::cout<<"\n \n using values \n";
     for (int i = 0; i < gamevalues.size(); i++) {
@@ -840,6 +845,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
     // USING GAME VALUES ENDS HERE
 
+}
 
 
     //generate moves
@@ -863,6 +869,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     //Delete dominated moves
+    if (dominated==true){
     std::vector<std::pair<int, int>> sg = generateSubgames(state);
 
     for (int i = 0; i < sg.size(); i++) {
@@ -891,7 +898,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     }
 
-
+    }
 
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {

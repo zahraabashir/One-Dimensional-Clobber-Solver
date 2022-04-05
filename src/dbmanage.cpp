@@ -164,11 +164,11 @@ int set_basic_value_rules(int L, int R){
     int stars_R = values.at(2);
 
 
-    if (L==0 & R==0) return 1;
-    else if (L==0 & R==1) return 1000;
-    else if (L==1 & R==0) return 10;
+    if (L==0 && R==0) return 1;
+    else if (L==0 && R==1) return 1000;
+    else if (L==1 && R==0) return 10;
 
-    else if (L==0 and downs_R==0){ //Rule 0 and 1
+    else if (L==0 && downs_R==0){ //Rule 0 and 1
         //rule 0
         if(stars_R==1){ // if R has one *
             return (ups_R+1)*1000; //
@@ -213,7 +213,7 @@ int compare(int value1, int value2, bool max){
         else return value2;
          }
     
-    else return -1; // not comparabale!!!
+    else return VAL_UNK; // not comparabale!!!
     }
  
  
@@ -956,7 +956,32 @@ cout<<"AVVALI\n";
                 
             }
     cout<<"sevomi\n";
+    for (int n = 1; n < DB_MAX_BITS/2; n++) {
+            if (n!=3){
+                char board[2*n];
+                for (int i = 0; i < 2*n; i++) {
+                    if (i%2==0){
+                    board[i] = BLACK;}
+                    else{
+                    board[i] = WHITE; 
+                    }
+                }
+                unsigned char *entry = db.get(2*n, board);
+                DB_SET_VALUE(entry, 1);
 
+                char board2[2*n];
+                for (int i = 0; i < 2*n; i++) {
+                    if (i%2==0){
+                    board2[i] = WHITE;}
+                    else{
+                    board2[i] = BLACK; 
+                    }
+                }
+                unsigned char *entry2 = db.get(2*n, board2);
+                DB_SET_VALUE(entry2, 1);
+                
+            }
+    }
     db.save();
     
     return 0;

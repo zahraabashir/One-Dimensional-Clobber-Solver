@@ -15,7 +15,7 @@ int best_from = -1; //root player's move
 int best_to = -1;
 //gamevalue mode, true=> with gamevalue
 bool dominated = true;
-bool gamevalue = true;
+bool gamevalue = false;
 //int collisions = 0; //transposition table collisions
 
 //TODO: the new simplifies game value can be saved in the transposition table 

@@ -956,6 +956,7 @@ cout<<"AVVALI\n";
                 
             }
     cout<<"sevomi\n";
+    /*
     for (int n = 1; n < DB_MAX_BITS/2; n++) {
             if (n!=3){
                 char board[2*n];
@@ -982,6 +983,7 @@ cout<<"AVVALI\n";
                 
             }
     }
+    */
     db.save();
     
     return 0;

@@ -518,6 +518,103 @@ vector<string> string_list;
     // cout<<"END \n\n\n\n";
     maxLength = DB_MAX_BITS;
     maxGame = 0;
+
+    vector<string> string_list;
+
+    string s1="";
+    string s2="";
+    
+    for (int m = 2; m < DB_MAX_BITS/2; m++) {
+            
+        for (int n = 2; n < DB_MAX_BITS/2; n++) {
+                char board[m+n];
+                s1 = string(m, 'B') + string(n, 'W');
+                for (int i = 0; i < m+n; i++) {
+                    if (s1[i]=='W'){
+                    board[i] = WHITE;
+                    }
+                    else if(s1[i]=='B'){
+                        board[i] = BLACK;
+                    }
+                }
+                unsigned char *entry = db.get(m+n, board);
+                DB_SET_VALUE(entry, 0);
+
+                char board2[m+n];
+                s2 = string(m, 'W') + string(n, 'B');
+                for (int i = 0; i < m+n; i++) {
+                    if (s2[i]=='W'){
+                    board2[i] = WHITE;
+                    }
+                    else if(s2[i]=='B'){
+                        board2[i] = BLACK;
+                    }
+                }
+                unsigned char *entry2 = db.get(m+n, board2);
+                DB_SET_VALUE(entry2, 0);
+                
+            }
+    }
+cout<<"AVVALI\n";
+
+
+
+
+    for (int n = 1; n < DB_MAX_BITS-1; n++) {
+
+                char board[n+1];
+                s1 = string(1, 'W') + string(n, 'B');
+                board[0] = WHITE;
+
+                for (int i = 1; i < n+1; i++) {
+                    board[i] = BLACK;
+                }
+                unsigned char *entry = db.get(n+1, board);
+                DB_SET_VALUE(entry, (n-1)*1000 + (n%2));
+
+                char board2[n+1];
+                s1 = string(1, 'B') + string(n, 'W');
+                board2[0] = BLACK;
+
+                for (int i = 1; i < n+1; i++) {
+                    board2[i] = WHITE;
+                }
+                unsigned char *entry2 = db.get(n+1, board2);
+                DB_SET_VALUE(entry2, (n-1)*10 + (n%2));
+                
+            }
+    cout<<"dovomi\n";
+
+
+    for (int n = 1; n < DB_MAX_BITS/3; n++) {
+
+                char board[3*n];
+
+                
+                for (int i = 0; i < 3*n; i++) {
+                    if (i%3==2){
+                    board[i] = WHITE;}
+                    else{
+                    board[i] = BLACK; 
+                    }
+                }
+                unsigned char *entry = db.get(3*n, board);
+                DB_SET_VALUE(entry, int((n+1)/2)*1000);
+
+                char board2[3*n];
+                
+                for (int i = 0; i < 3*n; i++) {
+                    if (i%3==2){
+                    board2[i] = BLACK;}
+                    else{
+                    board2[i] = WHITE; 
+                    }
+                }
+                unsigned char *entry2 = db.get(3*n, board2);
+                DB_SET_VALUE(entry2, int((n+1)/2)*10);
+                
+            }
+    cout<<"sevomi\n";
     
     for (int length = 1; length <= maxLength; length++) {
 
@@ -866,102 +963,102 @@ vector<string> string_list;
 
     }
 
-    vector<string> string_list;
+//     vector<string> string_list;
 
-    string s1="";
-    string s2="";
+//     string s1="";
+//     string s2="";
     
-    for (int m = 2; m < DB_MAX_BITS/2; m++) {
+//     for (int m = 2; m < DB_MAX_BITS/2; m++) {
             
-        for (int n = 2; n < DB_MAX_BITS/2; n++) {
-                char board[m+n];
-                s1 = string(m, 'B') + string(n, 'W');
-                for (int i = 0; i < m+n; i++) {
-                    if (s1[i]=='W'){
-                    board[i] = WHITE;
-                    }
-                    else if(s1[i]=='B'){
-                        board[i] = BLACK;
-                    }
-                }
-                unsigned char *entry = db.get(m+n, board);
-                DB_SET_VALUE(entry, 0);
+//         for (int n = 2; n < DB_MAX_BITS/2; n++) {
+//                 char board[m+n];
+//                 s1 = string(m, 'B') + string(n, 'W');
+//                 for (int i = 0; i < m+n; i++) {
+//                     if (s1[i]=='W'){
+//                     board[i] = WHITE;
+//                     }
+//                     else if(s1[i]=='B'){
+//                         board[i] = BLACK;
+//                     }
+//                 }
+//                 unsigned char *entry = db.get(m+n, board);
+//                 DB_SET_VALUE(entry, 0);
 
-                char board2[m+n];
-                s2 = string(m, 'W') + string(n, 'B');
-                for (int i = 0; i < m+n; i++) {
-                    if (s2[i]=='W'){
-                    board2[i] = WHITE;
-                    }
-                    else if(s2[i]=='B'){
-                        board2[i] = BLACK;
-                    }
-                }
-                unsigned char *entry2 = db.get(m+n, board2);
-                DB_SET_VALUE(entry2, 0);
+//                 char board2[m+n];
+//                 s2 = string(m, 'W') + string(n, 'B');
+//                 for (int i = 0; i < m+n; i++) {
+//                     if (s2[i]=='W'){
+//                     board2[i] = WHITE;
+//                     }
+//                     else if(s2[i]=='B'){
+//                         board2[i] = BLACK;
+//                     }
+//                 }
+//                 unsigned char *entry2 = db.get(m+n, board2);
+//                 DB_SET_VALUE(entry2, 0);
                 
-            }
-    }
-cout<<"AVVALI\n";
+//             }
+//     }
+// cout<<"AVVALI\n";
 
 
 
 
-    for (int n = 1; n < DB_MAX_BITS-1; n++) {
+//     for (int n = 1; n < DB_MAX_BITS-1; n++) {
 
-                char board[n+1];
-                s1 = string(1, 'W') + string(n, 'B');
-                board[0] = WHITE;
+//                 char board[n+1];
+//                 s1 = string(1, 'W') + string(n, 'B');
+//                 board[0] = WHITE;
 
-                for (int i = 1; i < n+1; i++) {
-                    board[i] = BLACK;
-                }
-                unsigned char *entry = db.get(n+1, board);
-                DB_SET_VALUE(entry, (n-1)*1000 + (n%2));
+//                 for (int i = 1; i < n+1; i++) {
+//                     board[i] = BLACK;
+//                 }
+//                 unsigned char *entry = db.get(n+1, board);
+//                 DB_SET_VALUE(entry, (n-1)*1000 + (n%2));
 
-                char board2[n+1];
-                s1 = string(1, 'B') + string(n, 'W');
-                board2[0] = BLACK;
+//                 char board2[n+1];
+//                 s1 = string(1, 'B') + string(n, 'W');
+//                 board2[0] = BLACK;
 
-                for (int i = 1; i < n+1; i++) {
-                    board2[i] = WHITE;
-                }
-                unsigned char *entry2 = db.get(n+1, board2);
-                DB_SET_VALUE(entry2, (n-1)*10 + (n%2));
+//                 for (int i = 1; i < n+1; i++) {
+//                     board2[i] = WHITE;
+//                 }
+//                 unsigned char *entry2 = db.get(n+1, board2);
+//                 DB_SET_VALUE(entry2, (n-1)*10 + (n%2));
                 
-            }
-    cout<<"dovomi\n";
+//             }
+//     cout<<"dovomi\n";
 
 
-    for (int n = 1; n < DB_MAX_BITS/3; n++) {
+//     for (int n = 1; n < DB_MAX_BITS/3; n++) {
 
-                char board[3*n];
+//                 char board[3*n];
 
                 
-                for (int i = 0; i < 3*n; i++) {
-                    if (i%3==2){
-                    board[i] = WHITE;}
-                    else{
-                    board[i] = BLACK; 
-                    }
-                }
-                unsigned char *entry = db.get(3*n, board);
-                DB_SET_VALUE(entry, int((n+1)/2)*1000);
+//                 for (int i = 0; i < 3*n; i++) {
+//                     if (i%3==2){
+//                     board[i] = WHITE;}
+//                     else{
+//                     board[i] = BLACK; 
+//                     }
+//                 }
+//                 unsigned char *entry = db.get(3*n, board);
+//                 DB_SET_VALUE(entry, int((n+1)/2)*1000);
 
-                char board2[3*n];
+//                 char board2[3*n];
                 
-                for (int i = 0; i < 3*n; i++) {
-                    if (i%3==2){
-                    board2[i] = BLACK;}
-                    else{
-                    board2[i] = WHITE; 
-                    }
-                }
-                unsigned char *entry2 = db.get(3*n, board2);
-                DB_SET_VALUE(entry2, int((n+1)/2)*10);
+//                 for (int i = 0; i < 3*n; i++) {
+//                     if (i%3==2){
+//                     board2[i] = BLACK;}
+//                     else{
+//                     board2[i] = WHITE; 
+//                     }
+//                 }
+//                 unsigned char *entry2 = db.get(3*n, board2);
+//                 DB_SET_VALUE(entry2, int((n+1)/2)*10);
                 
-            }
-    cout<<"sevomi\n";
+//             }
+//     cout<<"sevomi\n";
     /*
     for (int n = 1; n < DB_MAX_BITS/2; n++) {
             if (n!=3){

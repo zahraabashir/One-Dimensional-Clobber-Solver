@@ -11,6 +11,15 @@
 #include <algorithm>
 using namespace std;
 
+int two_ups=0;
+int two_downs = 0;
+int one_ups=0;
+int one_downs=0;
+int all_stars = 0;
+int zeros = 0;
+int up_star= 0;
+int down_star = 0;
+
 bool all_black(string s){
     set <char> s1;
    
@@ -218,6 +227,33 @@ int compare(int value1, int value2, bool max){
             return value1;}
         else return value2;
          }
+    else if (value1==1 && ups_2>=2){// one is star another has 2 or more ups and no downs (already simplified)
+        return value2;
+    }
+    else if (value1==1 && downs_2>=2) // one is star another has 2 or more downs and no ups
+    {
+        return value1;
+    }
+    // repeat for inverse
+    else if (value2==1 && ups_1>=2){// one is star another has 2 or more ups and no downs (already simplified)
+        return value1;
+    }
+    else if (value2==1 && downs_1>=2) // one is star another has 2 or more downs and no ups
+    {
+        return value2;
+    }
+   else if(stars_1==1 && ups_2-ups_1>2){
+       return value2;
+   }
+      else if(stars_2==1 && ups_1-ups_2>2){
+       return value1;
+   }
+   else if(ups_1-ups_2>=2 && stars_1>stars_2){
+       return value1;
+   }
+      else if(ups_2-ups_1>=2 && stars_2>stars_1){
+       return value2;
+   }
     
     else return VAL_UNK; // not comparabale!!!
     }
@@ -240,6 +276,33 @@ int compare(int value1, int value2, bool max){
             return value1;}
         else return value2;
     }
+    else if (value1==1 && ups_2>=2){// one is star another has 2 or more ups and no downs (already simplified)
+        return value1;
+    }
+    else if (value1==1 && downs_2>=2) // one is star another has 2 or more downs and no ups
+    {
+        return value2;
+    }
+    // repeat for inverse
+    else if (value2==1 && ups_1>=2){// one is star another has 2 or more ups and no downs (already simplified)
+        return value2;
+    }
+    else if (value2==1 && downs_1>=2) // one is star another has 2 or more downs and no ups
+    {
+        return value1;
+    }
+   else if(stars_1==1 && ups_2-ups_1>2){
+       return value1;
+   }
+      else if(stars_2==1 && ups_1-ups_2>2){
+       return value2;
+   }
+      else if(ups_1-ups_2>=2 && stars_1>stars_2){
+       return value2;
+   }
+      else if(ups_2-ups_1>=2 && stars_2>stars_1){
+       return value1;
+   }
     else{ 
         // cout<<"not comparable";
         return VAL_UNK; // not comparabale!!!
@@ -383,6 +446,8 @@ int gameValue(Database &db, char *board, int boardSize, int player){
                 for (int i =1; i<optionValues.size(); i++){
                     // cout<<"return value B "<<return_value << "\n";
                     // implement a way to compare values
+                    return_value = simplifySumValue(return_value);
+                    optionValues[i] = simplifySumValue(optionValues[i]);
                     return_value = compare(optionValues[i],return_value,true);
                     if (return_value== VAL_UNK) return VAL_UNK;
 
@@ -394,6 +459,8 @@ int gameValue(Database &db, char *board, int boardSize, int player){
                 for (int i =1; i<optionValues.size(); i++){
                     // cout<<"return value W "<<return_value << "\n";
                     // implement a way to compare values
+                    return_value = simplifySumValue(return_value);
+                    optionValues[i] = simplifySumValue(optionValues[i]);
                     return_value = compare(optionValues[i],return_value,false);
                     if (return_value== VAL_UNK) return VAL_UNK;
                 }
@@ -717,6 +784,14 @@ cout<<"AVVALI\n";
 
                     // cout<< "mirror game value: "<< InverseValue<<"\n";
                     DB_SET_VALUE(entry,InverseValue);
+                    if(InverseValue==2000){two_ups++;}
+                    if(InverseValue==20){two_downs++;}
+                    if(InverseValue==1){all_stars++;}
+                    if(InverseValue==0){zeros++;}
+                    if(InverseValue==1000){one_ups++;}
+                    if(InverseValue==10){one_downs++;}
+                    if(InverseValue==1001){up_star++;}
+                    if(InverseValue==11){down_star++;}
                 }
                 else DB_SET_VALUE(entry,VAL_UNK);
 
@@ -927,6 +1002,22 @@ cout<<"AVVALI\n";
                     if (Black_value!=VAL_UNK && White_value!=VAL_UNK){
                         uint64_t board_value = set_basic_value_rules(Black_value,White_value);
                         DB_SET_VALUE(entry, board_value);
+                        //statistics
+                    std::vector<int> values1 = Decode_GameValues(board_value);
+                    int ups1 = values1.at(0);
+                    int downs1 = values1.at(1);
+                    int stars1 = values1.at(2);
+                    if(board_value==2000){two_ups++;}
+                    if(board_value==20){two_downs++;}
+                    if(board_value==1){all_stars++;}
+                    if(board_value==0){zeros++;}
+                    if(board_value==1000){one_ups++;}
+                    if(board_value==10){one_downs++;}
+                    if(board_value==1001){up_star++;}
+                    if(board_value==11){down_star++;}
+
+
+
                         //printing
                         if(board_value!=VAL_UNK){
 
@@ -1087,6 +1178,15 @@ cout<<"AVVALI\n";
             }
     }
     */
+   cout<<"two ups"<< two_ups <<"\n";
+   cout<<"two downs"<< two_downs <<"\n";
+   cout<<"one ups"<< one_ups <<"\n";
+   cout<<"onw downs"<< one_downs <<"\n";
+   cout<<"zeros"<< zeros <<"\n";
+   cout<<"stars"<< all_stars<<"\n";
+   cout<<"up star"<< up_star<<"\n";
+   cout<<"down star"<< down_star<<"\n";
+   
     db.save();
     
     return 0;

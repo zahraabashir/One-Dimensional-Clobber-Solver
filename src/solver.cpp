@@ -8,6 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <cmath>
 
 
 int node_count = 0; //nodes visited
@@ -530,6 +531,57 @@ bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int
     return (a.second - a.first) > (b.second - b.first);
 }
 
+
+int BasicSolver::checkBounds(State *state) {
+    return 0;
+
+    std::vector<std::pair<int, int>> sg = generateSubgames(state);
+
+    std::vector<std::pair<int, int>> bounds;
+
+
+
+    int lowSum = 0;
+    bool lowStar = false;
+
+    int highSum = 0;
+    bool highStar = false;
+
+    for (auto it = sg.begin(); it != sg.end(); it++) {
+        int size = it->second - it->first;
+        if (size > DB_MAX_BOUND_BITS) {
+            return 0;
+        }
+
+        unsigned char *dbEntry = db->get(size, state->board + it->first);
+
+        if (DB_GET_OUTCOME(dbEntry) == OC_UNKNOWN) {
+            return 0;
+        }
+
+        int low = DB_GET_BOUND(dbEntry, 0);
+        int high = DB_GET_BOUND(dbEntry, 1);
+
+
+        lowSum += std::signbit(low) * std::max(std::abs(low) - 1, 0);
+        lowStar = std::abs(low) % 2 != 0 ? !lowStar : lowStar;
+
+        lowSum += std::signbit(high) * std::max(std::abs(high) - 1, 0);
+        lowStar = std::abs(high) % 2 != 0 ? !highStar : highStar;
+    }
+
+    if (lowSum - (lowStar ? 1 : 0) > 0) {
+        return 1;
+    }
+
+    if (highSum + (highStar ? 1 : 0) < 0) {
+        return 2;
+    }
+
+
+    return 0;
+}
+
 std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     node_count += 1;
     updateTime();
@@ -540,6 +592,13 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     char oldBoard[state->boardSize];
     memcpy(oldBoard, state->board, state->boardSize);
     simplify(state);
+
+    int boundWin = checkBounds(state);
+
+    if (boundWin != 0) {
+        memcpy(state->board, oldBoard, state->boardSize);
+        return std::pair<int, bool>(boundWin, true);
+    }
 
 
     //lookup entry

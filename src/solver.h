@@ -89,6 +89,9 @@ class BasicSolver {
 
     //void setTableEntry(int code, char *board, char player, char outcome);
 
+
+    int checkBounds(State *state);
+
 };
 
 

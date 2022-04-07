@@ -282,6 +282,10 @@ int main() {
 
 
             cout << "solving" << endl;
+
+
+
+
             int result1, result2;
 
             {
@@ -324,6 +328,22 @@ int main() {
 
             std::cout << "Lookup" << std::endl;
             entry = db.get(length, board);
+
+            //find bounds
+            if (length <= DB_MAX_BOUND_BITS) {
+        
+                int8_t bounds[2];
+                computeBounds(db, board, bounds);
+
+                DB_SET_BOUND(entry, 0, bounds[0]);
+                DB_SET_BOUND(entry, 1, bounds[1]);
+
+                std::cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << std::endl;
+            }
+
+
+
+
             if (DB_GET_OUTCOME(entry) != 0) {
                 cout << "Overwriting outcome: " << DB_GET_OUTCOME(entry) << endl;
                 while(1){}
@@ -455,18 +475,6 @@ int main() {
                 std::cout << domBlack << " " << domWhite << std::endl;
             }
 
-
-            //find bounds
-            if (length <= DB_MAX_BOUND_BITS) {
-        
-                int8_t bounds[2];
-                computeBounds(db, board, bounds);
-
-                DB_SET_BOUND(entry, 0, bounds[0]);
-                DB_SET_BOUND(entry, 1, bounds[1]);
-
-                std::cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << std::endl;
-            }
 
 
             cout << endl;

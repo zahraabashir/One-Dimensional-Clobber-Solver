@@ -5,6 +5,8 @@
 #include "solver.h"
 #include "database.h"
 #include <chrono>
+#include <map>
+
 
 int gameResult(Database &db, char *board, int boardSize, int player) {
     int result;
@@ -30,6 +32,131 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     delete root;
 
     return result;
+}
+
+char *addGames(char *g1, char *g2) {
+    size_t l1 = strlen(g1);
+    size_t l2 = strlen(g2);
+
+    char *g3 = new char[l1 + l2 + 2];
+
+    memcpy(g3, g1, l1);
+    memcpy(g3 + l1 + 1, g2, l2);
+    g3[l1] = 0;
+    g3[l1 + l2 + 1] = 0;
+
+    return g3;
+}
+
+
+void computeBounds(Database &db, char *board, int8_t *bounds) {
+    char compare[32];
+
+    std::map<int, int> ltFlags; //-1 false, 0 unknown, 1 true
+    std::map<int, int> gtFlags;
+
+    bool found = false;
+
+    for (int i = 0; abs(i) < 31; i = i >= 0 ? -(i + 1) : -i) {
+        //std::cout << "[" << i << "]" << std::endl;
+
+        memset(compare, 0, 32);
+        char player = i < 0 ? 1 : 2; //we're adding the negative of compare -- flip 1 and 2
+
+
+        compare[0] = opponentNumber(player);
+
+        for (int j = 0; j < abs(i); j++) {
+            compare[j + 1] = player;
+        }
+
+        char *g = addGames(board, compare);
+
+        int boardSize = strlen(board) + 1 + strlen(compare);
+
+        //for (int j = 0; j < boardSize; j++) {
+        //    std::cout << playerNumberToChar(g[j]);
+        //}
+        //std::cout << std::endl;
+
+        int result1 = gameResult(db, g, boardSize, 1);
+        int result2 = gameResult(db, g, boardSize, 2);
+
+        delete[] g;
+
+        int outcomeClass;
+        if (result1 == result2) {
+            outcomeClass = result1;
+        } else {
+            if (result1 == 1) {
+                outcomeClass = OC_N;
+            } else {
+                outcomeClass = OC_P;
+            }
+        }
+
+
+        // C >= G --> 0 >= G - C --> G - C <= 0
+        gtFlags[i] = (outcomeClass == OC_W || outcomeClass == OC_P) ? 1 : -1;
+
+        // C <= G --> 0 <= G - C --> G - C >= 0
+        ltFlags[i] = (outcomeClass == OC_B || outcomeClass == OC_P) ? 1 : -1;
+ 
+
+        //Now check if we can determine the bound from this
+        int low, high;
+        bool foundLow = false;
+        bool foundHigh = false;
+
+        for (int j = -31; j < 31; j++) {
+            if (ltFlags[j] == 1 && ltFlags[j + 1] == -1) {
+                low = j;
+                foundLow = true;
+                break;
+            }
+            
+        }
+
+        for (int j = 31; j > -31; j--) {
+            if (gtFlags[j] == 1 && gtFlags[j - 1] == -1) {
+                high = j;
+                foundHigh = true;
+                break;
+            }
+        }
+
+        if (foundLow && foundHigh) {
+            bounds[0] = low;
+            bounds[1] = high;
+            found = true;
+            break;
+        }
+
+    }
+
+    if (!found || bounds[0] > bounds[1]) {
+        std::cout << "Bounds not found..." << std::endl;
+        std::cout << "{" << (int) bounds[0] << " " << (int) bounds[1] << "}" << std::endl;
+
+
+        std::cout << "LT" << std::endl;
+        for (int i = -32; i < 32; i++) {
+            std::cout << "(" << i << " " << ltFlags[i] << ") ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "GT" << std::endl;
+        for (int i = -32; i < 32; i++) {
+            std::cout << "(" << i << " " << gtFlags[i] << ") ";
+        }
+        std::cout << std::endl;
+
+
+
+        while (1) {
+        }
+    }
+
 }
 
 
@@ -321,6 +448,13 @@ int main() {
                 std::cout << domBlack << " " << domWhite << std::endl;
             }
 
+
+            //find bounds
+            int8_t bounds[2];
+            computeBounds(db, board, bounds);
+
+
+            std::cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << std::endl;
 
             cout << endl;
         }

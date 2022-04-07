@@ -533,6 +533,12 @@ bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int
 
 
 int BasicSolver::checkBounds(State *state) {
+    int roll = (*rng)() % 10000;
+    if (roll < 7000) {
+        return 0;
+    }
+
+
     std::vector<std::pair<int, int>> sg = generateSubgames(state);
 
 

@@ -533,10 +533,8 @@ bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int
 
 
 int BasicSolver::checkBounds(State *state) {
+    return 0;
     std::vector<std::pair<int, int>> sg = generateSubgames(state);
-
-    std::vector<std::pair<int, int>> bounds;
-
 
 
     int lowSum = 0;

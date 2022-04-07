@@ -238,8 +238,8 @@ int main() {
             int outcome = 0;
             uint64_t domBlack = 0;
             uint64_t domWhite = 0;
-            uint8_t lowerBound = 0;
-            uint8_t upperBound = 0;
+            int8_t lowerBound = 0;
+            int8_t upperBound = 0;
 
             if (mirror) {
                 entry = db.get(length, mirrorBoard);

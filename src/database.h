@@ -30,7 +30,7 @@
 
 #define DB_MAX_BITS 16
 #define DB_MAX_DOMINANCE_BITS 10
-#define DB_MAX_BOUND_BITS 10
+#define DB_MAX_BOUND_BITS 12
 
 #define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t))
 

@@ -16,10 +16,10 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 
 
     char boardText[boardSize + 1];
-    memcpy(boardText, board, boardSize);
+    //memcpy(boardText, board, boardSize);
     boardText[boardSize] = 0;
     for (int i = 0; i < boardSize; i++) {
-        boardText[i] = playerNumberToChar(boardText[i]);
+        boardText[i] = playerNumberToChar(board[i]);
     }
 
     State *root = new State(boardText, player);

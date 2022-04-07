@@ -30,7 +30,7 @@
 
 #define DB_MAX_BITS 16
 #define DB_MAX_DOMINANCE_BITS 10
-#define DB_MAX_BOUND_BITS 10
+#define DB_MAX_BOUND_BITS 12
 
 #define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t))
 
@@ -45,8 +45,8 @@
 #define DB_SET_DOMINATED(entry, player, mask) ((uint64_t *) (&entry[1]))[player - 1] = mask
 
 
-#define DB_GET_BOUND(entry, player) ((int8_t *) (entry + 1 + 2 * sizeof(uint64_t)))[player - 1]
-#define DB_SET_BOUND(entry, player, bound) ((int8_t *) (entry + 1 + 2 * sizeof(uint64_t)))[player - 1] = bound
+#define DB_GET_BOUND(entry, index) ((int8_t *) (entry + 1 + 2 * sizeof(uint64_t)))[index]
+#define DB_SET_BOUND(entry, index, bound) ((int8_t *) (entry + 1 + 2 * sizeof(uint64_t)))[index] = bound
 
 
 class Database {

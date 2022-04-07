@@ -238,12 +238,17 @@ int main() {
             int outcome = 0;
             uint64_t domBlack = 0;
             uint64_t domWhite = 0;
+            uint8_t lowerBound = 0;
+            uint8_t upperBound = 0;
 
             if (mirror) {
                 entry = db.get(length, mirrorBoard);
                 outcome = DB_GET_OUTCOME(entry);
                 domBlack = DB_GET_DOMINATED(entry, 1);
                 domWhite = DB_GET_DOMINATED(entry, 2);
+                lowerBound = DB_GET_BOUND(entry, 0);
+                upperBound = DB_GET_BOUND(entry, 1);
+                
 
                 switch (outcome) {
                     case OC_B:
@@ -268,6 +273,8 @@ int main() {
                 DB_SET_OUTCOME(entry, outcome);
                 DB_SET_DOMINATED(entry, 1, domWhite); //invert dominance
                 DB_SET_DOMINATED(entry, 2, domBlack);
+                DB_SET_BOUND(entry, 0, -upperBound);
+                DB_SET_BOUND(entry, 1, -lowerBound);
 
                 cout << endl;
                 continue;
@@ -450,11 +457,17 @@ int main() {
 
 
             //find bounds
-            int8_t bounds[2];
-            computeBounds(db, board, bounds);
+            if (length <= DB_MAX_BOUND_BITS) {
+        
+                int8_t bounds[2];
+                computeBounds(db, board, bounds);
 
+                DB_SET_BOUND(entry, 0, bounds[0]);
+                DB_SET_BOUND(entry, 1, bounds[1]);
 
-            std::cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << std::endl;
+                std::cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << std::endl;
+            }
+
 
             cout << endl;
         }

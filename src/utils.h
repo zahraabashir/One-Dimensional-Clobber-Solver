@@ -37,4 +37,8 @@ std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {
     return os;
 }
 
+template <class T>
+int sign(T &val) {
+    return T(0) > val ? -1 : 1;
+}
 

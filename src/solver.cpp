@@ -533,8 +533,6 @@ bool subgameLengthCompare(const std::pair<int, int> &a, const std::pair<int, int
 
 
 int BasicSolver::checkBounds(State *state) {
-    return 0;
-
     std::vector<std::pair<int, int>> sg = generateSubgames(state);
 
     std::vector<std::pair<int, int>> bounds;
@@ -563,18 +561,40 @@ int BasicSolver::checkBounds(State *state) {
         int high = DB_GET_BOUND(dbEntry, 1);
 
 
-        lowSum += std::signbit(low) * std::max(std::abs(low) - 1, 0);
+        //std::cout << "[" << low << " " << high << "]" << std::endl;
+
+        int lowVal = sign(low) * std::max(std::abs(low) - 1, 0);
+        lowSum += lowVal;
         lowStar = std::abs(low) % 2 != 0 ? !lowStar : lowStar;
 
-        lowSum += std::signbit(high) * std::max(std::abs(high) - 1, 0);
-        lowStar = std::abs(high) % 2 != 0 ? !highStar : highStar;
+        int highVal = sign(high) * std::max(std::abs(high) - 1, 0);
+        highSum += highVal;
+        highStar = std::abs(high) % 2 != 0 ? !highStar : highStar;
+
     }
 
+    //std::cout << "{" << lowSum << " " << highSum << "}" << std::endl;
+
     if (lowSum - (lowStar ? 1 : 0) > 0) {
+        //std::cout << "Black cut" << std::endl;
+        //for (int i = 0; i < boardSize; i++) {
+        //    std::cout << playerNumberToChar(state->board[i]);
+        //}
+        //std::cout << std::endl;
+        //while(1) {}
+
         return 1;
     }
 
     if (highSum + (highStar ? 1 : 0) < 0) {
+        //std::cout << "White cut" << std::endl;
+        //for (int i = 0; i < boardSize; i++) {
+        //    std::cout << playerNumberToChar(state->board[i]);
+        //}
+        //std::cout << std::endl;
+        //while(1) {}
+
+
         return 2;
     }
 

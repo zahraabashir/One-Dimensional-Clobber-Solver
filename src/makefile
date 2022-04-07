@@ -38,7 +38,7 @@ rmdb:
 corr: TheSolvers referenceSolver
 	python3 instructorSolution/runTests.py
 
-fcorr: TheSolvers referenceSolver
+fcorr: TheSolvers
 	python3 instructorSolution/runTests.py --fast
 
 report: TheSolvers referenceSolver

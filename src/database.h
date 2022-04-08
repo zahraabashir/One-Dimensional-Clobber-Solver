@@ -11,6 +11,7 @@
 /*
     DB_MAX_BITS was 20
     DB_MAX_DOMINANCE_BITS was 12
+    DB_MAX_BOUND_BITS was 16
     
 
     WWWWWB  -5 = 4v *
@@ -28,9 +29,10 @@
 
 */
 
-#define DB_MAX_BITS 16
+//16,10,16
+#define DB_MAX_BITS 14
 #define DB_MAX_DOMINANCE_BITS 10
-#define DB_MAX_BOUND_BITS 12
+#define DB_MAX_BOUND_BITS 14
 
 #define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t))
 

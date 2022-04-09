@@ -428,7 +428,7 @@ bool subgameCompare(const pair<int, int> &a, const pair<int, int> &b) {
 
 
 void BasicSolver::simplify(State *state) {
-    char *board = state->board;
+    char *board = state->board; //MUST reassign this after deleting state->board
 
     //find subgames
     vector<pair<int, int>> subgames = generateSubgames(state);
@@ -522,24 +522,26 @@ void BasicSolver::simplify(State *state) {
     }
 
 
-    { //TODO this MUST work somehow...
-        char arr[state->boardSize];
-        memcpy(arr, state->board, state->boardSize);
-        
-        delete[] state->board;
-        state->board = new char[state->boardSize];
+    //{ //TODO this MUST work somehow...
+    //    char arr[state->boardSize];
+    //    memcpy(arr, state->board, state->boardSize);
+    //    
+    //    memset(state->board, 7, state->boardSize);
+    //    delete[] state->board;
+    //    state->board = new char[state->boardSize];
+    //    board = state->board;
 
-        memcpy(state->board, arr, state->boardSize);
-    }
+    //    memcpy(state->board, arr, state->boardSize);
+    //}
 
-    //#define SOLVER_SIMPLIFY
+    #define SOLVER_SIMPLIFY
     #if defined(SOLVER_SIMPLIFY)
 
-    cout << "Board before substitution (" << state->boardSize << ")" << endl;
-    for (int i = 0; i < state->boardSize; i++) {
-        cout << playerNumberToChar(state->board[i]);
-    }
-    cout << endl;
+    //cout << "Board before substitution (" << state->boardSize << ")" << endl;
+    //for (int i = 0; i < state->boardSize; i++) {
+    //    cout << playerNumberToChar(state->board[i]);
+    //}
+    //cout << endl;
 
     //replace games with simpler games
     subgames = generateSubgames(state);
@@ -607,14 +609,15 @@ void BasicSolver::simplify(State *state) {
 
         delete[] state->board;
         state->board = newBuffer;
+        board = state->board;
         state->boardSize = newSize;
     }
 
-    cout << "Board after substitution (" << state->boardSize << ")" << endl;
-    for (int i = 0; i < state->boardSize; i++) {
-        cout << playerNumberToChar(state->board[i]);
-    }
-    cout << endl << endl;
+    //cout << "Board after substitution (" << state->boardSize << ")" << endl;
+    //for (int i = 0; i < state->boardSize; i++) {
+    //    cout << playerNumberToChar(state->board[i]);
+    //}
+    //cout << endl << endl;
 
 
     #endif

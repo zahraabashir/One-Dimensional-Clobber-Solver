@@ -151,8 +151,6 @@ void computeBounds(Database &db, char *board, int8_t *bounds) {
         }
         cout << endl;
 
-
-
         while (1) {
         }
     }

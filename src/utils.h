@@ -93,3 +93,7 @@ bool operator<(const triple<T1, T2, T3> &t1, const triple<T1, T2, T3> &t2) {
 
     return false;
 }
+
+size_t gameLength(size_t bufferSize, char *game);
+
+

@@ -36,10 +36,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     return result;
 }
 
-char *addGames(char *g1, char *g2) {
-    size_t l1 = strlen(g1);
-    size_t l2 = strlen(g2);
-
+char *addGames(size_t l1, char *g1, size_t l2, char *g2) {
     char *g3 = new char[l1 + l2 + 2];
 
     memcpy(g3, g1, l1);
@@ -72,7 +69,7 @@ void computeBounds(Database &db, char *board, int8_t *bounds) {
             compare[j + 1] = player;
         }
 
-        char *g = addGames(board, compare);
+        char *g = addGames(strlen(board), board, strlen(compare), compare);
 
         int boardSize = strlen(board) + 1 + strlen(compare);
 
@@ -177,7 +174,7 @@ int main() {
     Database db;
     //db.load(); //might be wrong to load here
 
-    //(low, high, outcome) --> pointer to vector of udMoveCount1, link1, udMoveCount2, link2, ...
+    //(low, high, outcome) --> pointer to vector of UDMoveCount1, link1, UDMoveCount2, link2, ...
     map<triple<int, int, int>, vector<int> *> udMap;
 
     int maxLength = DB_MAX_BITS;
@@ -244,7 +241,7 @@ int main() {
             uint64_t domWhite = 0;
             int8_t lowerBound = 0;
             int8_t upperBound = 0;
-            int udMoveCount = 0;
+            int UDMoveCount = 0;
             int link = 0;
 
             if (mirror) {
@@ -254,7 +251,7 @@ int main() {
                 domWhite = DB_GET_DOMINATED(entry, 2);
                 lowerBound = DB_GET_BOUND(entry, 0);
                 upperBound = DB_GET_BOUND(entry, 1);
-                udMoveCount = DB_GET_UDMOVECOUNT(entry);
+                UDMoveCount = DB_GET_UDMOVECOUNT(entry);
 
                 //TODO mirror links somehow
 
@@ -285,8 +282,10 @@ int main() {
                 DB_SET_DOMINATED(entry, 2, domBlack);
                 DB_SET_BOUND(entry, 0, -upperBound);
                 DB_SET_BOUND(entry, 1, -lowerBound);
-                DB_SET_UDMOVECOUNT(entry, udMoveCount);
+                DB_SET_UDMOVECOUNT(entry, UDMoveCount);
                 DB_SET_LINK(entry, link);
+                DB_SET_LENGTH(entry, length);
+                DB_SET_NUMBER(entry, game); 
 
                 cout << endl;
                 continue;
@@ -340,7 +339,7 @@ int main() {
 
             cout << "Lookup" << endl;
             entry = db.get(length, board);
-            int link = db.getIdx(length, board);
+            link = db.getIdx(length, board);
 
             //find bounds
             if (length <= DB_MAX_BOUND_BITS) {
@@ -362,10 +361,12 @@ int main() {
                 while(1){}
             }
             DB_SET_OUTCOME(entry, outcome);
+            DB_SET_LENGTH(entry, length);
+            DB_SET_NUMBER(entry, game);
 
 
             if (length <= DB_MAX_DOMINANCE_BITS ) {
-                int udMoveCount = 0;
+                int UDMoveCount = 0;
 
                 //find dominated moves for B
                 char sumBoard[length + 1 + length + 1];
@@ -382,7 +383,7 @@ int main() {
                     size_t moveCount = 0;
                     int *moves = s1.getMoves(1, 2, &moveCount);
 
-                    udMoveCount += moveCount;
+                    UDMoveCount += moveCount;
 
                     char undo1[sizeof(int) + 2 * sizeof(char)];
                     char undo2[sizeof(int) + 2 * sizeof(char)];
@@ -440,7 +441,7 @@ int main() {
                     size_t moveCount = 0;
                     int *moves = s1.getMoves(2, 1, &moveCount);
 
-                    udMoveCount += moveCount;
+                    UDMoveCount += moveCount;
 
                     char undo1[sizeof(int) + 2 * sizeof(char)];
                     char undo2[sizeof(int) + 2 * sizeof(char)];
@@ -492,8 +493,8 @@ int main() {
                 DB_SET_DOMINATED(entry, 1, domBlack);
                 DB_SET_DOMINATED(entry, 2, domWhite);
 
-                udMoveCount -= (sumBits(domBlack) + sumBits(domWhite));
-                DB_SET_UDMOVECOUNT(entry, udMoveCount);
+                UDMoveCount -= (sumBits(domBlack) + sumBits(domWhite));
+                DB_SET_UDMOVECOUNT(entry, UDMoveCount);
 
                 int low = DB_GET_BOUND(entry, 0);
                 int high = DB_GET_BOUND(entry, 1);
@@ -508,7 +509,7 @@ int main() {
                     udMap[mapTriple] = udVec;
                 }
 
-                udVec->push_back(udMoveCount);
+                udVec->push_back(UDMoveCount);
                 udVec->push_back(link);
 
                 cout << domBlack << " " << domWhite << endl;
@@ -582,12 +583,37 @@ int main() {
             }
             cout << endl;
 
-            int outcome = 0;
-            uint64_t domBlack = 0;
-            uint64_t domWhite = 0;
-            int8_t lowerBound = 0;
-            int8_t upperBound = 0;
-            int udMoveCount = 0;
+
+            unsigned char *entry = db.get(length, board);
+
+            int bestUDMoveCount = DB_GET_UDMOVECOUNT(entry);
+            int bestLink = db.getIdx(length, board);
+
+            int low = DB_GET_BOUND(entry, 0);
+            int high = DB_GET_BOUND(entry, 1);
+            int outcome = DB_GET_OUTCOME(entry);
+
+            triple<int, int, int> mapTriple(low, high, outcome);
+
+            vector<int> *udVec = udMap[mapTriple];
+
+            if (udVec == nullptr) {
+                continue;
+            }
+
+            for (int i = 0; i < udVec->size(); i += 2) {
+                int itemUDMoveCount = (*udVec)[i];
+                int itemLink = (*udVec)[i + 1];
+
+                if (itemUDMoveCount < bestUDMoveCount) {
+                    //play difference game
+                }
+            }
+
+
+        }
+    }
+    
 
         
 

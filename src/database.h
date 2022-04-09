@@ -34,7 +34,7 @@
 #define DB_MAX_DOMINANCE_BITS 10
 #define DB_MAX_BOUND_BITS 12
 
-#define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int))
+#define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 4 * sizeof(int))
 
 #define DB_GET_OUTCOME(entry) (entry == 0 ? 0 : *((unsigned char *) entry))
 #define DB_SET_OUTCOME(entry, value) *((unsigned char *) entry) = value
@@ -56,6 +56,12 @@
 
 #define DB_GET_LINK(entry) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + sizeof(int)))
 #define DB_SET_LINK(entry, link) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + sizeof(int))) = link
+
+#define DB_GET_LENGTH(entry) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int)))
+#define DB_SET_LENGTH(entry, length) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int))) = length
+
+#define DB_GET_NUMBER(entry) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int)))
+#define DB_SET_NUMBER(entry, number) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int))) = number
 
 class Database {
   private:

@@ -47,3 +47,15 @@ int charToPlayerNumber(char c) {
     return EMPTY;
 }
 
+
+size_t gameLength(size_t bufferSize, char *game) {
+    size_t length = 0;
+
+    for (size_t i = 0; i < bufferSize; i++) {
+        if (game[i] != 0) {
+            length = i;
+        }
+    }
+
+    return length;
+}

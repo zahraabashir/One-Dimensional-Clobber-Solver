@@ -245,6 +245,7 @@ int main() {
             int8_t lowerBound = 0;
             int8_t upperBound = 0;
             int udMoveCount = 0;
+            int link = 0;
 
             if (mirror) {
                 entry = db.get(length, mirrorBoard);
@@ -277,12 +278,15 @@ int main() {
 
 
                 entry = db.get(length, board);
+                link = db.getIdx(length, board);
+
                 DB_SET_OUTCOME(entry, outcome);
                 DB_SET_DOMINATED(entry, 1, domWhite); //invert dominance
                 DB_SET_DOMINATED(entry, 2, domBlack);
                 DB_SET_BOUND(entry, 0, -upperBound);
                 DB_SET_BOUND(entry, 1, -lowerBound);
                 DB_SET_UDMOVECOUNT(entry, udMoveCount);
+                DB_SET_LINK(entry, link);
 
                 cout << endl;
                 continue;
@@ -516,6 +520,79 @@ int main() {
         }
 
     }
+
+    cout << "Starting second pass" << endl;
+
+    maxLength = min(DB_MAX_BITS, min(DB_MAX_DOMINANCE_BITS, DB_MAX_BOUND_BITS));
+    maxGame = 0;
+
+    for (int length = 1; length <= maxLength; length++) {
+
+        maxGame *= 2;
+        maxGame += 1;
+
+        char boardText[length + 1];
+        char board[length + 1];
+        char mirrorBoard[length + 1];
+
+        boardText[length] = 0;
+        board[length] = 0;
+        mirrorBoard[length] = 0;
+
+        unsigned char *entry;
+
+        for (int game = 0; game <= maxGame; game++) {
+            cout << "Length - Game: " << length << " " << game << endl;
+            printBits(game, length);
+
+
+            bool mirror = false;
+
+            if (game > (maxGame + 2) / 2) {
+                mirror = true;
+            }
+
+            //mirror = false;
+
+            for (int i = 0; i < length; i++) {
+                if ((game >> i) & 1) {
+                    boardText[i] = 'W';
+                    board[i] = WHITE;
+                } else {
+                    boardText[i] = 'B';
+                    board[i] = BLACK;
+                }
+            }
+
+            if (mirror) {
+                for (int i = 0; i < length; i++) {
+                    if ((game >> i) & 1) {
+                        mirrorBoard[i] = BLACK;
+                    } else {
+                        mirrorBoard[i] = WHITE;
+                    }
+                }
+            }
+
+
+
+            
+            for (int i = 0; i < length; i++) {
+                cout << boardText[i];
+            }
+            cout << endl;
+
+            int outcome = 0;
+            uint64_t domBlack = 0;
+            uint64_t domWhite = 0;
+            int8_t lowerBound = 0;
+            int8_t upperBound = 0;
+            int udMoveCount = 0;
+
+        
+
+
+
 
 
     db.save();

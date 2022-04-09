@@ -38,7 +38,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 }
 
 char *addGames(size_t l1, char *g1, size_t l2, char *g2) {
-    char *g3 = new char[l1 + l2 + 2];
+    char *g3 = new char[l1 + 1 + l2 + 1];
 
     memcpy(g3, g1, l1);
     memcpy(g3 + l1 + 1, g2, l2);
@@ -161,7 +161,6 @@ void computeBounds(Database &db, char *board, int8_t *bounds) {
 
 
 
-using namespace std;
 
 void printBits(int x, int length) {
     for (int i = 0; i < length; i++) {
@@ -244,6 +243,7 @@ int main() {
             int8_t upperBound = 0;
             int UDMoveCount = 0;
             int link = 0;
+            //length and number are just length and game -- don't need to store these like the rest above
 
             if (mirror) {
                 entry = db.get(length, mirrorBoard);

@@ -68,7 +68,8 @@ void negateGame(size_t length, char *game) {
 }
 
 char *generateGame(int length, int game) {
-    char *board = new char[length];
+    char *board = new char[length + 1];
+    board[length] = 0;
 
     for (int i = 0; i < length; i++) {
         if ((game >> i) & 1) {

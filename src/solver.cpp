@@ -494,7 +494,6 @@ void BasicSolver::simplify(State *state) {
         }
     }
 
-/*
     //replace games with simpler games
     subgames = generateSubgames(state);
     subgameCount = subgames.size();
@@ -516,6 +515,12 @@ void BasicSolver::simplify(State *state) {
             newSize += DB_GET_LENGTH(entry);
         }
 
+    }
+
+    if (newSize != state->boardSize) {
+        //std::cout << "Board size changed: " << state->boardSize << " --> " << newSize << std::endl;
+        //while (1) {
+        //}
     }
 
     if (newSize > 0) {
@@ -557,8 +562,6 @@ void BasicSolver::simplify(State *state) {
         state->board = newBuffer;
         state->boardSize = newSize;
     }
-*/
-
 
 
     //now canonicalize the board

@@ -76,6 +76,7 @@ class Database {
     Database();
     ~Database();
     unsigned char *get(int len, char *board);
+    unsigned char *getFromIdx(int idx);
     //void set(int len, char *board, int outcome);
 
     void load();

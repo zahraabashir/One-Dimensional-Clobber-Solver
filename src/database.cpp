@@ -50,6 +50,10 @@ unsigned char *Database::get(int len, char *board) {
     return &data[idx * DB_ENTRY_SIZE];
 }
 
+unsigned char *Database::getFromIdx(int idx) {
+    return &data[idx * DB_ENTRY_SIZE];
+}
+
 //void Database::set(int len, char *board, int outcome) {
 //	int idx = getIdx(len, board);
 //	char outcomeByte = outcome;

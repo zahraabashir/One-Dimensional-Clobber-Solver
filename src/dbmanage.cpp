@@ -9,6 +9,20 @@
 
 using namespace std;
 
+char *generateGame(int length, int game) {
+    char *board = new char[length];
+
+    for (int i = 0; i < length; i++) {
+        if ((game >> i) & 1) {
+            board[i] = WHITE;
+        } else {
+            board[i] = BLACK;
+        }
+    }
+
+    return board;
+}
+
 
 int gameResult(Database &db, char *board, int boardSize, int player) {
     int result;
@@ -585,9 +599,11 @@ int main() {
 
 
             unsigned char *entry = db.get(length, board);
+            int originalUDMoveCount = DB_GET_UDMOVECOUNT(entry);
+            int originalLink = db.getIdx(length, board);
 
-            int bestUDMoveCount = DB_GET_UDMOVECOUNT(entry);
-            int bestLink = db.getIdx(length, board);
+            int bestUDMoveCount = originalUDMoveCount;
+            int bestLink = originalLink;
 
             int low = DB_GET_BOUND(entry, 0);
             int high = DB_GET_BOUND(entry, 1);
@@ -605,12 +621,36 @@ int main() {
                 int itemUDMoveCount = (*udVec)[i];
                 int itemLink = (*udVec)[i + 1];
 
+                unsigned char *item = db.getFromIdx(itemLink);
+
+                int itemLength = DB_GET_LENGTH(item);
+                int itemNumber = DB_GET_NUMBER(item);
+
                 if (itemUDMoveCount < bestUDMoveCount) {
                     //play difference game
+                    char *game = generateGame(itemLength, itemNumber);
+                    negateGame(itemLength, game);
+
+                    char *sumGame = addGames(length, board, itemLength, game);
+                    int sumLength = length + 1 + itemLength;
+
+                    int oc1 = gameResult(db, sumGame, sumLength, 1);
+                    int oc2 = gameResult(db, sumGame, sumLength, 2);
+
+                    if (oc1 == 2 && oc2 == 1) {
+                        bestUDMoveCount = itemUDMoveCount;
+                        bestLink = itemLink;
+                    }
+
+                    delete[] sumGame;
+                    delete[] game;
                 }
             }
 
-
+            DB_SET_LINK(entry, bestLink);
+            if (bestLink != originalLink) {
+                cout << "Found better: " << originalUDMoveCount << " --> " << bestUDMoveCount << endl;
+            }
         }
     }
     

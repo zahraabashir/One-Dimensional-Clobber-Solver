@@ -59,3 +59,10 @@ size_t gameLength(size_t bufferSize, char *game) {
 
     return length;
 }
+
+
+void negateGame(size_t length, char *game) {
+    for (size_t i = 0; i < length; i++) {
+        game[i] = opponentNumber(game[i]);
+    }
+}

@@ -636,6 +636,8 @@ int main() {
             if (bestLink != originalLink) {
                 cout << "Found better: " << originalUDMoveCount << " --> " << bestUDMoveCount << endl;
             }
+
+            cout << endl;
         }
     }
     

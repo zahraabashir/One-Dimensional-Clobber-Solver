@@ -5,12 +5,41 @@
 #include <chrono>
 #include <random>
 
-#define BOARD(te) te
-#define PLAYER(te) *(te + boardSize)
-#define OUTCOME(te) *(te + boardSize + 1)
-#define BESTMOVE(te) *(te + boardSize + 2)
-#define DEPTH(te) *(te + boardSize + 3)
-#define HEURISTIC(te) *(te + boardSize + 4)
+#define BOARDLEN(te) *(te) //uint8_t
+#define BOARDPTR(te) *((char **) (te + 1)) //char *
+#define PLAYER(te) *(te + 1 + sizeof(char *)) //uint8_t
+#define OUTCOME(te) *(te + 1 + sizeof(char *) + 1) //uint8_t
+#define BESTMOVE(te) *(te + 1 + sizeof(char *) + 2) //uint8_t
+#define DEPTH(te) *((unsigned int *) (te + 1 + sizeof(char *) + 3)) //unsigned int
+#define HEURISTIC(te) *(te + 1 + sizeof(char *) + 3 + sizeof(unsigned int)) //int8_t
+
+#define RESIZETTBOARD(entry, newSize) \
+{ \
+    uint8_t oldSize = BOARDLEN(entry); \
+    if (oldSize != newSize) { \
+        if (oldSize != 0) { \
+            delete[] BOARDPTR(entry); \
+        } \
+        if (newSize != 0) { \
+            BOARDPTR(entry) = new char[newSize]; \
+        } \
+        BOARDLEN(entry) = newSize; \
+    } \
+}
+
+#define RESIZESTATEBOARD(state, newSize) \
+{ \
+    int oldSize = state->boardSize; \
+    if (oldSize != newSize) { \
+        if (oldSize != 0) { \
+            delete[] state->board; \
+        } \
+        if (newSize != 0) { \
+            state->board = new char[newSize]; \
+        } \
+        state->boardSize = newSize; \
+    } \
+}
 
 extern int node_count;
 extern int best_from;

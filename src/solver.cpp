@@ -42,7 +42,7 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     codeLength = bits;
 
     //look at macros in header file
-    tableEntrySize = boardSize + 5 + 0 * sizeof(int);
+    tableEntrySize = 1 + sizeof(char *) + 3 + sizeof(unsigned int) + 1;
 
     bitMask = 0;
     for (int i = 0; i < bits; i++) {
@@ -67,11 +67,20 @@ BasicSolver::~BasicSolver() {
 }
 
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
+    uint8_t len = BOARDLEN(entry);
+
+    if (len != state->boardSize) {
+        return false;
+    }
+
+
+    char *entryBoard = BOARDPTR(entry);
+
     bool found = false;
     if (PLAYER(entry) == p) {
         found = true;
         for (int i = 0; i < boardSize; i++) {
-            if (entry[i] != state->board[i]) {
+            if (entryBoard[i] != state->board[i]) {
                 found = false;
                 break;
             }
@@ -152,7 +161,9 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
     if (moveCount == 0) { //is terminal
         completed += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
@@ -211,7 +222,9 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
         }
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = EMPTY;
             BESTMOVE(entry) = 0;
@@ -276,7 +289,9 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
 
         if (result.second && result.first == p) {
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
+                //memcpy(entry, state->board, boardSize);
+                RESIZETTBOARD(entry, boardSize);
+                memcpy(BOARDPTR(entry), state->board, boardSize);
                 PLAYER(entry) = p;
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
@@ -314,7 +329,9 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
 
     if (allProven) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
@@ -329,8 +346,9 @@ std::pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int d
 
 
     if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        
-        memcpy(entry, state->board, boardSize);
+        //memcpy(entry, state->board, boardSize);
+        RESIZETTBOARD(entry, boardSize);
+        memcpy(BOARDPTR(entry), state->board, boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
         BESTMOVE(entry) = newBestMove;
@@ -691,12 +709,14 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     }
 
     char oldBoard[state->boardSize];
+    uint8_t oldBoardSize = state->boardSize;
     memcpy(oldBoard, state->board, state->boardSize);
     simplify(state);
 
     int boundWin = checkBounds(state);
 
     if (boundWin != 0) {
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
         return std::pair<int, bool>(boundWin, true);
     }
@@ -709,6 +729,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     bool validEntry = validateTableEntry(state, p, entry);
     if (validEntry && OUTCOME(entry) != EMPTY) {
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
         return std::pair<int, bool>(OUTCOME(entry), true);
     }
@@ -769,7 +790,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = BLACK;
             BESTMOVE(entry) = 0;
@@ -777,6 +800,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
         }        
 
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
 
         return std::pair<int, bool>(OC_B, true);
@@ -786,7 +810,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = WHITE;
             BESTMOVE(entry) = 0;
@@ -794,6 +820,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
         }        
 
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
 
         return std::pair<int, bool>(OC_W, true);
@@ -802,7 +829,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     //Only one N
     if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = p;
             BESTMOVE(entry) = 0;
@@ -810,6 +839,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = 127;
         }        
 
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
 
         return std::pair<int, bool>(p, true); //current player wins
@@ -818,6 +848,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     //Use differences
     char boardCopy[state->boardSize];
+    int boardCopySize = state->boardSize;
     memcpy(boardCopy, state->board, state->boardSize);
 
     for (int i = 0; i < subgames.size(); i++) {
@@ -834,18 +865,22 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 //memcpy(state->board, oldBoard, state->boardSize);
                 return result;
             }
+            RESIZESTATEBOARD(state, boardCopySize);
             memcpy(state->board, boardCopy, state->boardSize);
 
             if (result.second && result.first == p) {
 
                 if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                    memcpy(entry, state->board, boardSize);
+                    //memcpy(entry, state->board, boardSize);
+                    RESIZETTBOARD(entry, boardSize);
+                    memcpy(BOARDPTR(entry), state->board, boardSize);
                     PLAYER(entry) = p;
                     OUTCOME(entry) = p;
                     BESTMOVE(entry) = 0;
                     DEPTH(entry) = depth;
                     HEURISTIC(entry) = 127;
                 }        
+                RESIZESTATEBOARD(state, oldBoardSize);
                 memcpy(state->board, oldBoard, state->boardSize);
 
                 return result;
@@ -862,7 +897,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
     if (moveCount == 0) { //is terminal
         completed += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
@@ -870,6 +907,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = -127;
         }
 
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
         return std::pair<int, bool>(n, true);
     }
@@ -923,7 +961,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
         }
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = EMPTY;
             BESTMOVE(entry) = 0;
@@ -931,6 +971,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
             HEURISTIC(entry) = h;
         }        
 
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
         delete[] moves;
         return std::pair<int, bool>(h, false);
@@ -1021,7 +1062,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         if (result.second && result.first == p) {
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                memcpy(entry, state->board, boardSize);
+                //memcpy(entry, state->board, boardSize);
+                RESIZETTBOARD(entry, boardSize);
+                memcpy(BOARDPTR(entry), state->board, boardSize);
                 PLAYER(entry) = p;
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
@@ -1029,6 +1072,7 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
                 HEURISTIC(entry) = 127;
             }
 
+            RESIZESTATEBOARD(state, oldBoardSize);
             memcpy(state->board, oldBoard, state->boardSize);
             delete[] moves;
             return std::pair<int, bool>(p, true);
@@ -1056,7 +1100,9 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
     if (allProven) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            memcpy(entry, state->board, boardSize);
+            //memcpy(entry, state->board, boardSize);
+            RESIZETTBOARD(entry, boardSize);
+            memcpy(BOARDPTR(entry), state->board, boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
@@ -1065,19 +1111,23 @@ std::pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth
 
         }
 
+        RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
         return std::pair<int, bool>(n, true);
     }
 
 
     if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        memcpy(entry, state->board, boardSize);
+        //memcpy(entry, state->board, boardSize);
+        RESIZETTBOARD(entry, boardSize);
+        memcpy(BOARDPTR(entry), state->board, boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
         BESTMOVE(entry) = newBestMove;
         DEPTH(entry) = depth;
         HEURISTIC(entry) = bestVal;
     }
+    RESIZESTATEBOARD(state, oldBoardSize);
     memcpy(state->board, oldBoard, state->boardSize);
     return std::pair<int, bool>(bestVal, false);
 }

@@ -66,3 +66,18 @@ void negateGame(size_t length, char *game) {
         game[i] = opponentNumber(game[i]);
     }
 }
+
+char *generateGame(int length, int game) {
+    char *board = new char[length];
+
+    for (int i = 0; i < length; i++) {
+        if ((game >> i) & 1) {
+            board[i] = WHITE;
+        } else {
+            board[i] = BLACK;
+        }
+    }
+
+    return board;
+}
+

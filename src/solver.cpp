@@ -494,6 +494,73 @@ void BasicSolver::simplify(State *state) {
         }
     }
 
+/*
+    //replace games with simpler games
+    subgames = generateSubgames(state);
+    subgameCount = subgames.size();
+
+    size_t newSize = std::max(subgameCount - 1, 0);
+
+    //Figure out new size based on database links
+    for (int i = 0; i < subgameCount; i++) {
+        int start = subgames[i].first;
+        int end = subgames[i].second;
+        int len = end - start;
+
+        unsigned char *entry = db->get(len, state->board + start);
+        entry = 0;
+
+        if (entry == 0) {
+            newSize += len;
+        } else {
+            newSize += DB_GET_LENGTH(entry);
+        }
+
+    }
+
+    if (newSize > 0) {
+        char *newBuffer = new char[newSize + 1];
+        memset(newBuffer, 0, newSize + 1);
+
+
+        size_t idx = 0;
+        //copy simpler games from database links
+        for (int i = 0; i < subgameCount; i++) {
+            int start = subgames[i].first;
+            int end = subgames[i].second;
+            int len = end - start;
+
+            unsigned char *entry = db->get(len, state->board + start);
+            entry = 0;
+            unsigned char *linkedEntry = entry == 0 ? 0 : db->getFromIdx(DB_GET_LINK(entry));
+
+
+            if (entry == 0 || entry == linkedEntry) {
+                memcpy(newBuffer, state->board + start, len);
+                idx += len + 1;
+            } else {
+                int linkedLength = DB_GET_LENGTH(linkedEntry);
+                int linkedNumber = DB_GET_NUMBER(linkedEntry);
+
+                char *newGame = generateGame(linkedLength, linkedNumber);
+
+                memcpy(newBuffer, newGame, linkedLength);
+                idx += linkedLength + 1;
+
+                delete[] newGame;
+            }
+
+        }
+
+
+        delete[] state->board;
+        state->board = newBuffer;
+        state->boardSize = newSize;
+    }
+*/
+
+
+
     //now canonicalize the board
     subgames = generateSubgames(state);
     subgameCount = subgames.size();

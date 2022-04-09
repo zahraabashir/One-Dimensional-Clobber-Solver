@@ -254,8 +254,6 @@ int main() {
                 upperBound = DB_GET_BOUND(entry, 1);
                 UDMoveCount = DB_GET_UDMOVECOUNT(entry);
 
-                //TODO mirror links somehow
-
                 switch (outcome) {
                     case OC_B:
                         outcome = OC_W;

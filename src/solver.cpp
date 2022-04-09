@@ -1,3 +1,10 @@
+/*
+
+        TODO: Solver needs to accomodate varying length boards...
+            the transposition table will need to change, and copying/restoring boards
+*/
+
+
 #include "solver.h"
 #include "utils.h"
 

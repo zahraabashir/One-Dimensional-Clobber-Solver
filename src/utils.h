@@ -42,3 +42,54 @@ int sign(T &val) {
     return T(0) > val ? -1 : 1;
 }
 
+template <class T>
+int sumBits(T val) {
+    int sum = 0;
+    
+    while (val != 0) {
+        sum += val & T(1);
+        val >>= 1;
+    }
+
+    return sum;
+}
+
+template <class T1, class T2, class T3>
+struct triple {
+    T1 first;
+    T2 second;
+    T3 third;
+
+    triple(T1 first, T2 second, T3 third) {
+        this->first = first;
+        this->second = second;
+        this->third = third;
+    }
+
+};
+
+template <class T1, class T2, class T3>
+bool operator<(const triple<T1, T2, T3> &t1, const triple<T1, T2, T3> &t2) {
+    if (t1.first < t2.first) {
+        return true;
+    }
+    if (t1.first > t2.first) {
+        return false;
+    }
+
+    if (t1.second < t2.second) {
+        return true;
+    }
+    if (t1.second > t2.second) {
+        return false;
+    }
+
+    if (t1.third < t2.third) {
+        return true;
+    }
+    if (t1.third > t2.third) {
+        return false;
+    }
+
+    return false;
+}

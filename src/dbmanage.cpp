@@ -7,11 +7,13 @@
 #include <chrono>
 #include <map>
 
+using namespace std;
+
 
 int gameResult(Database &db, char *board, int boardSize, int player) {
     int result;
 
-    auto start = std::chrono::steady_clock::now();
+    auto start = chrono::steady_clock::now();
     BasicSolver *solver = new BasicSolver(player, boardSize, &db);
     solver->timeLimit = 1000000000.0;
     solver->startTime = start;
@@ -52,13 +54,13 @@ char *addGames(char *g1, char *g2) {
 void computeBounds(Database &db, char *board, int8_t *bounds) {
     char compare[32];
 
-    std::map<int, int> ltFlags; //-1 false, 0 unknown, 1 true
-    std::map<int, int> gtFlags;
+    map<int, int> ltFlags; //-1 false, 0 unknown, 1 true
+    map<int, int> gtFlags;
 
     bool found = false;
 
     for (int i = 0; abs(i) < 31; i = i >= 0 ? -(i + 1) : -i) {
-        //std::cout << "[" << i << "]" << std::endl;
+        //cout << "[" << i << "]" << endl;
 
         memset(compare, 0, 32);
         char player = i < 0 ? 1 : 2; //we're adding the negative of compare -- flip 1 and 2
@@ -75,9 +77,9 @@ void computeBounds(Database &db, char *board, int8_t *bounds) {
         int boardSize = strlen(board) + 1 + strlen(compare);
 
         //for (int j = 0; j < boardSize; j++) {
-        //    std::cout << playerNumberToChar(g[j]);
+        //    cout << playerNumberToChar(g[j]);
         //}
-        //std::cout << std::endl;
+        //cout << endl;
 
         int result1 = gameResult(db, g, boardSize, 1);
         int result2 = gameResult(db, g, boardSize, 2);
@@ -135,21 +137,21 @@ void computeBounds(Database &db, char *board, int8_t *bounds) {
     }
 
     if (!found || bounds[0] > bounds[1]) {
-        std::cout << "Bounds not found..." << std::endl;
-        std::cout << "{" << (int) bounds[0] << " " << (int) bounds[1] << "}" << std::endl;
+        cout << "Bounds not found..." << endl;
+        cout << "{" << (int) bounds[0] << " " << (int) bounds[1] << "}" << endl;
 
 
-        std::cout << "LT" << std::endl;
+        cout << "LT" << endl;
         for (int i = -32; i < 32; i++) {
-            std::cout << "(" << i << " " << ltFlags[i] << ") ";
+            cout << "(" << i << " " << ltFlags[i] << ") ";
         }
-        std::cout << std::endl;
+        cout << endl;
 
-        std::cout << "GT" << std::endl;
+        cout << "GT" << endl;
         for (int i = -32; i < 32; i++) {
-            std::cout << "(" << i << " " << gtFlags[i] << ") ";
+            cout << "(" << i << " " << gtFlags[i] << ") ";
         }
-        std::cout << std::endl;
+        cout << endl;
 
 
 
@@ -175,6 +177,8 @@ int main() {
     Database db;
     //db.load(); //might be wrong to load here
 
+    //(low, high, outcome) --> pointer to vector of udMoveCount1, link1, udMoveCount2, link2, ...
+    map<triple<int, int, int>, vector<int> *> udMap;
 
     int maxLength = DB_MAX_BITS;
     int maxGame = 0;
@@ -240,6 +244,7 @@ int main() {
             uint64_t domWhite = 0;
             int8_t lowerBound = 0;
             int8_t upperBound = 0;
+            int udMoveCount = 0;
 
             if (mirror) {
                 entry = db.get(length, mirrorBoard);
@@ -248,7 +253,9 @@ int main() {
                 domWhite = DB_GET_DOMINATED(entry, 2);
                 lowerBound = DB_GET_BOUND(entry, 0);
                 upperBound = DB_GET_BOUND(entry, 1);
-                
+                udMoveCount = DB_GET_UDMOVECOUNT(entry);
+
+                //TODO mirror links somehow
 
                 switch (outcome) {
                     case OC_B:
@@ -275,6 +282,7 @@ int main() {
                 DB_SET_DOMINATED(entry, 2, domBlack);
                 DB_SET_BOUND(entry, 0, -upperBound);
                 DB_SET_BOUND(entry, 1, -lowerBound);
+                DB_SET_UDMOVECOUNT(entry, udMoveCount);
 
                 cout << endl;
                 continue;
@@ -289,7 +297,7 @@ int main() {
             int result1, result2;
 
             {
-                auto start = std::chrono::steady_clock::now();
+                auto start = chrono::steady_clock::now();
                 BasicSolver *solver = new BasicSolver(1, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
@@ -303,7 +311,7 @@ int main() {
             }
 
             {
-                auto start = std::chrono::steady_clock::now();
+                auto start = chrono::steady_clock::now();
                 BasicSolver *solver = new BasicSolver(2, length, &db);
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
@@ -326,8 +334,9 @@ int main() {
                 outcome = OC_P;
             }
 
-            std::cout << "Lookup" << std::endl;
+            cout << "Lookup" << endl;
             entry = db.get(length, board);
+            int link = db.getIdx(length, board);
 
             //find bounds
             if (length <= DB_MAX_BOUND_BITS) {
@@ -338,7 +347,7 @@ int main() {
                 DB_SET_BOUND(entry, 0, bounds[0]);
                 DB_SET_BOUND(entry, 1, bounds[1]);
 
-                std::cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << std::endl;
+                cout << "<" << (int) bounds[0] << " " << (int) bounds[1] << ">" << endl;
             }
 
 
@@ -352,6 +361,8 @@ int main() {
 
 
             if (length <= DB_MAX_DOMINANCE_BITS ) {
+                int udMoveCount = 0;
+
                 //find dominated moves for B
                 char sumBoard[length + 1 + length + 1];
                 sumBoard[length + 1 + length] = 0;
@@ -366,6 +377,8 @@ int main() {
 
                     size_t moveCount = 0;
                     int *moves = s1.getMoves(1, 2, &moveCount);
+
+                    udMoveCount += moveCount;
 
                     char undo1[sizeof(int) + 2 * sizeof(char)];
                     char undo2[sizeof(int) + 2 * sizeof(char)];
@@ -423,6 +436,8 @@ int main() {
                     size_t moveCount = 0;
                     int *moves = s1.getMoves(2, 1, &moveCount);
 
+                    udMoveCount += moveCount;
+
                     char undo1[sizeof(int) + 2 * sizeof(char)];
                     char undo2[sizeof(int) + 2 * sizeof(char)];
 
@@ -472,7 +487,27 @@ int main() {
 
                 DB_SET_DOMINATED(entry, 1, domBlack);
                 DB_SET_DOMINATED(entry, 2, domWhite);
-                std::cout << domBlack << " " << domWhite << std::endl;
+
+                udMoveCount -= (sumBits(domBlack) + sumBits(domWhite));
+                DB_SET_UDMOVECOUNT(entry, udMoveCount);
+
+                int low = DB_GET_BOUND(entry, 0);
+                int high = DB_GET_BOUND(entry, 1);
+                int outcome = DB_GET_OUTCOME(entry);
+
+                triple<int, int, int> mapTriple(low, high, outcome);
+
+                vector<int> *udVec = udMap[mapTriple];
+
+                if (udVec == nullptr) {
+                    udVec = new vector<int>();
+                    udMap[mapTriple] = udVec;
+                }
+
+                udVec->push_back(udMoveCount);
+                udVec->push_back(link);
+
+                cout << domBlack << " " << domWhite << endl;
             }
 
 

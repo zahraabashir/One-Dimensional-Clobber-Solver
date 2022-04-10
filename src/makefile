@@ -11,10 +11,10 @@ FLAGS = -Wall --std=c++17 -O3
 run: TheSolvers
 	./TheSolvers BWBWBWBWBWBW W 200
 
-TheSolvers: main.o database.o utils.o state.o solver.o
+TheSolvers: main.o database.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage: dbmanage.o database.o utils.o state.o solver.o
+DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
 %.o: %.cpp %.h

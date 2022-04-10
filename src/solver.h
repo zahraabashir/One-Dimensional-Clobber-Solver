@@ -1,5 +1,7 @@
 #pragma once
 
+#define SOLVER_SIMPLIFY
+
 #include "state.h"
 #include "database.h"
 #include <chrono>
@@ -58,7 +60,7 @@ class BasicSolver {
 
     std::default_random_engine *rng;
 
-    void simplify(State *state);
+    void simplify(State *state, int depth);
   public:
     int rootPlayer;
     int boardSize;

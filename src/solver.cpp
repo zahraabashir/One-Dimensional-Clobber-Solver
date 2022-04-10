@@ -427,7 +427,7 @@ bool subgameCompare(const pair<int, int> &a, const pair<int, int> &b) {
 
 
 
-void BasicSolver::simplify(State *state) {
+void BasicSolver::simplify(State *state, int depth) {
     char *board = state->board; //MUST reassign this after deleting state->board
 
     //find subgames
@@ -534,91 +534,130 @@ void BasicSolver::simplify(State *state) {
     //    memcpy(state->board, arr, state->boardSize);
     //}
 
-    #define SOLVER_SIMPLIFY
+    //#define SOLVER_SIMPLIFY
     #if defined(SOLVER_SIMPLIFY)
 
-    //cout << "Board before substitution (" << state->boardSize << ")" << endl;
-    //for (int i = 0; i < state->boardSize; i++) {
-    //    cout << playerNumberToChar(state->board[i]);
-    //}
-    //cout << endl;
-
-    //replace games with simpler games
-    subgames = generateSubgames(state);
-    subgameCount = subgames.size();
-
-    size_t newSize = max(subgameCount - 1, 0);
-
-    //Figure out new size based on database links
-    for (int i = 0; i < subgameCount; i++) {
-        int start = subgames[i].first;
-        int end = subgames[i].second;
-        int len = end - start;
-
-        unsigned char *entry = db->get(len, state->board + start);
-        entry = 0;
-
-        if (entry == 0) {
-            newSize += len;
-        } else {
-            newSize += DB_GET_LENGTH(entry);
-        }
-
-    }
-
-    if (newSize != state->boardSize) {
-        //cout << "Board size changed: " << state->boardSize << " --> " << newSize << endl;
-        //while (1) {
-        //}
-    }
-
-    if (newSize > 0) {
-        char *newBuffer = new char[newSize + 1];
-        memset(newBuffer, 0, newSize + 1);
+    if (depth <= 1 || true) {
+        bool type2 = false;
+        type2 = true;
 
 
-        size_t idx = 0;
-        //copy simpler games from database links
+        //replace games with simpler games
+        subgames = generateSubgames(state);
+        subgameCount = subgames.size();
+
+        size_t newSize = max(subgameCount - 1, 0);
+
+        //Figure out new size based on database links
         for (int i = 0; i < subgameCount; i++) {
             int start = subgames[i].first;
             int end = subgames[i].second;
             int len = end - start;
 
             unsigned char *entry = db->get(len, state->board + start);
+            if (entry == 0 || DB_GET_OUTCOME(entry) == 0) {
+                entry = 0;
+            }
             entry = 0;
-            unsigned char *linkedEntry = entry == 0 ? 0 : db->getFromIdx(DB_GET_LINK(entry));
 
-
-            if (entry == 0 || entry == linkedEntry) {
-                memcpy(newBuffer + idx, state->board + start, len);
-                idx += len + 1;
+            if (entry == 0) {
+                newSize += len;
             } else {
-                int linkedLength = DB_GET_LENGTH(linkedEntry);
-                int linkedNumber = DB_GET_NUMBER(linkedEntry);
+                unsigned char *linkedEntry = db->getFromIdx(DB_GET_LINK(entry));
+                newSize += DB_GET_LENGTH(linkedEntry);
 
-                char *newGame = generateGame(linkedLength, linkedNumber);
 
-                memcpy(newBuffer + idx, newGame, linkedLength);
-                idx += linkedLength + 1;
-
-                delete[] newGame;
+                if (linkedEntry != entry) {
+                    type2 = true;
+                }
             }
 
         }
 
 
-        delete[] state->board;
-        state->board = newBuffer;
-        board = state->board;
-        state->boardSize = newSize;
+        if (type2) {
+            cout << "Board before substitution (" << state->boardSize << ")" << endl;
+            for (int i = 0; i < state->boardSize; i++) {
+                cout << playerNumberToChar(state->board[i]);
+            }
+            cout << endl;
+        }
+
+
+
+        if (newSize != state->boardSize) {
+            //cout << "Board size changed: " << state->boardSize << " --> " << newSize << endl;
+            //while (1) {
+            //}
+        }
+
+        if (newSize > 0) {
+            char *newBuffer = new char[newSize + 1];
+            memset(newBuffer, 0, newSize + 1);
+
+
+            size_t idx = 0;
+            //copy simpler games from database links
+            for (int i = 0; i < subgameCount; i++) {
+                int start = subgames[i].first;
+                int end = subgames[i].second;
+                int len = end - start;
+
+                unsigned char *entry = db->get(len, state->board + start);
+                if (entry == 0 || DB_GET_OUTCOME(entry) == 0) {
+                    entry = 0;
+                }
+                entry = 0;
+                unsigned char *linkedEntry = entry == 0 ? 0 : db->getFromIdx(DB_GET_LINK(entry));
+
+
+                if (entry == 0 || entry == linkedEntry) {
+                    memcpy(newBuffer + idx, state->board + start, len);
+                    idx += len + 1;
+
+                    //cout << "Substitution 1:" << endl;
+                    //for (int j = 0; j < len; j++) {
+                    //    cout << playerNumberToChar(state->board[start + j]);
+                    //}
+                    //cout << endl;
+
+                } else {
+                    int linkedLength = DB_GET_LENGTH(linkedEntry);
+                    int linkedNumber = DB_GET_NUMBER(linkedEntry);
+
+                    char *newGame = generateGame(linkedLength, linkedNumber);
+
+                    memcpy(newBuffer + idx, newGame, linkedLength);
+                    idx += linkedLength + 1;
+
+                    //cout << "Substitution 2:" << endl;
+                    //for (int j = 0; j < linkedLength; j++) {
+                    //    cout << playerNumberToChar(newGame[j]);
+                    //}
+                    //cout << endl;
+
+
+                    delete[] newGame;
+                }
+
+            }
+
+
+            delete[] state->board;
+            state->board = newBuffer;
+            board = state->board;
+            state->boardSize = newSize;
+        }
+
+        if (type2) {
+            cout << "Board after substitution (" << state->boardSize << ")" << endl;
+            for (int i = 0; i < state->boardSize; i++) {
+                cout << playerNumberToChar(state->board[i]);
+            }
+            cout << endl << endl;
+        }
+
     }
-
-    //cout << "Board after substitution (" << state->boardSize << ")" << endl;
-    //for (int i = 0; i < state->boardSize; i++) {
-    //    cout << playerNumberToChar(state->board[i]);
-    //}
-    //cout << endl << endl;
-
 
     #endif
 
@@ -745,7 +784,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     char oldBoard[state->boardSize];
     uint8_t oldBoardSize = state->boardSize;
     memcpy(oldBoard, state->board, state->boardSize);
-    simplify(state);
+    simplify(state, depth);
 
     int boundWin = checkBounds(state);
 

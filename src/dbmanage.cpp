@@ -360,6 +360,7 @@ int main() {
             DB_SET_OUTCOME(entry, outcome);
             DB_SET_LENGTH(entry, length);
             DB_SET_NUMBER(entry, game);
+            DB_SET_LINK(entry, link);
 
 
             if (length <= DB_MAX_DOMINANCE_BITS ) {
@@ -506,7 +507,8 @@ int main() {
                     udMap[mapTriple] = udVec;
                 }
 
-                udVec->push_back(UDMoveCount);
+                //udVec->push_back(UDMoveCount);
+                udVec->push_back(length);
                 udVec->push_back(link);
 
                 cout << domBlack << " " << domWhite << endl;
@@ -582,7 +584,8 @@ int main() {
 
 
             unsigned char *entry = db.get(length, board);
-            int originalUDMoveCount = DB_GET_UDMOVECOUNT(entry);
+            //int originalUDMoveCount = DB_GET_UDMOVECOUNT(entry);
+            int originalUDMoveCount = length;
             int originalLink = db.getIdx(length, board);
 
             int bestUDMoveCount = originalUDMoveCount;
@@ -621,6 +624,13 @@ int main() {
                     int oc2 = gameResult(db, sumGame, sumLength, 2);
 
                     if (oc1 == 2 && oc2 == 1) {
+                        cout << "EQ: ";
+                        negateGame(itemLength, game);
+                        for (int j = 0; j < itemLength; j++) {
+                            cout << playerNumberToChar(game[j]);
+                        }
+                        cout << endl;
+
                         bestUDMoveCount = itemUDMoveCount;
                         bestLink = itemLink;
                     }

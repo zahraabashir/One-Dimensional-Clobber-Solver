@@ -1117,6 +1117,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 
 
     //Use differences
+    #if defined(SOLVER_DELETE_SUBGAMES)
     char boardCopy[state->boardSize];
     int boardCopySize = state->boardSize;
     memcpy(boardCopy, state->board, state->boardSize);
@@ -1210,6 +1211,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 
         }
     }
+    #endif
 
     //generate moves
     //check for terminal

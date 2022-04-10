@@ -191,12 +191,14 @@ int BasicSolver::solveID(State *state, int p, int n) {
         //cout << depth << endl;
 
 
+        #if defined(SOLVER_ALPHA_BETA)
         Bound alpha = Bound::min();
         Bound beta = Bound::max();
-
         Bound cb1, cb2;
-
         pair<int, bool> result = rootSearchID(state, p, n, 0, alpha, beta, cb1, cb2);
+        #else
+        pair<int, bool> result = rootSearchID(state, p, n, 0);
+        #endif
 
         if (outOfTime) {
             return EMPTY;
@@ -214,7 +216,11 @@ int BasicSolver::solveID(State *state, int p, int n) {
 }
 
 
+#if defined(SOLVER_ALPHA_BETA)
 pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2) {
+#else
+pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth) {
+#endif
     node_count += 1;
     updateTime();
     if (outOfTime) {
@@ -227,30 +233,12 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
     //    return pair<int, bool>(boundWin, true);
     //}
 
+    #if defined(SOLVER_ALPHA_BETA)
     Bound a, b;
     if (!limitCompletions) {
         generateBounds(state, a, b);
     }
-
-//    if (a > Bound(0, 0)) {
-//        return pair<int, bool>(1, true);
-//    }
-//
-//    if (b < Bound(0, 0)) {
-//        return pair<int, bool>(2, true);
-//    }
-
-
-//    Bound b1, b2;
-//    generateBounds(state, b1, b2);
-//
-//    if (b1 > Bound()) {
-//        return pair<int, bool>(1, true);
-//    }
-//
-//    if (b2 < Bound()) {
-//        return pair<int, bool>(2, true);
-//    }
+    #endif
 
 
     //lookup entry
@@ -393,8 +381,12 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
 
         state->play(from, to, undoBuffer);
 
+        #if defined(SOLVER_ALPHA_BETA)
         Bound cb1, cb2;
-        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2, 0);
+        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2);
+        #else
+        pair<int, bool> result = searchID(state, n, p, depth + 1);
+        #endif
 
         if (outOfTime) {
             delete[] moves;
@@ -422,6 +414,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
             return pair<int, bool>(p, true);
         }
 
+        #if defined(SOLVER_ALPHA_BETA)
         //update ab
         if (!limitCompletions) {
             bool abCut = false;
@@ -455,6 +448,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
                 return pair<int, bool>(0, false);
             }
         }
+        #endif
 
 
         if (!result.second) {
@@ -584,19 +578,6 @@ void BasicSolver::simplify(State *state, int depth) {
 
     vector<pair<int, int>> subgames = generateSubgames(state);
     int subgameCount = subgames.size();
-
-
-    //{ //TODO this MUST work somehow...
-    //    char arr[state->boardSize];
-    //    memcpy(arr, state->board, state->boardSize);
-    //    
-    //    memset(state->board, 7, state->boardSize);
-    //    delete[] state->board;
-    //    state->board = new char[state->boardSize];
-    //    board = state->board;
-
-    //    memcpy(state->board, arr, state->boardSize);
-    //}
 
     #if defined(SOLVER_SUBSTITUTE)
 
@@ -967,7 +948,11 @@ int BasicSolver::checkBounds(State *state) {
     return 0;
 }
 
-pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2, uint64_t skipDelete) {
+#if defined(SOLVER_ALPHA_BETA)
+pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2) {
+#else
+pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
+#endif
     node_count += 1;
     updateTime();
     if (outOfTime) {
@@ -987,10 +972,12 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 //        return pair<int, bool>(boundWin, true);
 //    }
 
+    #if defined(SOLVER_ALPHA_BETA)
     Bound a, b;
     if (!limitCompletions) {
         generateBounds(state, a, b);
     }
+    #endif
 
     //lookup entry
     //if solved, return
@@ -1137,15 +1124,21 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
             //uint64_t leftSkip = skipDelete & (((uint64_t) -1) >> (64 - i));
             //uint64_t rightSkip = skipDelete & (((uint64_t) -1) << (i + 1));
             //uint64_t newSkip = leftSkip | rightSkip;
-            uint64_t newSkip = 0;
+            //uint64_t newSkip = 0;
 
             //cout << sumBits(skipDelete) << " " << sumBits(leftSkip) << " " << sumBits(rightSkip) << " " << sumBits(newSkip) << endl;
 
 
 
             //Don't swap players or increase depth -- we haven't played a move
+            #if defined(SOLVER_ALPHA_BETA)
             Bound cb1, cb2;
-            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, cb1, cb2, newSkip);
+            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, cb1, cb2);
+            #else
+            pair<int, bool> result = searchID(state, p, n, depth);
+            #endif
+
+
             if (outOfTime) {
                 //memcpy(state->board, oldBoard, state->boardSize);
                 return result;
@@ -1171,9 +1164,10 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
                 return result;
             }
 
-            skipDelete |= ((uint64_t) 1) << i;
+            //skipDelete |= ((uint64_t) 1) << i;
 
 
+            #if defined(SOLVER_ALPHA_BETA)
             if (!limitCompletions) {
                 bool abCut = false;
 
@@ -1207,6 +1201,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
                     return pair<int, bool>(0, false);
                 }
             }
+            #endif
 
 
         }
@@ -1376,10 +1371,16 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 
         state->play(from, to, undoBuffer);
 
-        Bound cb1, cb2;
 
         int beforeSize = state->boardSize;
-        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2, 0);
+
+        #if defined(SOLVER_ALPHA_BETA)
+        Bound cb1, cb2;
+        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2);
+        #else
+        pair<int, bool> result = searchID(state, n, p, depth + 1);
+        #endif
+
         if (beforeSize != state->boardSize) {
             cout << "Size change" << endl;
             while (1) { }
@@ -1412,6 +1413,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
             return pair<int, bool>(p, true);
         }
 
+        #if defined(SOLVER_ALPHA_BETA)
         //update ab
         if (!limitCompletions) {
             bool abCut = false;
@@ -1447,6 +1449,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
                 return pair<int, bool>(0, false);
             }
         }
+        #endif
 
 
 

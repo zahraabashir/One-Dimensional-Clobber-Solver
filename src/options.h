@@ -7,7 +7,7 @@
 #define SOLVER_SUBSTITUTE
 
 // allow alpha beta pruning
-#define SOLVER_ALPHA_BETA //TODO
+#define SOLVER_ALPHA_BETA
 
 // don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE
 #define SOLVER_FIX_MEMORY_LEAK //TODO

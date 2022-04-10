@@ -17,10 +17,10 @@ TheSolvers: main.o database.o utils.o state.o solver.o bound.o
 DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
-%.o: %.cpp %.h
+%.o: %.cpp %.h options.h
 	$(CC) $(FLAGS) $< -o $@ -c
 
-%.o: %.cpp
+%.o: %.cpp options.h
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:

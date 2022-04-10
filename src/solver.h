@@ -1,12 +1,13 @@
 #pragma once
 
-#define SOLVER_SIMPLIFY
+//#define SOLVER_SIMPLIFY
 
 #include "state.h"
 #include "database.h"
 #include <chrono>
 #include <random>
 #include "bound.h"
+#include "options.h"
 
 #define BOARDLEN(te) *(te) //uint8_t
 #define BOARDPTR(te) *((char **) (te + 1)) //char *

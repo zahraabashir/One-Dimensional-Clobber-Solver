@@ -596,8 +596,7 @@ void BasicSolver::simplify(State *state, int depth) {
     //    memcpy(state->board, arr, state->boardSize);
     //}
 
-    //#define SOLVER_SIMPLIFY
-    #if defined(SOLVER_SIMPLIFY)
+    #if defined(SOLVER_SUBSTITUTE)
 
     if (depth <= 1 || true) {
         bool type2 = false;

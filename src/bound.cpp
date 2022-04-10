@@ -39,7 +39,6 @@ Bound Bound::max() {
 }
 
 Bound Bound::operator-() {
-    cout << "Op1" << endl;
     return Bound(-ups, star);
 }
 

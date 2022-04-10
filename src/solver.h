@@ -1,6 +1,6 @@
 #pragma once
 
-//#define SOLVER_SIMPLIFY
+#define SOLVER_SIMPLIFY
 
 #include "state.h"
 #include "database.h"

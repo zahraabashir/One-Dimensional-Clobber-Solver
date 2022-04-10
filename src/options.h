@@ -13,7 +13,7 @@
 #define SOLVER_FIX_MEMORY_LEAK //TODO
 
 // ignore dominated moves
-#define SOLVER_DELETE_DOMINATED_MOVES //TODO
+#define SOLVER_DELETE_DOMINATED_MOVES
 
 // try searching on a board after deleting a subgame whose outcome agrees with the current player
 #define SOLVER_DELETE_SUBGAMES //TODO

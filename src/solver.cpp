@@ -288,6 +288,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
     }
 
     //Delete dominated moves
+    #if defined(SOLVER_DELETE_DOMINATED_MOVES)
     vector<pair<int, int>> sg = generateSubgames(state);
 
     for (int i = 0; i < sg.size(); i++) {
@@ -315,6 +316,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
         }
 
     }
+    #endif
 
 
 
@@ -1233,6 +1235,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
     }
 
     //Delete dominated moves
+    #if defined(SOLVER_DELETE_DOMINATED_MOVES)
     vector<pair<int, int>> sg = generateSubgames(state);
 
     for (int i = 0; i < sg.size(); i++) {
@@ -1260,6 +1263,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
         }
 
     }
+    #endif
 
 
 

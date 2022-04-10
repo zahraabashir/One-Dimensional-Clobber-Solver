@@ -39,6 +39,7 @@ Bound Bound::max() {
 }
 
 Bound Bound::operator-() {
+    cout << "Op1" << endl;
     return Bound(-ups, star);
 }
 
@@ -52,13 +53,13 @@ Bound operator+(const Bound &b1, const Bound &b2) {
 
 bool operator<(const Bound &b1, const Bound &b2) {
     Bound b3 = b1 - b2;
-    int val = b3.ups + b3.star ? 1 : 0;
+    int val = b3.ups + (b3.star ? 1 : 0);
     return val < 0;
 }
 
 bool operator>(const Bound &b1, const Bound &b2) {
     Bound b3 = b1 - b2;
-    int val = b3.ups - b3.star ? 1 : 0;
+    int val = b3.ups - (b3.star ? 1 : 0);
     return val > 0;
 }
 

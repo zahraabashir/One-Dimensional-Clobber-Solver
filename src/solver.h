@@ -1,6 +1,5 @@
 #pragma once
 
-//#define SOLVER_SIMPLIFY
 
 #include "state.h"
 #include "database.h"
@@ -15,7 +14,7 @@
 
 
 #define BOARDLEN(te) FIXED_BOARD_SIZE 
-#define BOARDPTR(te) (te) //char *
+#define BOARDPTR(te) (te) //char[]
 #define PLAYER(te) *(te + FIXED_BOARD_SIZE) //uint8_t
 #define OUTCOME(te) *(te + FIXED_BOARD_SIZE + 1) //uint8_t
 #define BESTMOVE(te) *(te + FIXED_BOARD_SIZE + 2) //uint8_t

@@ -4,6 +4,7 @@
 #include "solver.h"
 #include <chrono>
 #include "options.h"
+#include <cstring>
 
 
 using namespace std;
@@ -36,7 +37,18 @@ int main(int argc, char **argv) {
     solver.timeLimit = timeLimit - 0.05 - ((double) board.length()) * 0.002;
     solver.startTime = start;
 
+    #if defined(SOLVER_FIX_MEMORY_LEAK)
+    char boardFixed[FIXED_BOARD_SIZE + 1];
+
+    memset(boardFixed, '.', FIXED_BOARD_SIZE);
+    boardFixed[FIXED_BOARD_SIZE] = 0;
+
+    memcpy(boardFixed, board.data(), board.size());
+
+    State *root = new State(boardFixed, rootPlayer);
+    #else
     State *root = new State(board, rootPlayer);
+    #endif
 
     // int result = solver.solveRoot(root, rootPlayer, opponentNumber(rootPlayer));
     int result = solver.solveID(root, rootPlayer, opponentNumber(rootPlayer));

@@ -92,7 +92,12 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     codeLength = bits;
 
     //look at macros in header file
+
+    #if defined(SOLVER_FIX_MEMORY_LEAK)
+    tableEntrySize = FIXED_BOARD_SIZE + 3 + sizeof(unsigned int) + 1;
+    #else
     tableEntrySize = 1 + sizeof(char *) + 3 + sizeof(unsigned int) + 1;
+    #endif
 
     bitMask = 0;
     for (int i = 0; i < bits; i++) {
@@ -167,6 +172,8 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 }
 
 int BasicSolver::solveID(State *state, int p, int n) {
+
+
     maxCompleted = 1;
 
     int depth = 0;

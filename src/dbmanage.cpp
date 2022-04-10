@@ -16,17 +16,32 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
     int result;
 
     auto start = chrono::steady_clock::now();
-    BasicSolver *solver = new BasicSolver(player, boardSize, &db);
-    solver->timeLimit = 1000000000.0;
-    solver->startTime = start;
 
+
+    #if defined(SOLVER_FIX_MEMORY_LEAK)
+    BasicSolver *solver = new BasicSolver(player, FIXED_BOARD_SIZE, &db);
+
+    char boardText[FIXED_BOARD_SIZE + 1];
+    memset(boardText, '.', FIXED_BOARD_SIZE);
+    boardText[FIXED_BOARD_SIZE] = 0;
+
+    for (int i = 0; i < boardSize; i++) {
+        boardText[i] = playerNumberToChar(board[i]);
+    }
+    #else
+    BasicSolver *solver = new BasicSolver(player, boardSize, &db);
 
     char boardText[boardSize + 1];
-    //memcpy(boardText, board, boardSize);
     boardText[boardSize] = 0;
     for (int i = 0; i < boardSize; i++) {
         boardText[i] = playerNumberToChar(board[i]);
     }
+    #endif
+
+    solver->timeLimit = 1000000000.0;
+    solver->startTime = start;
+
+
 
     State *root = new State(boardText, player);
 

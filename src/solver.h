@@ -1,6 +1,6 @@
 #pragma once
 
-#define SOLVER_SIMPLIFY
+//#define SOLVER_SIMPLIFY
 
 #include "state.h"
 #include "database.h"
@@ -50,6 +50,8 @@ extern int best_to;
 class BasicSolver {
   private:
     int maxDepth;
+
+    size_t entryCount;
 
     //this limits the number of searches, for the current depth, that can reach leaf nodes
     //search is aborted after this
@@ -122,6 +124,7 @@ class BasicSolver {
 
 
     int checkBounds(State *state);
+
 
 };
 

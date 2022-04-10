@@ -56,6 +56,8 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     tableSize <<= (size_t) bits;
     tableSize *= (size_t) tableEntrySize;
 
+    entryCount = ((size_t) 1) << bits;
+
     //cout << "Entry size: " << tableEntrySize << endl;
     //cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << endl;
     //cout << "Board size: " << boardSize << endl;   
@@ -64,6 +66,17 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
 }
 
 BasicSolver::~BasicSolver() {
+//    char *ptr = table;
+//
+//    for (size_t i = 0; i < entryCount; i++) {
+//        if (BOARDLEN(ptr) != 0) {
+//            delete[] BOARDPTR(ptr);
+//        }
+//
+//        ptr += tableEntrySize;
+//    }
+
+
     free(table);
     delete rng;
 }

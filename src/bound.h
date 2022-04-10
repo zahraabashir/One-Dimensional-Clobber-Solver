@@ -26,4 +26,8 @@ Bound operator+(const Bound &b1, const Bound &b2);
 bool operator<(const Bound &b1, const Bound &b2);
 bool operator>(const Bound &b1, const Bound &b2);
 
+bool operator==(const Bound &b1, const Bound &b2);
+bool operator<=(const Bound &b1, const Bound &b2);
+bool operator>=(const Bound &b1, const Bound &b2);
+
 std::ostream &operator<<(std::ostream &os, const Bound &b);

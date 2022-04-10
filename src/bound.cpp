@@ -60,6 +60,18 @@ bool operator>(const Bound &b1, const Bound &b2) {
     return val > 0;
 }
 
+bool operator==(const Bound &b1, const Bound &b2) {
+    return (b1.ups == b2.ups) && (b1.star == b2.star);
+}
+
+bool operator<=(const Bound &b1, const Bound &b2) {
+    return (b1 == b2) || (b1 < b2);
+}
+
+bool operator>=(const Bound &b1, const Bound &b2) {
+    return (b1 == b2) || (b1 > b2);
+}
+
 std::ostream &operator<<(std::ostream &os, const Bound &b) {
     os << "|" << b.ups << " " << b.star << "|";
     return os;

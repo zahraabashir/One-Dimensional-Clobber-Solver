@@ -6,6 +6,7 @@
 #include "database.h"
 #include <chrono>
 #include <random>
+#include "bound.h"
 
 #define BOARDLEN(te) *(te) //uint8_t
 #define BOARDPTR(te) *((char **) (te + 1)) //char *
@@ -124,6 +125,8 @@ class BasicSolver {
 
 
     int checkBounds(State *state);
+
+    void generateBounds(State *state, Bound &alpha, Bound &beta);
 
 
 };

@@ -26,6 +26,54 @@ int best_to = -1;
 
 //int collisions = 0; //transposition table collisions
 
+
+void BasicSolver::generateBounds(State *state, Bound &alpha, Bound &beta) {
+    vector<pair<int, int>> sg = generateSubgames(state);
+
+    int lowSum = 0;
+    bool lowStar = false;
+
+    int highSum = 0;
+    bool highStar = false;
+
+    for (auto it = sg.begin(); it != sg.end(); it++) {
+        int size = it->second - it->first;
+        if (size > DB_MAX_BOUND_BITS) {
+            alpha = Bound::min();
+            beta = Bound::max();
+            return;
+        }
+
+        unsigned char *dbEntry = db->get(size, state->board + it->first);
+
+        if (DB_GET_OUTCOME(dbEntry) == OC_UNKNOWN) {
+            alpha = Bound::min();
+            beta = Bound::max();
+            return;
+        }
+
+        int low = DB_GET_BOUND(dbEntry, 0);
+        int high = DB_GET_BOUND(dbEntry, 1);
+
+        int lowVal = sign(low) * max(abs(low) - 1, 0);
+        lowSum += lowVal;
+        lowStar = abs(low) % 2 != 0 ? !lowStar : lowStar;
+
+        int highVal = sign(high) * max(abs(high) - 1, 0);
+        highSum += highVal;
+        highStar = abs(high) % 2 != 0 ? !highStar : highStar;
+
+    }
+
+    alpha.ups = lowSum;
+    alpha.star = lowStar;
+
+    beta.ups = highSum;
+    beta.star = highStar;
+}
+
+
+
 BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
     this->rootPlayer = rootPlayer;
     this->boardSize = boardSize;

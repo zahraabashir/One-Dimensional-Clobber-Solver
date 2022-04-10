@@ -15,12 +15,14 @@ Bound::Bound() {
 }
 
 void Bound::setMin() {
-    ups = numeric_limits<int>::min() + 1;
+    //ups = numeric_limits<int>::min() + 1;
+    ups = -10000;
     star = false;
 }
 
 void Bound::setMax() {
-    ups = numeric_limits<int>::max() - 1;
+    //ups = numeric_limits<int>::max() - 1;
+    ups = 10000;
     star = false;
 }
 

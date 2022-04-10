@@ -392,7 +392,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
         state->play(from, to, undoBuffer);
 
         Bound cb1, cb2;
-        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2);
+        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2, 0);
 
         if (outOfTime) {
             delete[] moves;
@@ -966,7 +966,7 @@ int BasicSolver::checkBounds(State *state) {
     return 0;
 }
 
-pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2) {
+pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2, uint64_t skipDelete) {
     node_count += 1;
     updateTime();
     if (outOfTime) {
@@ -1121,6 +1121,10 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
     memcpy(boardCopy, state->board, state->boardSize);
 
     for (int i = 0; i < subgames.size(); i++) {
+        //if ((skipDelete >> i) & ((uint64_t) 1)) {
+        //    continue;
+        //}
+
         pair<int, int> &sg = subgames[i];
 
         if (outcomes[i] == p) {
@@ -1128,9 +1132,18 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
                 state->board[sg.first + j] = 0;
             }
            
+            //uint64_t leftSkip = skipDelete & (((uint64_t) -1) >> (64 - i));
+            //uint64_t rightSkip = skipDelete & (((uint64_t) -1) << (i + 1));
+            //uint64_t newSkip = leftSkip | rightSkip;
+            uint64_t newSkip = 0;
+
+            //cout << sumBits(skipDelete) << " " << sumBits(leftSkip) << " " << sumBits(rightSkip) << " " << sumBits(newSkip) << endl;
+
+
+
             //Don't swap players or increase depth -- we haven't played a move
             Bound cb1, cb2;
-            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, cb1, cb2);
+            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, cb1, cb2, newSkip);
             if (outOfTime) {
                 //memcpy(state->board, oldBoard, state->boardSize);
                 return result;
@@ -1155,6 +1168,9 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 
                 return result;
             }
+
+            skipDelete |= ((uint64_t) 1) << i;
+
 
             if (!limitCompletions) {
                 bool abCut = false;
@@ -1358,7 +1374,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
         Bound cb1, cb2;
 
         int beforeSize = state->boardSize;
-        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2);
+        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2, 0);
         if (beforeSize != state->boardSize) {
             cout << "Size change" << endl;
             while (1) { }

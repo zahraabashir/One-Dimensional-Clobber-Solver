@@ -105,7 +105,7 @@ class BasicSolver {
     if the bool is true, the int is the player who wins, otherwise it is the heuristic score
     */
     std::pair<int, bool> rootSearchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2);
-    std::pair<int, bool> searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2);
+    std::pair<int, bool> searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2, uint64_t skipDelete);
 
 
     //basic solver functions

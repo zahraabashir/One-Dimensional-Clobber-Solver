@@ -191,7 +191,12 @@ int BasicSolver::solveID(State *state, int p, int n) {
         //cout << depth << endl;
 
 
-        pair<int, bool> result = rootSearchID(state, p, n, 0);
+        Bound alpha = Bound::min();
+        Bound beta = Bound::max();
+
+        Bound cb1, cb2;
+
+        pair<int, bool> result = rootSearchID(state, p, n, 0, alpha, beta, cb1, cb2);
 
         if (outOfTime) {
             return EMPTY;
@@ -209,12 +214,42 @@ int BasicSolver::solveID(State *state, int p, int n) {
 }
 
 
-pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth) {
+pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2) {
     node_count += 1;
     updateTime();
     if (outOfTime) {
         return pair<int, bool>(0, false);
     }
+
+    //int boundWin = checkBounds(state);
+
+    //if (boundWin != 0) {
+    //    return pair<int, bool>(boundWin, true);
+    //}
+
+    Bound a, b;
+    generateBounds(state, a, b);
+
+//    if (a > Bound(0, 0)) {
+//        return pair<int, bool>(1, true);
+//    }
+//
+//    if (b < Bound(0, 0)) {
+//        return pair<int, bool>(2, true);
+//    }
+
+
+//    Bound b1, b2;
+//    generateBounds(state, b1, b2);
+//
+//    if (b1 > Bound()) {
+//        return pair<int, bool>(1, true);
+//    }
+//
+//    if (b2 < Bound()) {
+//        return pair<int, bool>(2, true);
+//    }
+
 
     //lookup entry
     //if solved, return
@@ -353,7 +388,9 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
         }
 
         state->play(from, to, undoBuffer);
-        pair<int, bool> result = searchID(state, n, p, depth + 1);
+
+        Bound cb1, cb2;
+        pair<int, bool> result = rootSearchID(state, n, p, depth + 1, alpha, beta, cb1, cb2);
 
         if (outOfTime) {
             delete[] moves;
@@ -380,6 +417,39 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
             delete[] moves;
             return pair<int, bool>(p, true);
         }
+
+        //update ab
+        bool abCut = false;
+
+        if (p == 1) {
+            if (cb1 > rb1) {
+                rb1 = cb1;
+            }
+            if (cb1 >= beta) {
+                abCut = true;
+            } else {
+                if (cb1 > alpha) {
+                    alpha = cb1;
+                }
+            }
+        } else {
+            if (cb2 < rb2) {
+                rb2 = cb2;
+            }
+            if (cb2 <= alpha) {
+                abCut = true;
+            } else {
+                if (cb2 < beta) {
+                    beta = cb2;
+                }
+            }
+        }
+
+        if (abCut && depth > 0 && !limitCompletions) {
+            delete[] moves;
+            return pair<int, bool>(0, false);
+        }
+
 
         if (!result.second) {
             result.first *= -1;
@@ -885,6 +955,8 @@ int BasicSolver::checkBounds(State *state) {
 
         return 2;
     }
+
+
 
 
     return 0;

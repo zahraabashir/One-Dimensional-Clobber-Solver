@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdio>
+#include "options.h"
 
 
 #define OC_UNKNOWN 0
@@ -31,9 +32,6 @@
 
 //12,10,12
 //16,12,16
-#define DB_MAX_BITS 16
-#define DB_MAX_DOMINANCE_BITS 12
-#define DB_MAX_BOUND_BITS 16
 
 #define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 4 * sizeof(int))
 

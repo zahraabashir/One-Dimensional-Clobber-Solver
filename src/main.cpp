@@ -3,6 +3,7 @@
 #include "state.h"
 #include "solver.h"
 #include <chrono>
+#include "options.h"
 
 
 using namespace std;

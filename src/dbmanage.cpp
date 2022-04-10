@@ -6,6 +6,7 @@
 #include "database.h"
 #include <chrono>
 #include <map>
+#include "options.h"
 
 using namespace std;
 

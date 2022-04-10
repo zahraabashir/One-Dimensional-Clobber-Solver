@@ -27,7 +27,12 @@ int main(int argc, char **argv) {
     int rootPlayer = charToPlayerNumber(*argv[2]);
     double timeLimit = (double) atoi(argv[3]);
 
+    #if defined(SOLVER_FIX_MEMORY_LEAK)
+    BasicSolver solver(rootPlayer, FIXED_BOARD_SIZE, &db);
+    #else
     BasicSolver solver(rootPlayer, board.length(), &db);
+    #endif
+
     solver.timeLimit = timeLimit - 0.05 - ((double) board.length()) * 0.002;
     solver.startTime = start;
 

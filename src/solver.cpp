@@ -636,8 +636,13 @@ void BasicSolver::simplify(State *state, int depth) {
         }
 
         if (newSize > 0) {
+            #if defined(SOLVER_FIX_MEMORY_LEAK)
+            char *newBuffer[state->boardSize];
+            memset(newBuffer, 0, state->boardSize);
+            #else
             char *newBuffer = new char[newSize + 1];
             memset(newBuffer, 0, newSize + 1);
+            #endif
 
 
             size_t idx = 0;
@@ -686,11 +691,14 @@ void BasicSolver::simplify(State *state, int depth) {
 
             }
 
-
+            #if defined(SOLVER_FIX_MEMORY_LEAK)
+            memcpy(state->board, newBuffer, state->boardSize);
+            #else
             delete[] state->board;
             state->board = newBuffer;
             board = state->board;
             state->boardSize = newSize;
+            #endif
         }
 
         if (type2 && printSub) {
@@ -838,6 +846,8 @@ void BasicSolver::simplify(State *state, int depth) {
 
 
 
+    #if defined(SOLVER_FIX_MEMORY_LEAK)
+    #else
     size_t minSize = gameLength(state->boardSize, state->board);
     char *minBuffer = new char[minSize];
     memset(minBuffer, 0, minSize);
@@ -846,25 +856,11 @@ void BasicSolver::simplify(State *state, int depth) {
         memcpy(minBuffer, state->board, minSize);
     }
 
-    //cout << "board: ";
-    //for (int i = 0; i < minSize; i++) {
-    //    cout << playerNumberToChar(minBuffer[i]);
-    //}
-    //cout << endl;
-
-
     delete[] state->board;
     state->board = minBuffer;
     state->boardSize = minSize;
+    #endif
 
-    
-    
-    //delete[] minBuffer;
-
-
-
-
-    //cout << endl;
 }
 
 bool subgameLengthCompare(const pair<int, int> &a, const pair<int, int> &b) {

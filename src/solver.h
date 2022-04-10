@@ -9,6 +9,24 @@
 #include "bound.h"
 #include "options.h"
 
+
+
+#if defined(SOLVER_FIX_MEMORY_LEAK)
+
+
+#define BOARDLEN(te) FIXED_BOARD_SIZE 
+#define BOARDPTR(te) (te) //char *
+#define PLAYER(te) *(te + FIXED_BOARD_SIZE) //uint8_t
+#define OUTCOME(te) *(te + FIXED_BOARD_SIZE + 1) //uint8_t
+#define BESTMOVE(te) *(te + FIXED_BOARD_SIZE + 2) //uint8_t
+#define DEPTH(te) *((unsigned int *) (te + FIXED_BOARD_SIZE + 3)) //unsigned int
+#define HEURISTIC(te) *(te + FIXED_BOARD_SIZE + 3 + sizeof(unsigned int)) //int8_t
+
+#define RESIZETTBOARD(entry, newSize)
+#define RESIZESTATEBOARD(state, newSize)
+
+#else
+
 #define BOARDLEN(te) *(te) //uint8_t
 #define BOARDPTR(te) *((char **) (te + 1)) //char *
 #define PLAYER(te) *(te + 1 + sizeof(char *)) //uint8_t
@@ -44,6 +62,20 @@
         state->boardSize = newSize; \
     } \
 }
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
 
 extern int node_count;
 extern int best_from;

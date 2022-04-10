@@ -10,7 +10,7 @@
 #define SOLVER_ALPHA_BETA
 
 // don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE
-#define SOLVER_FIX_MEMORY_LEAK //TODO
+//#define SOLVER_FIX_MEMORY_LEAK //TODO
 
 // ignore dominated moves
 #define SOLVER_DELETE_DOMINATED_MOVES

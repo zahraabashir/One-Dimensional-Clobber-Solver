@@ -20,7 +20,7 @@
 
 // 0: sum of black and white moves, 1: sum of black and white undominated moves, 2: length (in tiles)
 // This requires rebuilding the database
-#define SUBGAME_COMPLEXITY_METRIC 0 //TODO
+#define SUBGAME_COMPLEXITY_METRIC 0
 
 
 

@@ -492,7 +492,10 @@ int main() {
                 DB_SET_DOMINATED(entry, 1, domBlack);
                 DB_SET_DOMINATED(entry, 2, domWhite);
 
-                //UDMoveCount -= (sumBits(domBlack) + sumBits(domWhite));
+                #if SUBGAME_COMPLEXITY_METRIC  == 1
+                UDMoveCount -= (sumBits(domBlack) + sumBits(domWhite));
+                #endif
+
                 DB_SET_UDMOVECOUNT(entry, UDMoveCount);
 
                 int low = DB_GET_BOUND(entry, 0);
@@ -508,8 +511,14 @@ int main() {
                     udMap[mapTriple] = udVec;
                 }
 
+                #if (SUBGAME_COMPLEXITY_METRIC == 0) or (SUBGAME_COMPLEXITY_METRIC == 1)
                 udVec->push_back(UDMoveCount);
-                //udVec->push_back(length);
+                #endif
+
+                #if (SUBGAME_COMPLEXITY_METRIC == 2)
+                udVec->push_back(length);
+                #endif
+
                 udVec->push_back(link);
 
                 cout << domBlack << " " << domWhite << endl;
@@ -585,8 +594,16 @@ int main() {
 
 
             unsigned char *entry = db.get(length, board);
+
+
+            #if (SUBGAME_COMPLEXITY_METRIC == 0) or (SUBGAME_COMPLEXITY_METRIC == 1)
             int originalUDMoveCount = DB_GET_UDMOVECOUNT(entry);
-            //int originalUDMoveCount = length;
+            #endif
+
+            #if (SUBGAME_COMPLEXITY_METRIC == 2)
+            int originalUDMoveCount = length;
+            #endif
+
             int originalLink = db.getIdx(length, board);
 
             int bestUDMoveCount = originalUDMoveCount;

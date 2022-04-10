@@ -228,7 +228,9 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
     //}
 
     Bound a, b;
-    generateBounds(state, a, b);
+    if (!limitCompletions) {
+        generateBounds(state, a, b);
+    }
 
 //    if (a > Bound(0, 0)) {
 //        return pair<int, bool>(1, true);
@@ -419,35 +421,37 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
         }
 
         //update ab
-        bool abCut = false;
+        if (!limitCompletions) {
+            bool abCut = false;
 
-        if (p == 1) {
-            if (cb1 > rb1) {
-                rb1 = cb1;
-            }
-            if (cb1 >= beta) {
-                abCut = true;
+            if (p == 1) {
+                if (cb1 > rb1) {
+                    rb1 = cb1;
+                }
+                if (cb1 >= beta) {
+                    abCut = true;
+                } else {
+                    if (cb1 > alpha) {
+                        alpha = cb1;
+                    }
+                }
             } else {
-                if (cb1 > alpha) {
-                    alpha = cb1;
+                if (cb2 < rb2) {
+                    rb2 = cb2;
+                }
+                if (cb2 <= alpha) {
+                    abCut = true;
+                } else {
+                    if (cb2 < beta) {
+                        beta = cb2;
+                    }
                 }
             }
-        } else {
-            if (cb2 < rb2) {
-                rb2 = cb2;
-            }
-            if (cb2 <= alpha) {
-                abCut = true;
-            } else {
-                if (cb2 < beta) {
-                    beta = cb2;
-                }
-            }
-        }
 
-        if (abCut && depth > 0 && !limitCompletions) {
-            delete[] moves;
-            return pair<int, bool>(0, false);
+            if (abCut && depth > 0 && !limitCompletions) {
+                delete[] moves;
+                return pair<int, bool>(0, false);
+            }
         }
 
 
@@ -983,8 +987,9 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 //    }
 
     Bound a, b;
-    generateBounds(state, a, b);
-
+    if (!limitCompletions) {
+        generateBounds(state, a, b);
+    }
 
     //lookup entry
     //if solved, return
@@ -1124,8 +1129,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
             }
            
             //Don't swap players or increase depth -- we haven't played a move
-            Bound trashBound1, trashBound2;
-            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, trashBound1, trashBound2);
+            Bound cb1, cb2;
+            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, cb1, cb2);
             if (outOfTime) {
                 //memcpy(state->board, oldBoard, state->boardSize);
                 return result;
@@ -1150,6 +1155,41 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 
                 return result;
             }
+
+            if (!limitCompletions) {
+                bool abCut = false;
+
+                if (p == 1) {
+                    if (cb1 > rb1) {
+                        rb1 = cb1;
+                    }
+                    if (cb1 >= beta) {
+                        abCut = true;
+                    } else {
+                        if (cb1 > alpha) {
+                            alpha = cb1;
+                        }
+                    }
+                } else {
+                    if (cb2 < rb2) {
+                        rb2 = cb2;
+                    }
+                    if (cb2 <= alpha) {
+                        abCut = true;
+                    } else {
+                        if (cb2 < beta) {
+                            beta = cb2;
+                        }
+                    }
+                }
+
+                if (abCut && depth > 0 && !limitCompletions) {
+                    RESIZESTATEBOARD(state, oldBoardSize);
+                    memcpy(state->board, oldBoard, state->boardSize);
+                    return pair<int, bool>(0, false);
+                }
+            }
+
 
         }
     }
@@ -1352,37 +1392,39 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
         }
 
         //update ab
-        bool abCut = false;
+        if (!limitCompletions) {
+            bool abCut = false;
 
-        if (p == 1) {
-            if (cb1 > rb1) {
-                rb1 = cb1;
-            }
-            if (cb1 >= beta) {
-                abCut = true;
+            if (p == 1) {
+                if (cb1 > rb1) {
+                    rb1 = cb1;
+                }
+                if (cb1 >= beta) {
+                    abCut = true;
+                } else {
+                    if (cb1 > alpha) {
+                        alpha = cb1;
+                    }
+                }
             } else {
-                if (cb1 > alpha) {
-                    alpha = cb1;
+                if (cb2 < rb2) {
+                    rb2 = cb2;
+                }
+                if (cb2 <= alpha) {
+                    abCut = true;
+                } else {
+                    if (cb2 < beta) {
+                        beta = cb2;
+                    }
                 }
             }
-        } else {
-            if (cb2 < rb2) {
-                rb2 = cb2;
-            }
-            if (cb2 <= alpha) {
-                abCut = true;
-            } else {
-                if (cb2 < beta) {
-                    beta = cb2;
-                }
-            }
-        }
 
-        if (abCut && depth > 0 && !limitCompletions) {
-            RESIZESTATEBOARD(state, oldBoardSize);
-            memcpy(state->board, oldBoard, state->boardSize);
-            delete[] moves;
-            return pair<int, bool>(0, false);
+            if (abCut && depth > 0 && !limitCompletions) {
+                RESIZESTATEBOARD(state, oldBoardSize);
+                memcpy(state->board, oldBoard, state->boardSize);
+                delete[] moves;
+                return pair<int, bool>(0, false);
+            }
         }
 
 

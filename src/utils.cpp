@@ -49,15 +49,15 @@ int charToPlayerNumber(char c) {
 
 
 size_t gameLength(size_t bufferSize, char *game) {
-    size_t length = 0;
+    size_t idx = 0;
 
     for (size_t i = 0; i < bufferSize; i++) {
         if (game[i] != 0) {
-            length = i;
+            idx = i;
         }
     }
 
-    return length;
+    return idx + 1;
 }
 
 

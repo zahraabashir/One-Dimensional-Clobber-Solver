@@ -70,18 +70,29 @@ BasicSolver::~BasicSolver() {
 
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
     uint8_t len = BOARDLEN(entry);
+    char *entryBoard = BOARDPTR(entry);
+
+    //for (int i = 0; i < state->boardSize; i++) {
+    //    cout << playerNumberToChar(state->board[i]);
+    //}
+    //cout << endl;
+
+    //for (int i = 0; i < len; i++) {
+    //    cout << playerNumberToChar(entryBoard[i]);
+    //}
+    //cout << endl << endl;
+
 
     if (len != state->boardSize) {
         return false;
     }
 
 
-    char *entryBoard = BOARDPTR(entry);
 
     bool found = false;
     if (PLAYER(entry) == p) {
         found = true;
-        for (int i = 0; i < boardSize; i++) {
+        for (int i = 0; i < state->boardSize; i++) {
             if (entryBoard[i] != state->board[i]) {
                 found = false;
                 break;
@@ -164,8 +175,8 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
         completed += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
@@ -225,8 +236,8 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = EMPTY;
             BESTMOVE(entry) = 0;
@@ -292,8 +303,8 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
         if (result.second && result.first == p) {
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                 //memcpy(entry, state->board, boardSize);
-                RESIZETTBOARD(entry, boardSize);
-                memcpy(BOARDPTR(entry), state->board, boardSize);
+                RESIZETTBOARD(entry, state->boardSize);
+                memcpy(BOARDPTR(entry), state->board, state->boardSize);
                 PLAYER(entry) = p;
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
@@ -332,8 +343,8 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
     if (allProven) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
@@ -349,8 +360,8 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
 
     if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         //memcpy(entry, state->board, boardSize);
-        RESIZETTBOARD(entry, boardSize);
-        memcpy(BOARDPTR(entry), state->board, boardSize);
+        RESIZETTBOARD(entry, state->boardSize);
+        memcpy(BOARDPTR(entry), state->board, state->boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
         BESTMOVE(entry) = newBestMove;
@@ -430,8 +441,155 @@ bool subgameCompare(const pair<int, int> &a, const pair<int, int> &b) {
 void BasicSolver::simplify(State *state, int depth) {
     char *board = state->board; //MUST reassign this after deleting state->board
 
-    //find subgames
+
     vector<pair<int, int>> subgames = generateSubgames(state);
+    int subgameCount = subgames.size();
+
+
+    //{ //TODO this MUST work somehow...
+    //    char arr[state->boardSize];
+    //    memcpy(arr, state->board, state->boardSize);
+    //    
+    //    memset(state->board, 7, state->boardSize);
+    //    delete[] state->board;
+    //    state->board = new char[state->boardSize];
+    //    board = state->board;
+
+    //    memcpy(state->board, arr, state->boardSize);
+    //}
+
+    //#define SOLVER_SIMPLIFY
+    #if defined(SOLVER_SIMPLIFY)
+
+    if (depth <= 1 || true) {
+        bool type2 = false;
+        bool printSub = false;
+
+
+        //replace games with simpler games
+        subgames = generateSubgames(state);
+        subgameCount = subgames.size();
+
+        size_t newSize = max(subgameCount - 1, 0);
+
+        //Figure out new size based on database links
+        for (int i = 0; i < subgameCount; i++) {
+            int start = subgames[i].first;
+            int end = subgames[i].second;
+            int len = end - start;
+
+            unsigned char *entry = db->get(len, state->board + start);
+            if (entry == 0 || DB_GET_OUTCOME(entry) == 0) {
+                entry = 0;
+            }
+            //entry = 0;
+
+            if (entry == 0) {
+                newSize += len;
+            } else {
+                unsigned char *linkedEntry = db->getFromIdx(DB_GET_LINK(entry));
+                newSize += DB_GET_LENGTH(linkedEntry);
+
+
+                if (linkedEntry != entry) {
+                    type2 = true;
+                }
+            }
+
+        }
+
+
+        if (type2 && printSub) {
+            cout << "Board before substitution (" << state->boardSize << ")" << endl;
+            for (int i = 0; i < state->boardSize; i++) {
+                cout << playerNumberToChar(state->board[i]);
+            }
+            cout << endl;
+        }
+
+
+
+        if (newSize != state->boardSize) {
+            //cout << "Board size changed: " << state->boardSize << " --> " << newSize << endl;
+            //while (1) {
+            //}
+        }
+
+        if (newSize > 0) {
+            char *newBuffer = new char[newSize + 1];
+            memset(newBuffer, 0, newSize + 1);
+
+
+            size_t idx = 0;
+            //copy simpler games from database links
+            for (int i = 0; i < subgameCount; i++) {
+                int start = subgames[i].first;
+                int end = subgames[i].second;
+                int len = end - start;
+
+                unsigned char *entry = db->get(len, state->board + start);
+                if (entry == 0 || DB_GET_OUTCOME(entry) == 0) {
+                    entry = 0;
+                }
+                //entry = 0;
+                unsigned char *linkedEntry = entry == 0 ? 0 : db->getFromIdx(DB_GET_LINK(entry));
+
+
+                if (entry == 0 || entry == linkedEntry) {
+                    memcpy(newBuffer + idx, state->board + start, len);
+                    idx += len + 1;
+
+                    //cout << "Substitution 1:" << endl;
+                    //for (int j = 0; j < len; j++) {
+                    //    cout << playerNumberToChar(state->board[start + j]);
+                    //}
+                    //cout << endl;
+
+                } else {
+                    int linkedLength = DB_GET_LENGTH(linkedEntry);
+                    int linkedNumber = DB_GET_NUMBER(linkedEntry);
+
+                    char *newGame = generateGame(linkedLength, linkedNumber);
+
+                    memcpy(newBuffer + idx, newGame, linkedLength);
+                    idx += linkedLength + 1;
+
+                    //cout << "Substitution 2:" << endl;
+                    //for (int j = 0; j < linkedLength; j++) {
+                    //    cout << playerNumberToChar(newGame[j]);
+                    //}
+                    //cout << endl;
+
+
+                    delete[] newGame;
+                }
+
+            }
+
+
+            delete[] state->board;
+            state->board = newBuffer;
+            board = state->board;
+            state->boardSize = newSize;
+        }
+
+        if (type2 && printSub) {
+            cout << "Board after substitution (" << state->boardSize << ")" << endl;
+            for (int i = 0; i < state->boardSize; i++) {
+                cout << playerNumberToChar(state->board[i]);
+            }
+            cout << endl << endl;
+        }
+
+    }
+
+    #endif
+
+
+
+    //find subgames
+    subgames = generateSubgames(state);
+    subgameCount = subgames.size();
 
     //print
     for (int i = 0; i < state->boardSize; i++) {
@@ -440,7 +598,6 @@ void BasicSolver::simplify(State *state, int depth) {
     //cout << endl;
     //cout << "Subgames: " << subgames.size() << endl;
 
-    int subgameCount = subgames.size();
 
     //find subgames that have the same length
     for (int i = 0; i < subgameCount; i++) {
@@ -522,144 +679,6 @@ void BasicSolver::simplify(State *state, int depth) {
     }
 
 
-    //{ //TODO this MUST work somehow...
-    //    char arr[state->boardSize];
-    //    memcpy(arr, state->board, state->boardSize);
-    //    
-    //    memset(state->board, 7, state->boardSize);
-    //    delete[] state->board;
-    //    state->board = new char[state->boardSize];
-    //    board = state->board;
-
-    //    memcpy(state->board, arr, state->boardSize);
-    //}
-
-    //#define SOLVER_SIMPLIFY
-    #if defined(SOLVER_SIMPLIFY)
-
-    if (depth <= 1 || true) {
-        bool type2 = false;
-        type2 = true;
-
-
-        //replace games with simpler games
-        subgames = generateSubgames(state);
-        subgameCount = subgames.size();
-
-        size_t newSize = max(subgameCount - 1, 0);
-
-        //Figure out new size based on database links
-        for (int i = 0; i < subgameCount; i++) {
-            int start = subgames[i].first;
-            int end = subgames[i].second;
-            int len = end - start;
-
-            unsigned char *entry = db->get(len, state->board + start);
-            if (entry == 0 || DB_GET_OUTCOME(entry) == 0) {
-                entry = 0;
-            }
-            entry = 0;
-
-            if (entry == 0) {
-                newSize += len;
-            } else {
-                unsigned char *linkedEntry = db->getFromIdx(DB_GET_LINK(entry));
-                newSize += DB_GET_LENGTH(linkedEntry);
-
-
-                if (linkedEntry != entry) {
-                    type2 = true;
-                }
-            }
-
-        }
-
-
-        if (type2) {
-            cout << "Board before substitution (" << state->boardSize << ")" << endl;
-            for (int i = 0; i < state->boardSize; i++) {
-                cout << playerNumberToChar(state->board[i]);
-            }
-            cout << endl;
-        }
-
-
-
-        if (newSize != state->boardSize) {
-            //cout << "Board size changed: " << state->boardSize << " --> " << newSize << endl;
-            //while (1) {
-            //}
-        }
-
-        if (newSize > 0) {
-            char *newBuffer = new char[newSize + 1];
-            memset(newBuffer, 0, newSize + 1);
-
-
-            size_t idx = 0;
-            //copy simpler games from database links
-            for (int i = 0; i < subgameCount; i++) {
-                int start = subgames[i].first;
-                int end = subgames[i].second;
-                int len = end - start;
-
-                unsigned char *entry = db->get(len, state->board + start);
-                if (entry == 0 || DB_GET_OUTCOME(entry) == 0) {
-                    entry = 0;
-                }
-                entry = 0;
-                unsigned char *linkedEntry = entry == 0 ? 0 : db->getFromIdx(DB_GET_LINK(entry));
-
-
-                if (entry == 0 || entry == linkedEntry) {
-                    memcpy(newBuffer + idx, state->board + start, len);
-                    idx += len + 1;
-
-                    //cout << "Substitution 1:" << endl;
-                    //for (int j = 0; j < len; j++) {
-                    //    cout << playerNumberToChar(state->board[start + j]);
-                    //}
-                    //cout << endl;
-
-                } else {
-                    int linkedLength = DB_GET_LENGTH(linkedEntry);
-                    int linkedNumber = DB_GET_NUMBER(linkedEntry);
-
-                    char *newGame = generateGame(linkedLength, linkedNumber);
-
-                    memcpy(newBuffer + idx, newGame, linkedLength);
-                    idx += linkedLength + 1;
-
-                    //cout << "Substitution 2:" << endl;
-                    //for (int j = 0; j < linkedLength; j++) {
-                    //    cout << playerNumberToChar(newGame[j]);
-                    //}
-                    //cout << endl;
-
-
-                    delete[] newGame;
-                }
-
-            }
-
-
-            delete[] state->board;
-            state->board = newBuffer;
-            board = state->board;
-            state->boardSize = newSize;
-        }
-
-        if (type2) {
-            cout << "Board after substitution (" << state->boardSize << ")" << endl;
-            for (int i = 0; i < state->boardSize; i++) {
-                cout << playerNumberToChar(state->board[i]);
-            }
-            cout << endl << endl;
-        }
-
-    }
-
-    #endif
 
 
     //now canonicalize the board
@@ -689,6 +708,39 @@ void BasicSolver::simplify(State *state, int depth) {
     //    cout << playerNumberToChar(board[i]);
     }
     //cout << endl;
+
+
+    //cout << "Board: ";
+    //for (int i = 0; i < state->boardSize; i++) {
+    //    cout << playerNumberToChar(state->board[i]);
+    //}
+    //cout << endl;
+
+
+
+    size_t minSize = gameLength(state->boardSize, state->board);
+    char *minBuffer = new char[minSize];
+    memset(minBuffer, 0, minSize);
+
+    if (state->boardSize > 0) {
+        memcpy(minBuffer, state->board, minSize);
+    }
+
+    //cout << "board: ";
+    //for (int i = 0; i < minSize; i++) {
+    //    cout << playerNumberToChar(minBuffer[i]);
+    //}
+    //cout << endl;
+
+
+    delete[] state->board;
+    state->board = minBuffer;
+    state->boardSize = minSize;
+
+    
+    
+    //delete[] minBuffer;
+
 
 
 
@@ -864,8 +916,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = BLACK;
             BESTMOVE(entry) = 0;
@@ -884,8 +936,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = WHITE;
             BESTMOVE(entry) = 0;
@@ -903,8 +955,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = p;
             BESTMOVE(entry) = 0;
@@ -945,8 +997,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
                 if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                     //memcpy(entry, state->board, boardSize);
-                    RESIZETTBOARD(entry, boardSize);
-                    memcpy(BOARDPTR(entry), state->board, boardSize);
+                    RESIZETTBOARD(entry, state->boardSize);
+                    memcpy(BOARDPTR(entry), state->board, state->boardSize);
                     PLAYER(entry) = p;
                     OUTCOME(entry) = p;
                     BESTMOVE(entry) = 0;
@@ -971,8 +1023,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
         completed += 1;
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = 0;
@@ -1035,8 +1087,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = EMPTY;
             BESTMOVE(entry) = 0;
@@ -1122,7 +1174,12 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
         }
 
         state->play(from, to, undoBuffer);
+        int beforeSize = state->boardSize;
         pair<int, bool> result = searchID(state, n, p, depth + 1);
+        if (beforeSize != state->boardSize) {
+            cout << "Size change" << endl;
+            while (1) { }
+        }
         if (outOfTime) {
             //memcpy(state->board, oldBoard, state->boardSize);
             delete[] moves;
@@ -1136,8 +1193,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
         if (result.second && result.first == p) {
             if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
                 //memcpy(entry, state->board, boardSize);
-                RESIZETTBOARD(entry, boardSize);
-                memcpy(BOARDPTR(entry), state->board, boardSize);
+                RESIZETTBOARD(entry, state->boardSize);
+                memcpy(BOARDPTR(entry), state->board, state->boardSize);
                 PLAYER(entry) = p;
                 OUTCOME(entry) = p;
                 BESTMOVE(entry) = i;
@@ -1174,8 +1231,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     if (allProven) {
         if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, boardSize);
-            memcpy(BOARDPTR(entry), state->board, boardSize);
+            RESIZETTBOARD(entry, state->boardSize);
+            memcpy(BOARDPTR(entry), state->board, state->boardSize);
             PLAYER(entry) = p;
             OUTCOME(entry) = n;
             BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
@@ -1192,8 +1249,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
     if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         //memcpy(entry, state->board, boardSize);
-        RESIZETTBOARD(entry, boardSize);
-        memcpy(BOARDPTR(entry), state->board, boardSize);
+        RESIZETTBOARD(entry, state->boardSize);
+        memcpy(BOARDPTR(entry), state->board, state->boardSize);
         PLAYER(entry) = p;
         OUTCOME(entry) = EMPTY;
         BESTMOVE(entry) = newBestMove;

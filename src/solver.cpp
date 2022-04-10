@@ -72,6 +72,7 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
     uint8_t len = BOARDLEN(entry);
     char *entryBoard = BOARDPTR(entry);
 
+    //cout << "--------------------------" << endl;
     //for (int i = 0; i < state->boardSize; i++) {
     //    cout << playerNumberToChar(state->board[i]);
     //}
@@ -80,7 +81,9 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
     //for (int i = 0; i < len; i++) {
     //    cout << playerNumberToChar(entryBoard[i]);
     //}
-    //cout << endl << endl;
+    //cout << endl;
+    //cout << "==========================" << endl;
+    //cout << endl;
 
 
     if (len != state->boardSize) {

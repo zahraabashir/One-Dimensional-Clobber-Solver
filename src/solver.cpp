@@ -1379,6 +1379,8 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
         }
 
         if (abCut && depth > 0 && !limitCompletions) {
+            RESIZESTATEBOARD(state, oldBoardSize);
+            memcpy(state->board, oldBoard, state->boardSize);
             delete[] moves;
             return pair<int, bool>(0, false);
         }

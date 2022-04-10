@@ -83,6 +83,7 @@ extern int best_to;
 class BasicSolver {
   private:
     int maxDepth;
+    bool doABPrune;
 
     size_t entryCount;
 

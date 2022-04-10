@@ -173,6 +173,8 @@ bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
 
 int BasicSolver::solveID(State *state, int p, int n) {
 
+    doABPrune = false;
+
 
     maxCompleted = 1;
 
@@ -192,6 +194,10 @@ int BasicSolver::solveID(State *state, int p, int n) {
         //used to be 150
         if (depth > 300) {
             limitCompletions = false;
+        }
+
+        if (maxDepth >= 10) {
+            doABPrune = true;
         }
 
 
@@ -242,9 +248,11 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
 
     #if defined(SOLVER_ALPHA_BETA)
     Bound a, b;
-    if (!limitCompletions) {
+    if (doABPrune) {
         generateBounds(state, a, b);
     }
+    rb1 = a;
+    rb2 = b;
     #endif
 
 
@@ -423,7 +431,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
 
         #if defined(SOLVER_ALPHA_BETA)
         //update ab
-        if (!limitCompletions) {
+        if (doABPrune) {
             bool abCut = false;
 
             if (p == 1) {
@@ -450,7 +458,7 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
                 }
             }
 
-            if (abCut && depth > 0 && !limitCompletions) {
+            if (abCut && depth > 0 && doABPrune) {
                 delete[] moves;
                 return pair<int, bool>(0, false);
             }
@@ -977,9 +985,11 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
     #if defined(SOLVER_ALPHA_BETA)
     Bound a, b;
-    if (!limitCompletions) {
+    if (doABPrune) {
         generateBounds(state, a, b);
     }
+    rb1 = a;
+    rb2 = b;
     #endif
 
     //lookup entry
@@ -1171,7 +1181,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
 
             #if defined(SOLVER_ALPHA_BETA)
-            if (!limitCompletions) {
+            if (doABPrune) {
                 bool abCut = false;
 
                 if (p == 1) {
@@ -1198,7 +1208,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
                     }
                 }
 
-                if (abCut && depth > 0 && !limitCompletions) {
+                if (abCut && depth > 0 && doABPrune) {
                     RESIZESTATEBOARD(state, oldBoardSize);
                     memcpy(state->board, oldBoard, state->boardSize);
                     return pair<int, bool>(0, false);
@@ -1418,7 +1428,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 
         #if defined(SOLVER_ALPHA_BETA)
         //update ab
-        if (!limitCompletions) {
+        if (doABPrune) {
             bool abCut = false;
 
             if (p == 1) {
@@ -1445,7 +1455,7 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
                 }
             }
 
-            if (abCut && depth > 0 && !limitCompletions) {
+            if (abCut && depth > 0 && doABPrune) {
                 RESIZESTATEBOARD(state, oldBoardSize);
                 memcpy(state->board, oldBoard, state->boardSize);
                 delete[] moves;

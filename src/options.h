@@ -12,7 +12,7 @@
 // check bounds at the start of a node to see if it's a win
 //#define SOLVER_CHECK_BOUNDS
 
-// don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE, don't use with SOLVER_SUBSTITUTE
+// don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE, likely incompatible with SOLVER_SUBSTITUTE
 //#define SOLVER_FIX_MEMORY_LEAK
 
 // ignore dominated moves
@@ -22,7 +22,7 @@
 #define SOLVER_DELETE_SUBGAMES
 
 // 0: sum of black and white moves, 1: sum of black and white undominated moves, 2: length (in tiles)
-// This requires rebuilding the database
+// changing this requires rebuilding the database
 #define SUBGAME_COMPLEXITY_METRIC 0
 
 

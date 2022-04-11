@@ -4,6 +4,8 @@
 
 A 1 dimensional Clobber solver mostly following the specification of assignments 1 and 2.
 
+g++ is used to build the solver; clang might not work, which can be a problem for Mac OS.
+
 The "sample_c++" and "tests" directories in the src/instructorSolution directory are derived from the "ualberta-mueller-group/clobber_1xn" repository shared with us -- we did not write this code. We added a makefile and rearranged the test cases in these directories, and added a few scripts to the src/instructorSolution directory for testing.
 
 Our source code is in the "src" directory, and consists of all the .h and .cpp files. A makefile in this directory can build the solver and do various other things.

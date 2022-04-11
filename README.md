@@ -31,7 +31,7 @@ will run correctness tests based on the testlist.txt in the instructorSolution d
 
 `make corr`
 
-will run the tests and check the moves against the reference solver provided to us. The reference solver is much slower, and so is this test, so results from it are cached by the testing scripts in a .json file.
+will run the tests and check the moves against the reference solver provided to us. The reference solver is much slower, and so is this test, so results from the reference solver are cached by the testing scripts in a .json file.
 
 `make cleanall`
 

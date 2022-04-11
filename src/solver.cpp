@@ -192,11 +192,11 @@ int BasicSolver::solveID(State *state, int p, int n) {
         maxCompleted += 50;
 
         //used to be 150
-        if (depth > 300) {
+        if (depth >= 30) {
             limitCompletions = false;
         }
 
-        if (maxDepth >= 10) {
+        if (maxDepth >= 18) { //was 10
             doABPrune = true;
         }
 

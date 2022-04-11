@@ -4,7 +4,7 @@
 
 A 1 dimensional Clobber solver mostly following the specification of assignments 1 and 2.
 
-The "sample_c++" and "tests" directories in the src/instructorSolution directory are derived from the "ualberta-mueller-group/clobber_1xn" repository shared with us -- we did not write that code. We added a makefile and rearranged the test cases in these directories, and added a few scripts to the src/instructorSolution directory for testing.
+The "sample_c++" and "tests" directories in the src/instructorSolution directory are derived from the "ualberta-mueller-group/clobber_1xn" repository shared with us -- we did not write this code. We added a makefile and rearranged the test cases in these directories, and added a few scripts to the src/instructorSolution directory for testing.
 
 Our source code is in the "src" directory, and consists of all the .h and .cpp files. A makefile in this directory can build the solver and do various other things.
 

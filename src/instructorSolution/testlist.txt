@@ -1,19 +1,24 @@
 # This is a comment
 
-modified/easy.txt_processed
-modified/tests_small_more_time.txt_processed
-modified/tests_small.txt_processed
+finalTests/easy.txt_processed
+finalTests/tests_small_more_time.txt_processed
+finalTests/tests_small.txt_processed
+finalTests/standard.txt_processed
+finalTests/standard_more_time.txt_processed
+finalTests/hard.txt_processed
+finalTests/random.txt_processed
+finalTests/special.txt_processed
+finalTests/added_random.txt_processed
+finalTests/random_more_time.txt_processed
+finalTests/added_hard.txt_processed
+finalTests/random_hard.txt_processed
 
-modified/standard.txt_processed
-modified/standard_more_time.txt_processed
-modified/hard.txt_processed
-modified/random.txt_processed
+# these are to verify the hypotheses, you can uncomment them to see the results
+# finalTests/(BBW)^n-17.txt
+# finalTests/(BBW)^n18-20.txt
+# finalTests/(BWW)^n-21-25.txt
 
-modified/special.txt_processed
+# finalTests/(WB)^n-20.txt
 
-modified/added_random.txt_processed
-modified/random_more_time.txt_processed
-
-modified/added_hard.txt_processed
-
-modified/random_hard.txt_processed
+# finalTests/BW_consecutive_35_55.txt
+# finalTests/500_random.txt

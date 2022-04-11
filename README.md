@@ -12,32 +12,32 @@ Our source code is in the "src" directory, and consists of all the .h and .cpp f
 
 In the src directory, 
 
-make TheSolvers
+`make TheSolvers`
 
 will build the solver, while
 
-make run
+`make run`
 
 will build the solver and demonstrate usage.
 
 
-./TheSolvers
+`./TheSolvers`
 
 after building will also demonstrate usage.
 
-make fcorr
+`make fcorr`
 
 will run correctness tests based on the testlist.txt in the instructorSolution directory. This test doesn't check that the returned move is correct, though
 
-make corr
+`make corr`
 
 will run the tests and check the moves against the reference solver provided to us. The reference solver is much slower, and so is this test, so results from it are cached by the testing scripts in a .json file.
 
-make cleanall
+`make cleanall`
 
 will delete the solver executable and object files, and those for the reference solver in the instructorSolution/sample_c++ directory.
 
-make db
+`make db`
 
 Will build the database again. When building the database, you will need to edit options.h as follows:
 Comment out SOLVER_SUBSTITUTE, and enable SOLVER_FIX_MEMORY_LEAK.

@@ -27,7 +27,7 @@ after building will also demonstrate usage.
 
 `make fcorr`
 
-will run correctness tests based on the testlist.txt in the instructorSolution directory. This test doesn't check that the returned move is correct, though
+will run correctness tests based on the testlist.txt in the instructorSolution directory. This test only checks that the outcome is correct, and doesn't check that the returned move is correct, though
 
 `make corr`
 

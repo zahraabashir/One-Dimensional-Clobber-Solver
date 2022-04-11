@@ -55,7 +55,7 @@ SUBGAME_COMPLEXITY_METRIC 1 in options.h (considering the complexity of a subgam
 
 
 
-## Test files
+### Test files
 The final tests files are located in: `src/instructorSolution/tests/finalTests`.
 
 The address of all the files to be tested is listed on the `testlist.txt`. By commenting each row, you can exclude it from being executed. (use # for commenting) 

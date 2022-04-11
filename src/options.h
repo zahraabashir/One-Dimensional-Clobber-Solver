@@ -9,7 +9,7 @@
 // allow alpha beta pruning
 //#define SOLVER_ALPHA_BETA
 
-// don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE
+// don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE, don't use with SOLVER_SUBSTITUTE
 //#define SOLVER_FIX_MEMORY_LEAK
 
 // ignore dominated moves

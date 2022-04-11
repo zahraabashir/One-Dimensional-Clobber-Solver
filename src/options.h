@@ -9,6 +9,9 @@
 // allow alpha beta pruning
 //#define SOLVER_ALPHA_BETA
 
+// check bounds at the start of a node to see if it's a win
+//#define SOLVER_CHECK_BOUNDS
+
 // don't use variable board sizes -- fix board sizes to FIXED_BOARD_SIZE, don't use with SOLVER_SUBSTITUTE
 //#define SOLVER_FIX_MEMORY_LEAK
 

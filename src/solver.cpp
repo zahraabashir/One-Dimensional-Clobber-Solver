@@ -983,13 +983,33 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 //        return pair<int, bool>(boundWin, true);
 //    }
 
-    #if defined(SOLVER_ALPHA_BETA)
+    #if defined(SOLVER_ALPHA_BETA) or defined(SOLVER_CHECK_BOUNDS)
     Bound a, b;
+
+
+    #if not defined(SOLVER_CHECK_BOUNDS)
     if (doABPrune) {
         generateBounds(state, a, b);
     }
+    #else
+    generateBounds(state, a, b);
+    #endif
     rb1 = a;
     rb2 = b;
+
+    #if defined(SOLVER_CHECK_BOUNDS)
+    if (a > Bound(0, false)) {
+        RESIZESTATEBOARD(state, oldBoardSize);
+        memcpy(state->board, oldBoard, state->boardSize);
+        return pair<int, bool>(1, true);
+    }
+
+    if (b < Bound(0, false)) {
+        RESIZESTATEBOARD(state, oldBoardSize);
+        memcpy(state->board, oldBoard, state->boardSize);
+        return pair<int, bool>(2, true);
+    }
+    #endif
     #endif
 
     //lookup entry

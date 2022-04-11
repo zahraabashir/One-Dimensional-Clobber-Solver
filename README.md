@@ -46,7 +46,9 @@ Comment out SOLVER_SUBSTITUTE, and enable SOLVER_FIX_MEMORY_LEAK.
 
 
 
-## Known Bugs
+## Known Bugs/Limitations
+64 bit types are used to store some bit vectors, so connected subgames exceeding 64 moves might possibly have correctness/performance issues, though this hasn't been confirmed.
+
 When the first player has no move, "0-0" is sometimes printed instead of "None", but this is a minor formatting issue, and not a correctness issue.
 
 The BasicSolver class in Solver.h and Solver.cpp has a memory leak as it doesn't clean up the transposition table properly on exit. This is easy to fix, and the BasicSolver destructor has code to do this, but it's left commented out, to speed up subsequent invocations of the solver. This is because substituting simpler games in place of subgames can increase the size of the board, so the transposition table allows variable size boards, which is achieved by storing a pointer to a board buffer in each entry whose size can vary per entry. This doesn't affect correctness, and memory is only leaked on deletion of the solver, so this doesn't affect long searches. Enabling SOLVER_FIX_MEMORY_LEAK in options.h solves this by fixing the board size, though is incompatable with SOLVER_SUBSTITUTE.

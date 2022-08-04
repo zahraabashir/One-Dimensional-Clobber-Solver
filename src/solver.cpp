@@ -134,6 +134,10 @@ BasicSolver::~BasicSolver() {
     delete rng;
 }
 
+void BasicSolver::reset() {
+    node_count = 0;
+}
+
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
     uint8_t len = BOARDLEN(entry);
     char *entryBoard = BOARDPTR(entry);

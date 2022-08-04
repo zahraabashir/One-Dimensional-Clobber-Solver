@@ -123,6 +123,8 @@ class BasicSolver {
     BasicSolver(int rootPlayer, int boardSize, Database *db);
     ~BasicSolver();
 
+    void reset();
+
     //true if the given entry matches the state and player
     bool validateTableEntry(State *state, int p, char *entry);
 

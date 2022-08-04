@@ -7,6 +7,9 @@ CC = g++
 FLAGS = -Wall --std=c++17 -O3
 
 .PHONY: dbtest
+.PHONY: build
+
+build: TheSolvers
 
 run: TheSolvers
 	./TheSolvers BWBWBWBWBWBW W 200

@@ -39,3 +39,6 @@
 // games are only substituted if they are in the database, and have both dominance and bound information (so the minimum of these will determine what games can be substituted)
 
 
+// Force the solver to make a move at the root node, even if the root node is already solved in the transposition table
+// Without this option, moves printed to stdout are invalid after the first input is solved
+#define FORCE_ROOT_MOVE

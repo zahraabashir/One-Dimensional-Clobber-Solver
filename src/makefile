@@ -12,7 +12,7 @@ FLAGS = -Wall --std=c++17 -O3
 build: TheSolvers
 
 run: TheSolvers
-	./TheSolvers BWBWBWBWBWBW W 200
+	echo "BWBWBWBWBWBW W 200" | ./TheSolvers
 
 TheSolvers: main.o database.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
@@ -72,4 +72,4 @@ referenceSolver:
 	make -C instructorSolution/sample_c++/code
 
 hardtest: TheSolvers
-	time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500
+	time echo "BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500" | ./TheSolvers 

@@ -136,6 +136,8 @@ BasicSolver::~BasicSolver() {
 
 void BasicSolver::reset() {
     node_count = 0;
+    best_from = -1;
+    best_to = -1;
 }
 
 bool BasicSolver::validateTableEntry(State *state, int p, char *entry) {
@@ -266,9 +268,11 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
     char *entry = getTablePtr(code);
 
     bool validEntry = validateTableEntry(state, p, entry);
+    #if not defined(FORCE_ROOT_MOVE)
     if (validEntry && OUTCOME(entry) != EMPTY) {
         return pair<int, bool>(OUTCOME(entry), true);
     }
+    #endif
 
     if (!validEntry && PLAYER(entry) != 0) {
         //collisions++;

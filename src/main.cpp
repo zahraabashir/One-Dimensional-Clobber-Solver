@@ -27,7 +27,7 @@ int main(int _argc, char **_argv) {
 
 
     while (true) {
-        solver.reset(); //Just reset visited node count
+        solver.reset(); //Reset things that are invalid for subsequent inputs
 
         string input;
         getline(cin, input);

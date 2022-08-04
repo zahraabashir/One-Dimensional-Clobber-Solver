@@ -5,6 +5,10 @@ import os
 import sys
 import json
 
+from subprocess import Popen, PIPE
+
+proc = Popen("./TheSolvers", stdin = PIPE, stdout = PIPE, stderr = PIPE)
+
 testStats = {"totalTime": 0, "totalTests": 0, "correct": 0, "failed": 0, "wrongMove": 0}
 
 fastMode = False
@@ -69,12 +73,16 @@ def runTest(inputLine, outputLine):
     board, toPlay, timeLimit = inputLine.split()
     expectedWinner, expectedMove = outputLine.split()[1 : 3]
 
-    command = "./TheSolvers %s %s %s" % (board, toPlay, "100") 
+    #command = "./TheSolvers %s %s %s" % (board, toPlay, "100") 
+    command = "%s %s %s" % (board, toPlay, "100")
 
     start = time.clock_gettime(time.CLOCK_MONOTONIC)
-    result = subprocess.run(command, capture_output = True, shell = True)
+    #result = subprocess.run(command, capture_output = True, shell = True)
+    proc.stdin.write(bytes(command + "\n", encoding = "utf-8"))
+    proc.stdin.flush()
+    output = proc.stdout.readline().decode("utf-8")
     end = time.clock_gettime(time.CLOCK_MONOTONIC)
-    output = result.stdout.decode("utf-8").rstrip("\n")
+    #output = result.stdout.decode("utf-8").rstrip("\n")
 
     testTime = end - start
     testStats["totalTime"] += testTime

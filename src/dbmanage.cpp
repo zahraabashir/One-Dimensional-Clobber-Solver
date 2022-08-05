@@ -8,8 +8,15 @@
 #include <map>
 #include "options.h"
 
+#if defined(SOLVER_FIX_MEMORY_LEAK)
+#error Not implemented
+#endif
+
 using namespace std;
 
+BasicSolver *solver = NULL;
+
+uint64_t savedDuplicates = 0;
 
 
 int gameResult(Database &db, char *board, int boardSize, int player) {
@@ -19,7 +26,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 
 
     #if defined(SOLVER_FIX_MEMORY_LEAK)
-    BasicSolver *solver = new BasicSolver(player, FIXED_BOARD_SIZE, &db);
+    //BasicSolver *solver = new BasicSolver(player, FIXED_BOARD_SIZE, &db);
 
     char boardText[FIXED_BOARD_SIZE + 1];
     memset(boardText, '.', FIXED_BOARD_SIZE);
@@ -29,7 +36,8 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
         boardText[i] = playerNumberToChar(board[i]);
     }
     #else
-    BasicSolver *solver = new BasicSolver(player, boardSize, &db);
+    //BasicSolver *solver = new BasicSolver(player, boardSize, &db);
+    solver->rootPlayer = player;
 
     char boardText[boardSize + 1];
     boardText[boardSize] = 0;
@@ -47,7 +55,7 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 
     result = solver->solveID(root, player, opponentNumber(player));
 
-    delete solver;
+    //delete solver;
     delete root;
 
     return result;
@@ -185,8 +193,12 @@ void printBits(int x, int length) {
 
 int main() {
 
+
+
     Database db;
     //db.load(); //might be wrong to load here
+
+    solver = new BasicSolver(0, 100, &db);
 
     //(low, high, outcome) --> pointer to vector of UDMoveCount1, link1, UDMoveCount2, link2, ...
     map<triple<int, int, int>, vector<int> *> udMap;
@@ -314,7 +326,8 @@ int main() {
 
             {
                 auto start = chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(1, length, &db);
+                //BasicSolver *solver = new BasicSolver(1, length, &db);
+                solver->rootPlayer = 1;
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
@@ -322,13 +335,14 @@ int main() {
                 
                 result1 = solver->solveID(root, 1, opponentNumber(1));
 
-                delete solver;
+                //delete solver;
                 delete root;
             }
 
             {
                 auto start = chrono::steady_clock::now();
-                BasicSolver *solver = new BasicSolver(2, length, &db);
+                //BasicSolver *solver = new BasicSolver(2, length, &db);
+                solver->rootPlayer = 2;
                 solver->timeLimit = 1000000000.0;
                 solver->startTime = start;
 
@@ -336,7 +350,7 @@ int main() {
                 
                 result2 = solver->solveID(root, 2, opponentNumber(2));
 
-                delete solver;
+                //delete solver;
                 delete root;
             }
 
@@ -406,6 +420,11 @@ int main() {
                         s1.play(moves[2 * i], moves[2 * i + 1], undo1);
 
                         for (int j = i + 1; j < moveCount; j++) {
+                            if (((domBlack >> i) & 1) && ((domBlack >> j) & 1)) {
+                                savedDuplicates += 1;
+                                continue;
+                            }
+
                             s2.play(moves[2 * j], moves[2 * j + 1], undo2);
 
                             memcpy(sumBoard, s1.board, length);
@@ -464,6 +483,12 @@ int main() {
                         s1.play(moves[2 * i], moves[2 * i + 1], undo1);
 
                         for (int j = i + 1; j < moveCount; j++) {
+                            if (((domWhite >> i) & 1) && ((domWhite >> j) & 1)) {
+                                savedDuplicates += 1;
+                                continue;
+                            }
+
+
                             s2.play(moves[2 * j], moves[2 * j + 1], undo2);
 
                             memcpy(sumBoard, s1.board, length);
@@ -688,7 +713,11 @@ int main() {
 
 
 
+    delete solver;
+
 
     db.save();
+
+    cout << "Duplicates avoided: " << savedDuplicates << endl;
     return 0;
 }

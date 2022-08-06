@@ -17,6 +17,9 @@ TheSolvers: main.o database.o utils.o state.o solver.o bound.o
 DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
+DBManage2: dbmanage2.o database2.o utils.o state.o solver.o bound.o
+	$(CC) $(FLAGS) $^ -o $@
+
 %.o: %.cpp %.h options.h
 	$(CC) $(FLAGS) $< -o $@ -c
 
@@ -57,6 +60,10 @@ ptest: TheSolvers
 db: DBManage
 	touch database.bin
 	./DBManage
+
+db2: DBManage2
+	touch database2.bin
+	./DBManage2
 
 dbtest: database.o dbtest.o utils.o state.o
 	$(CC) $(FLAGS) $^ -o $@

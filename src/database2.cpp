@@ -198,6 +198,7 @@ unsigned char *Database::get(int len, char *board) {
     return NULL;
 }
 
+//This function is used by simplify() in the solver to get entries from links
 unsigned char *Database::getFromIdx(int idx) {
     return NULL;
 }

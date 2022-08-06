@@ -73,6 +73,7 @@ class Database {
   private:
     FILE *file;
     char *data;
+    char *table;
     ShapeNode *shapeTree;
 
     uint64_t shapeIndexEntries;
@@ -83,11 +84,14 @@ class Database {
 
     void genShapes(ShapeNode *node, int prev, const std::vector<int> &shape, int remaining);
     void visitShapeTree(ShapeNode *node);
-    void revisitShapeTree(ShapeNode *node, char **shapeIndex, uint64_t *tableOffset);
+    //void revisitShapeTree(ShapeNode *node, char **shapeIndex, uint64_t *tableOffset);
+
+    void revisitShapeTree(ShapeNode *node, std::vector<ShapeNode *> &nodeList);
 
     uint64_t totalBytes;
 
 
+    uint64_t searchShapeIndex(uint64_t shapeID);
 
   public:
     Database();

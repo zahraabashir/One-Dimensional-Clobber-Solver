@@ -108,6 +108,11 @@ int *State::getMoves(const int &player, const int &opponent, size_t *moveCount) 
 
 std::ostream &operator<<(std::ostream &os, const State &s) {
     //os << "[" << s.board << " " << playerNumberToChar(s.player) << "]";
-    os << "[" << s.board << " " << "]";
+    os << "{L: " << s.boardSize << "} [";
+    for (int i = 0; i < s.boardSize; i++) {
+        os << playerNumberToChar(s.board[i]);
+    }
+    os << "]";
+
     return os;
 }

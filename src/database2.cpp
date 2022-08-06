@@ -308,11 +308,7 @@ uint64_t Database::searchShapeIndex(uint64_t shapeID) {
     return ((uint64_t) 0) - 1;
 }
 
-unsigned char *Database::get(int len, char *board) {
-    if (len > DB_MAX_BITS) {
-        return 0;
-    }
-
+uint64_t Database::getIdx(int len, char *board) {
     vector<pair<int, int>> subgames = getSubgames(len, board);
     vector<pair<int, char*>> shapeData;
 
@@ -329,20 +325,8 @@ unsigned char *Database::get(int len, char *board) {
     uint64_t offset = searchShapeIndex(id); //offset to get to the correct table section
 
     if (offset == (((uint64_t) 0) - 1)) {
-        return NULL;
+        return offset;
     }
-
-    /*
-        Need to convert board to an index
-        Original database does this to generate index within a length:
-
-        int power = 1;
-        for (int i = 0; i < len; i++) {
-            idx += board[i] == 2 ? power : 0;
-            power *= 2;
-        }
-    */
-
 
     int index = 0;
     int power = 1;
@@ -353,10 +337,24 @@ unsigned char *Database::get(int len, char *board) {
         }
     }
 
-    return (unsigned char *) (table + offset + index);
+    return offset + index;
+}
+
+unsigned char *Database::get(int len, char *board) {
+    if (len > DB_MAX_BITS) {
+        return 0;
+    }
+
+    uint64_t idx = getIdx(len, board);
+
+    if (idx == ((uint64_t) 0) - 1) {
+        return 0;
+    }
+
+    return (unsigned char *) (table + idx);
 }
 
 //This function is used by simplify() in the solver to get entries from links
 unsigned char *Database::getFromIdx(int idx) {
-    return NULL;
+    return (unsigned char *) (table + idx);
 }

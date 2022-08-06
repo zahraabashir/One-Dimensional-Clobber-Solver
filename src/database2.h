@@ -99,10 +99,12 @@ class Database {
 
     void initData();
 
+    uint64_t getIdx(int len, char *board);
+
 
     //Need to implement these so that the linker doesn't complain
     unsigned char *get(int len, char *board);
-    unsigned char *getFromIdx(int idx);
+    unsigned char *getFromIdx(int idx); //TODO change this to uint64_t
 
     void load();
     void save();

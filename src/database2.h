@@ -68,14 +68,14 @@ struct ShapeNode {
     ~ShapeNode();
 };
 
+
 class Database {
   private:
     FILE *file;
-    unsigned char *data;
+    char *data;
     ShapeNode *shapeTree;
 
     uint64_t shapeIndexEntries;
-    //
     uint64_t gameEntries;
 
     void initShapeTree();
@@ -83,11 +83,17 @@ class Database {
 
     void genShapes(ShapeNode *node, int prev, const std::vector<int> &shape, int remaining);
     void visitShapeTree(ShapeNode *node);
+    void revisitShapeTree(ShapeNode *node, char **shapeIndex, uint64_t *tableOffset);
+
+    uint64_t totalBytes;
+
 
 
   public:
     Database();
     ~Database();
+
+    void initData();
 
 
     //Need to implement these so that the linker doesn't complain

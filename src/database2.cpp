@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdio.h>
 #include "database2.h"
 
 using namespace std;
@@ -89,6 +90,20 @@ void Database::visitShapeTree(ShapeNode *node) {
     }
 }
 
+void Database::revisitShapeTree(ShapeNode *node, char **shapeIndex, uint64_t *tableOffset) {
+    if (node->shape.size() > 0) {
+        (*shapeIndex)[0] = node->id;
+        (*shapeIndex)[1] = *tableOffset;
+
+        *shapeIndex += 2 * sizeof(uint64_t);
+        *tableOffset += node->entryCount * DB_ENTRY_SIZE;
+    }
+
+    for (ShapeNode *child : node->children) {
+        revisitShapeTree(child, shapeIndex, tableOffset);
+    }
+}
+
 void Database::initMemory() {
     shapeIndexEntries = 0;
     gameEntries = 0;
@@ -97,11 +112,27 @@ void Database::initMemory() {
 
     cout << "Shape index entries: " << shapeIndexEntries << endl;
     cout << "Game entries: " << gameEntries << endl;
-    
+
+    uint64_t shapeIndexHeaderBytes = sizeof(uint32_t);
+    uint64_t shapeIndexBytes = shapeIndexEntries * (2 * sizeof(uint64_t));
+    uint64_t gameEntryBytes = DB_ENTRY_SIZE * gameEntries;
+
+    totalBytes = shapeIndexHeaderBytes + shapeIndexBytes + gameEntryBytes;
+   
 
 
-    // shape index
-    // lookup tree 
+    cout << "Total bytes: " << totalBytes << endl;
+
+    data = new char[totalBytes];
+
+    *((uint32_t *) data) = shapeIndexEntries;
+
+    uint64_t tableOffset = 0;
+    char *shapeIndex = (data + sizeof(uint32_t));
+
+    revisitShapeTree(shapeTree, &shapeIndex, &tableOffset);
+
+    // shape index (map from shape ID to entries)
     // entries
 }
 
@@ -125,23 +156,42 @@ ShapeNode::~ShapeNode() {
     }
 }
 
-Database::Database() {
+void Database::initData() {
     initShapeTree();
     initMemory();
+}
+
+Database::Database() {
+    data = NULL;
 }
 
 
 Database::~Database() {
     delete shapeTree;
+
+    if (data != NULL) {
+        delete[] data;
+    }
 }
 
 void Database::load() {
+    file = fopen("database2.bin", "r+");
+
+    fseek(file, 0L, SEEK_END);
+    totalBytes = ftell(file);
+    fseek(file, 0L, SEEK_SET);
+
+    data = new char[totalBytes];
+
+    fread(data, 1, totalBytes, file);
+    fclose(file);
 }
 
 void Database::save() {
+    file = fopen("database2.bin", "r+");
+    fwrite(data, 1, totalBytes, file);
+    fclose(file);
 }
-
-
 
 
 unsigned char *Database::get(int len, char *board) {

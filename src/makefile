@@ -27,13 +27,16 @@ DBManage2: dbmanage2.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o TheSolvers DBManage dbtest
+	-rm *.o TheSolvers DBManage dbtest DBManage2
 
 cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code
 
 rmdb:
 	-rm database.bin
+
+rmdb2:
+	-rm database2.bin
 
 #@echo "This is a W position"
 #./TheSolvers BWW.BW.WB.WBWWWWWBWWBBWBBBB W 1

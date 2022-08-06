@@ -22,5 +22,9 @@ int main() {
 
     Database db;
 
+    db.load();
+    db.save();
+
+
     return 0;
 }

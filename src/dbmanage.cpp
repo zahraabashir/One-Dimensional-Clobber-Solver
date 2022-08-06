@@ -53,7 +53,6 @@ int gameResult(Database &db, char *board, int boardSize, int player) {
 
     State *root = new State(boardText, player);
 
-
     result = solver->solveID(root, player, opponentNumber(player));
 
     //delete solver;
@@ -533,7 +532,7 @@ int main() {
                 DB_SET_DOMINATED(entry, 1, domBlack);
                 DB_SET_DOMINATED(entry, 2, domWhite);
 
-                #if SUBGAME_COMPLEXITY_METRIC == 1
+                #if SUBGAME_COMPLEXITY_METRIC  == 1
                 UDMoveCount -= (sumBits(domBlack) + sumBits(domWhite));
                 #endif
 
@@ -679,36 +678,12 @@ int main() {
                     char *sumGame = addGames(length, board, itemLength, game);
                     int sumLength = length + 1 + itemLength;
 
-
-                    for (int i = 0; i < sumLength; i++) {
-                        cout << playerNumberToChar(sumGame[i]);
-                    }
-                    cout << endl;
-
                     int oc1 = gameResult(db, sumGame, sumLength, 1);
-
-                    for (int i = 0; i < sumLength; i++) {
-                        cout << playerNumberToChar(sumGame[i]);
-                    }
-                    cout << endl;
-
                     int oc2 = gameResult(db, sumGame, sumLength, 2);
-
-                    for (int i = 0; i < sumLength; i++) {
-                        cout << playerNumberToChar(sumGame[i]);
-                    }
-                    cout << endl;
 
                     if (oc1 == 2 && oc2 == 1) {
                         cout << "EQ: ";
-                        
-                        //DEBUG
-                        for (int j = 0; j < length; j++) {
-                            cout << playerNumberToChar(board[j]);
-                        }
-                        cout << ".";
-
-                        //negateGame(itemLength, game);
+                        negateGame(itemLength, game);
                         for (int j = 0; j < itemLength; j++) {
                             cout << playerNumberToChar(game[j]);
                         }

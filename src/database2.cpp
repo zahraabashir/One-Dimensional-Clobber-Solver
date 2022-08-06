@@ -144,7 +144,7 @@ void Database::initMemory() {
     *((uint32_t *) data) = shapeIndexEntries;
 
     uint64_t tableOffset = 0;
-    char *shapeIndex = (data + sizeof(uint32_t));
+    uint64_t *shapeIndex = (uint64_t *) (data + sizeof(uint32_t));
 
     vector<ShapeNode *> nodeList;
 
@@ -156,7 +156,8 @@ void Database::initMemory() {
         shapeIndex[0] = node->id;
         shapeIndex[1] = tableOffset;
 
-        shapeIndex += 2 * sizeof(uint64_t);
+
+        shapeIndex += 2;
         tableOffset += node->entryCount * DB_ENTRY_SIZE;
     }
 
@@ -287,7 +288,10 @@ uint64_t Database::searchShapeIndex(uint64_t shapeID) {
     while (low <= high) {
         int i = (low + high) / 2;
 
+
         uint64_t id = base[i * 2];
+
+
 
         if (id == shapeID) {
             return base[i * 2 + 1];

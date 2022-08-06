@@ -203,15 +203,6 @@ int BasicSolver::solveID(State *state, int p, int n) {
 
         //cout << depth << endl;
 
-        if (outOfTime) {
-            cout << "OUT OF TIME" << endl;
-        }
-        cout << "New ID iteration: " << depth << " " << maxCompleted << endl;
-
-        if (depth > 1000) {
-            while(1){}
-        }
-
 
         #if defined(SOLVER_ALPHA_BETA)
         Bound alpha = Bound::min();
@@ -221,8 +212,6 @@ int BasicSolver::solveID(State *state, int p, int n) {
         #else
         pair<int, bool> result = rootSearchID(state, p, n, 0);
         #endif
-
-        cout << "Result: " << result.first << " " << result.second << endl;
 
         if (outOfTime) {
             return EMPTY;
@@ -274,7 +263,6 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
 
     bool validEntry = validateTableEntry(state, p, entry);
     if (validEntry && OUTCOME(entry) != EMPTY) {
-        cout << "Returning from root with table lookup..." << endl;
         return pair<int, bool>(OUTCOME(entry), true);
     }
 
@@ -364,7 +352,6 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
         }        
 
         delete[] moves;
-        cout << "Returning from root with new generated heuristic" << endl;
         return pair<int, bool>(h, false);
     }
 
@@ -530,8 +517,6 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth)
         DEPTH(entry) = depth;
         HEURISTIC(entry) = bestVal;
     }
-    cout << "Returning from root, not all proven..." << endl;
-
     return pair<int, bool>(bestVal, false);
 }
 
@@ -603,10 +588,6 @@ bool subgameCompare(const pair<int, int> &a, const pair<int, int> &b) {
 
 
 void BasicSolver::simplify(State *state, int depth) {
-    cout << "BEFORE: " << *state << endl;
-
-
-
     char *board = state->board; //MUST reassign this after deleting state->board
 
 
@@ -894,8 +875,6 @@ void BasicSolver::simplify(State *state, int depth) {
     state->board = minBuffer;
     state->boardSize = minSize;
     #endif
-
-    cout << "AFTER: " << *state << endl;
 
 }
 
@@ -1349,15 +1328,6 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
         RESIZESTATEBOARD(state, oldBoardSize);
         memcpy(state->board, oldBoard, state->boardSize);
         delete[] moves;
-        cout << "Tree too deep below root, returning: ";
-        cout << (depth == maxDepth) << " " << depth << " " << maxDepth << "||";
-        cout << (limitCompletions && (completed >= maxCompleted));
-        cout << endl;
-        cout << p << " ";
-        for (int i = 0; i < state->boardSize; i++) {
-            cout << playerNumberToChar(state->board[i]);
-        }
-        cout << endl;
         return pair<int, bool>(h, false);
     }
 
@@ -1413,11 +1383,6 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     int newBestMove = 0;
 
     bool allProven = true;
-
-    if (moveCount > 0 && moveOrder.size() == 0) {
-        cout << "All moves pruned but didn't return..." << endl;
-        while(1){}
-    }
 
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;

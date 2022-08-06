@@ -1,4 +1,0 @@
-The problem is this:
-
-BEFORE: {L: 16} [WW.BWBBW.BBWBWWW]
-AFTER: {L: 16} [BWBBW.WBWWWBBWWB]

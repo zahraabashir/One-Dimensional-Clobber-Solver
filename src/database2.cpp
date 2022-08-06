@@ -208,14 +208,17 @@ void Database::initData() {
 
 Database::Database() {
     data = NULL;
+    shapeTree = NULL;
 }
 
 
 Database::~Database() {
-    delete shapeTree;
-
     if (data != NULL) {
         delete[] data;
+    }
+
+    if (shapeTree != NULL) {
+        delete shapeTree;
     }
 }
 

@@ -39,8 +39,6 @@ bool shapeListSort(const ShapeNode *n1, const ShapeNode *n2) {
 
 
 void processBoard(int len, char *board, char *boardText) {
-    cout << "{" << len << "}" << endl;
-
     unsigned char *entry = db->get(len, board);
 
     cout << ((uint64_t *) entry) << endl;
@@ -63,18 +61,6 @@ void processBoard(int len, char *board, char *boardText) {
 int main() {
     db = new Database();
     db->initData();
-
-    char b1[] = {1, 1, 0};
-    char b2[] = {1, 1, 0, 1, 1, 0};
-
-    cout << (uint64_t *) db->get(2, b1) << endl;
-    cout << (uint64_t *) db->get(5, b2) << endl;
-
-    delete db;
-    return 0;
-
-
-
 
     //Get all shapes
     vector<ShapeNode *> shapeList;

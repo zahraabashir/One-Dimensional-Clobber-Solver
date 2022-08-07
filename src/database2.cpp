@@ -195,14 +195,10 @@ uint64_t shapeDataToID(const vector<pair<int, char *>> &shapeData) {
     uint64_t id = 0;
 
     uint64_t exponent = 1;
-    cout << "//";
     for (const pair<int, char *> &chunk : shapeData) {
-        cout << chunk.first << " ";
-
         id += chunk.first * exponent;
         exponent <<= shift;
     }
-    cout << "\\\\" << endl;
 
     return id;
 }
@@ -255,38 +251,29 @@ void Database::save() {
     fclose(file);
 }
 
-vector<pair<int, int>> getSubgames(int len, char *board) {
-    vector<pair<int, int>> subgames;
+vector<pair<int, int>> getChunks(int len, char *board) {
+    vector<pair<int, int>> chunks;
 
     int start = -1;
-    int end = -1;
-
-    int foundMask = 0;
 
     for (int i = 0; i < len; i++) {
-        if (start == -1 && board[i] != 0) {
+        if (board[i] != 0 && start == -1) {
             start = i;
-            foundMask = 0;
-        }
-        
-        if (board[i] != 0) {
-            foundMask |= board[i];
         }
 
-        if (start != -1 && board[i] == 0) {
-            if (foundMask == 3) {
-                subgames.push_back(pair<int, int>(start, i));
-            }
+        if (board[i] == 0 && start != -1) {
+            chunks.push_back(pair<int, int>(start, i));
             start = -1;
         }
+
     }
 
     if (start != -1) {
-        subgames.push_back(pair<int, int>(start, len));
+        chunks.push_back(pair<int, int>(start, len));
     }
 
           
-    return subgames;
+    return chunks;
 }
 
 bool shapeDataSort(const pair<int, char *> &x1, const pair<int, char *> &x2) {
@@ -324,16 +311,10 @@ uint64_t Database::searchShapeIndex(uint64_t shapeID) {
 }
 
 uint64_t Database::getIdx(int len, char *board) {
-    vector<pair<int, int>> subgames = getSubgames(len, board);
+    vector<pair<int, int>> chunks = getChunks(len, board);
     vector<pair<int, char *>> shapeData;
 
-    cout << "/SG " << endl;
-    for (auto &x : subgames) {
-        cout << "(" << x.first << " " << x.second << ")" << endl;
-    }
-    cout << "\\SG" << endl;
-
-    for (const pair<int, int> &sg : subgames) {
+    for (const pair<int, int> &sg : chunks) {
         int l = sg.second - sg.first;
         char *p = board + sg.first;
 
@@ -357,8 +338,6 @@ uint64_t Database::getIdx(int len, char *board) {
             power *= 2;
         }
     }
-
-    cout << "ID OFFSET INDEX: " << id << " " <<  offset << " " << index << endl;
 
     return offset + index;
 }

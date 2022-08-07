@@ -4,7 +4,7 @@
 
 
 // allow replacement of games with simpler games (games having smaller move counts)
-#define SOLVER_SUBSTITUTE
+//#define SOLVER_SUBSTITUTE
 
 // allow alpha beta pruning
 //#define SOLVER_ALPHA_BETA

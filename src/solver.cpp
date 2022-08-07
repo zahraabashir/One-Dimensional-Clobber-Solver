@@ -630,6 +630,11 @@ void BasicSolver::simplify(State *state, int depth) {
                     cout << "Bad shape in solver simplify: " << shape << " size " << shape.size() << endl;
                     cout << ((uint64_t *) entry) << endl;
                     cout << ((uint64_t *) linkedEntry) << endl;
+                    for (int i = 0; i < len; i++) {
+                        cout << playerNumberToChar(state->board[start + i]);
+                    }
+                    cout << endl;
+
                     while(1){}
                 }
                 newSize += shape[0];

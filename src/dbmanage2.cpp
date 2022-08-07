@@ -49,13 +49,10 @@ void processBoard(int len, char *board, char *boardText) {
         }
     }
 
-    if (DB_GET_OUTCOME(entry) != 0) {
-        cout << "Outcome not 0 for: " << boardText << " (was " << DB_GET_OUTCOME(entry) << ")" << endl;
-        while (1) {
-        }
-    }
 
-    DB_SET_OUTCOME(entry, 1);
+
+
+
 }
 
 int main() {

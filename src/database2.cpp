@@ -195,10 +195,14 @@ uint64_t shapeDataToID(const vector<pair<int, char *>> &shapeData) {
     uint64_t id = 0;
 
     uint64_t exponent = 1;
+    cout << "//";
     for (const pair<int, char *> &chunk : shapeData) {
+        cout << chunk.first << " ";
+
         id += chunk.first * exponent;
         exponent <<= shift;
     }
+    cout << "\\\\" << endl;
 
     return id;
 }
@@ -323,6 +327,12 @@ uint64_t Database::getIdx(int len, char *board) {
     vector<pair<int, int>> subgames = getSubgames(len, board);
     vector<pair<int, char *>> shapeData;
 
+    cout << "/SG " << endl;
+    for (auto &x : subgames) {
+        cout << "(" << x.first << " " << x.second << ")" << endl;
+    }
+    cout << "\\SG" << endl;
+
     for (const pair<int, int> &sg : subgames) {
         int l = sg.second - sg.first;
         char *p = board + sg.first;
@@ -347,6 +357,8 @@ uint64_t Database::getIdx(int len, char *board) {
             power *= 2;
         }
     }
+
+    cout << "ID OFFSET INDEX: " << id << " " <<  offset << " " << index << endl;
 
     return offset + index;
 }

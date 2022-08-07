@@ -1,3 +1,5 @@
+#error Don't use original database
+
 #pragma once
 #include <cstdio>
 #include "options.h"

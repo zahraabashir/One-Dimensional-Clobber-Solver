@@ -4,14 +4,14 @@
 SHELL := /bin/bash
 
 CC = g++
-FLAGS = -Wall --std=c++17 -O3
+FLAGS = -Wall --std=c++17 -g
 
 .PHONY: dbtest
 
 run: TheSolvers
 	./TheSolvers BWBWBWBWBWBW W 200
 
-TheSolvers: main.o database.o utils.o state.o solver.o bound.o
+TheSolvers: main.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
 DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o
@@ -68,7 +68,7 @@ db2: DBManage2
 	touch database2.bin
 	./DBManage2
 
-dbtest: database.o dbtest.o utils.o state.o
+dbtest: database2.o dbtest.o utils.o state.o
 	$(CC) $(FLAGS) $^ -o $@
 	./dbtest
 

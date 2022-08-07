@@ -1,3 +1,5 @@
+#error Don't use original database
+
 #include "database.h"
 #include <iostream>
 

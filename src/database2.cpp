@@ -224,10 +224,13 @@ Database::~Database() {
 }
 
 void Database::load() {
+    cout << "DB LOAD" << endl;
+
     file = fopen("database2.bin", "r+");
 
     fseek(file, 0L, SEEK_END);
     totalBytes = ftell(file);
+    cout << "Database loading " << totalBytes << " bytes" << endl;
     fseek(file, 0L, SEEK_SET);
 
     data = (unsigned char *) calloc(totalBytes, 1);

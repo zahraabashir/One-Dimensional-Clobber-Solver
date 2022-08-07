@@ -272,7 +272,6 @@ vector<pair<int, int>> getChunks(int len, char *board) {
         chunks.push_back(pair<int, int>(start, len));
     }
 
-          
     return chunks;
 }
 

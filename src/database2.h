@@ -12,13 +12,23 @@
 #define OC_P 3
 #define OC_N 4
 
-#define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 4 * sizeof(int))
+
+/*
+char outcome
+uint64_t domBlack
+uint64_t domWhite
+int8_t lowerBound
+int8_t upperBound
+int metric
+int link
+int gameNumber
+uint64_t shape
+*/
+
+#define DB_ENTRY_SIZE (1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int) + sizeof(uint64_t))
 
 #define DB_GET_OUTCOME(entry) (entry == 0 ? 0 : *((unsigned char *) entry))
 #define DB_SET_OUTCOME(entry, value) *((unsigned char *) entry) = value
-
-//#define DB_GET_DOMINATED(entry, player) (entry == 0 ? 0 : *((uint64_t *) (entry + 1 + (sizeof(uint64_t) * (player - 1)))))
-//#define DB_SET_DOMINATED(entry, player, mask) *((uint64_t *) (entry + 1 + (sizeof(uint64_t) * (player - 1)))) = mask
 
 
 #define DB_GET_DOMINATED(entry, player) (entry == 0 ? 0 : ((uint64_t *) (&entry[1]))[player - 1])

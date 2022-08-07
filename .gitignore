@@ -2,5 +2,6 @@
 *.o
 src/TheSolvers
 src/DBManage
+src/DBManage2
 src/dbtest
 **/clobber

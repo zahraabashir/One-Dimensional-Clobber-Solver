@@ -62,8 +62,9 @@ constexpr uint64_t _shiftAmount() {
 struct ShapeNode {
     std::vector<int> shape;
     uint64_t id;
+    int bits;
     size_t entryCount;
-    std::vector<ShapeNode*> children;
+    std::vector<ShapeNode *> children;
 
     ~ShapeNode();
 };
@@ -74,7 +75,6 @@ class Database {
     FILE *file;
     char *data;
     char *table;
-    ShapeNode *shapeTree;
 
     uint64_t shapeIndexEntries;
     uint64_t gameEntries;
@@ -94,6 +94,8 @@ class Database {
     uint64_t searchShapeIndex(uint64_t shapeID);
 
   public:
+    ShapeNode *shapeTree;
+
     Database();
     ~Database();
 

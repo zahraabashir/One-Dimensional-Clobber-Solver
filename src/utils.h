@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ostream>
+#include <vector>
 
 #define EMPTY 0
 #define BLACK 1
@@ -100,3 +101,17 @@ void negateGame(size_t length, char *game);
 
 
 char *generateGame(int length, int game);
+
+template <class T>
+std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
+    os << "[";
+    for (int i = 0; i < vec.size(); i++) {
+        os << vec[i];
+        if (i + 1 < vec.size()) {
+            os << ", ";
+        }
+    }
+    os << "]";
+
+    return os;
+}

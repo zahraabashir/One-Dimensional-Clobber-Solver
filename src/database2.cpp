@@ -40,6 +40,10 @@ void Database::genShapes(ShapeNode *node, int prev, const vector<int> &shape, in
         ShapeNode *node2 = new ShapeNode();
         node2->shape = s;
         node2->id = shapeToID(node2->shape);
+        node2->bits = 0;
+        for (int chunkSize : node2->shape) {
+            node2->bits += chunkSize;
+        }
         node2->entryCount = countShape(s);
         node->children.push_back(node2);
 
@@ -72,11 +76,14 @@ void printTree(ShapeNode *node) {
 
 void Database::initShapeTree() {
     shapeTree = new ShapeNode();
+    shapeTree->id = 0;
+    shapeTree->bits = 0;
+    shapeTree->entryCount = 0;
 
     vector<int> emptyShape;
     genShapes(shapeTree, -1, emptyShape, DB_MAX_BITS);
 
-    printTree(shapeTree);
+    //printTree(shapeTree);
 
 }
 

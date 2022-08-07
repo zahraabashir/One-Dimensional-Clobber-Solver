@@ -334,7 +334,7 @@ uint64_t Database::getIdx(int len, char *board) {
 
     int index = 0;
     int power = 1;
-    for (pair<int, char *> &chunk : shapeData) {
+    for (const pair<int, char *> &chunk : shapeData) {
         for (int i = 0; i < chunk.first; i++) {
             index += chunk.second[i] == 2 ? power : 0;
             power *= 2;

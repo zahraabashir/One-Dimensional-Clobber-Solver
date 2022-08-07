@@ -1,3 +1,6 @@
+//TODO figure out null terminator/length jank
+
+
 #include <iostream>
 #include <vector>
 #include <algorithm>

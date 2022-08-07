@@ -623,7 +623,20 @@ void BasicSolver::simplify(State *state, int depth) {
                 newSize += len;
             } else {
                 unsigned char *linkedEntry = db->getFromIdx(DB_GET_LINK(entry));
-                newSize += DB_GET_SHAPE(linkedEntry);
+
+                uint64_t snum = DB_GET_SHAPE(linkedEntry);
+                vector<int> shape = numberToShapeVector(snum);
+                if (shape.size() != 1) {
+                    cout << "Bad shape in solver simplify: " << shape << " size " << shape.size() << endl;
+                    cout << ((uint64_t *) entry) << endl;
+                    cout << ((uint64_t *) linkedEntry) << endl;
+                    while(1){}
+                }
+                newSize += shape[0];
+
+
+
+                //newSize += DB_GET_SHAPE(linkedEntry);
 
 
                 if (linkedEntry != entry) {

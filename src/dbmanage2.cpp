@@ -4,10 +4,61 @@
 
 #include "database2.h"
 #include "utils.h"
+#include "solver.h"
 
 using namespace std;
 
 Database *db = NULL;
+BasicSolver *solver = NULL;
+
+int gameResult(char *boardText, int player) {
+    int result;
+
+    auto start = chrono::steady_clock::now();
+
+
+    /*
+    #if defined(SOLVER_FIX_MEMORY_LEAK)
+    //BasicSolver *solver = new BasicSolver(player, FIXED_BOARD_SIZE, &db);
+
+    char boardText[FIXED_BOARD_SIZE + 1];
+    memset(boardText, '.', FIXED_BOARD_SIZE);
+    boardText[FIXED_BOARD_SIZE] = 0;
+
+    for (int i = 0; i < boardSize; i++) {
+        boardText[i] = playerNumberToChar(board[i]);
+    }
+    #else
+    //BasicSolver *solver = new BasicSolver(player, boardSize, &db);
+    solver->rootPlayer = player;
+
+    char boardText[boardSize + 1];
+    boardText[boardSize] = 0;
+    for (int i = 0; i < boardSize; i++) {
+        boardText[i] = playerNumberToChar(board[i]);
+    }
+    #endif
+    */
+
+    solver->rootPlayer = player;
+    solver->timeLimit = 1000000000.0;
+    solver->startTime = start;
+
+    State *root = new State(boardText, player);
+
+    result = solver->solveID(root, player, opponentNumber(player));
+
+    //delete solver;
+    delete root;
+
+    return result;
+}
+
+
+
+
+
+
 
 void getShapeList(ShapeNode *node, vector<ShapeNode *> &list) {
     if (node->shape.size() > 0) {
@@ -42,11 +93,13 @@ int main() {
     db = new Database();
     db->initData();
 
+    solver = new BasicSolver(0, 100, db);
+
+
     //Get all shapes
     vector<ShapeNode *> shapeList;
     getShapeList(db->shapeTree, shapeList);
     sort(shapeList.begin(), shapeList.end(), shapeListSort);
-
 
     for (const ShapeNode *node : shapeList) {
         const vector<int> &shape = node->shape;
@@ -101,6 +154,22 @@ int main() {
                 }
             }
 
+
+            //game number, shape, self link
+            DB_SET_NUMBER(entry, number);
+
+            uint64_t snum = shapeVectorToNumber(shape);
+            DB_SET_SHAPE(entry, snum);
+
+            int selfLink = db->getEntryLink(entry);
+            DB_SET_LINK(entry, selfLink);
+
+
+            //domBlack, domWhite
+            //lowerBound, upperBound
+            //metric
+            //outcome
+
             ///////////////////End of process board/////////////////////////////////////////
 
 
@@ -119,6 +188,7 @@ int main() {
     db->save();
 
     delete db;
+    delete solver;
 
     return 0;
 }

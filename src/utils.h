@@ -102,6 +102,13 @@ void negateGame(size_t length, char *game);
 
 char *generateGame(int length, int game);
 
+char *generateGameFromShape(uint64_t shape, int game);
+
+uint64_t shapeVectorToNumber(const std::vector<int> &svec);
+uint64_t shapeDataToID(const std::vector<std::pair<int, char *>> &shapeData);
+
+std::vector<int> numberToShapeVector(uint64_t snum);
+
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
     os << "[";
@@ -115,3 +122,5 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
 
     return os;
 }
+
+

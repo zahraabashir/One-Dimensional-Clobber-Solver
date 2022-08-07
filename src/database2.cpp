@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "database2.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -147,7 +148,7 @@ void Database::initMemory() {
     cout << "Total bytes: " << totalBytes << endl;
 
     //data = new char[totalBytes];
-    data = (char *) calloc(totalBytes, 1);
+    data = (unsigned char *) calloc(totalBytes, 1);
 
     *((uint32_t *) data) = shapeIndexEntries;
 
@@ -164,10 +165,10 @@ void Database::initMemory() {
         shapeIndex[0] = node->id;
         shapeIndex[1] = tableOffset;
 
-
         shapeIndex += 2;
         tableOffset += node->entryCount * DB_ENTRY_SIZE;
     }
+
 
     table = data + sizeof(uint32_t) + (*((uint32_t *) data)) * (2 * sizeof(uint64_t));
 
@@ -175,33 +176,25 @@ void Database::initMemory() {
     // entries
 }
 
-uint64_t shapeToID(vector<int> &shape) {
+uint64_t shapeToID(const vector<int> &shape) {
+    uint64_t snum = shapeVectorToNumber(shape);
+
+
+    return snum;
+    //////////////////////////
     constexpr uint64_t shift = _shiftAmount();
 
     uint64_t id = 0;
 
     uint64_t exponent = 1;
     for (int chunk : shape) {
-        id += chunk * exponent;
+        id += chunk * exponent; // shoul probably subtract 1 from chunk
         exponent <<= shift;
     }
 
     return id;
 }
 
-uint64_t shapeDataToID(const vector<pair<int, char *>> &shapeData) {
-    constexpr uint64_t shift = _shiftAmount();
-
-    uint64_t id = 0;
-
-    uint64_t exponent = 1;
-    for (const pair<int, char *> &chunk : shapeData) {
-        id += chunk.first * exponent;
-        exponent <<= shift;
-    }
-
-    return id;
-}
 
 ShapeNode::~ShapeNode() {
     for (ShapeNode *n : children) {
@@ -237,7 +230,7 @@ void Database::load() {
     totalBytes = ftell(file);
     fseek(file, 0L, SEEK_SET);
 
-    data = new char[totalBytes];
+    data = (unsigned char *) calloc(totalBytes, 1);
 
     fread(data, 1, totalBytes, file);
     fclose(file);
@@ -358,4 +351,8 @@ unsigned char *Database::get(int len, char *board) {
 //This function is used by simplify() in the solver to get entries from links
 unsigned char *Database::getFromIdx(int idx) {
     return (unsigned char *) (table + idx);
+}
+
+int Database::getEntryLink(unsigned char *entry) {
+    return ((int) (entry - table));
 }

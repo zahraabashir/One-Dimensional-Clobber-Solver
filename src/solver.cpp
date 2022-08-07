@@ -623,7 +623,7 @@ void BasicSolver::simplify(State *state, int depth) {
                 newSize += len;
             } else {
                 unsigned char *linkedEntry = db->getFromIdx(DB_GET_LINK(entry));
-                newSize += DB_GET_LENGTH(linkedEntry);
+                newSize += DB_GET_SHAPE(linkedEntry);
 
 
                 if (linkedEntry != entry) {
@@ -686,7 +686,7 @@ void BasicSolver::simplify(State *state, int depth) {
                     //cout << endl;
 
                 } else {
-                    int linkedLength = DB_GET_LENGTH(linkedEntry);
+                    int linkedLength = DB_GET_SHAPE(linkedEntry);
                     int linkedNumber = DB_GET_NUMBER(linkedEntry);
 
                     char *newGame = generateGame(linkedLength, linkedNumber);

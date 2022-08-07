@@ -1,5 +1,9 @@
 #include "utils.h"
 #include <iostream>
+#include <vector>
+#include "database2.h"
+
+using namespace std;
 
 int playerSign(int p) {
     return p == 1 ? 1 : -1;
@@ -81,4 +85,62 @@ char *generateGame(int length, int game) {
 
     return board;
 }
+
+
+////////////////////////////////////////New DB stuff
+
+//TODO implement this
+char *generateGameFromShape(uint64_t shape, int game) {
+    char *board = new char[4];
+    return board;
+}
+
+////////////////////////////////////////////////////////////
+//THESE FUNCTIONS MUST BE CHANGED TOGETHER
+
+
+uint64_t shapeVectorToNumber(const vector<int> &svec) {
+    uint64_t snum = 0;
+    uint64_t shift = _shiftAmount();
+
+    for (auto it = svec.rbegin(); it != svec.rend(); it++) {
+        snum <<= shift;
+        int chunkSize = *it - 1;
+        snum += chunkSize;
+    }
+
+    return snum;
+}
+
+//Used by database get function
+uint64_t shapeDataToID(const vector<pair<int, char *>> &shapeData) {
+    uint64_t snum = 0;
+    uint64_t shift = _shiftAmount();
+
+    for (auto it = shapeData.rbegin(); it != shapeData.rend(); it++) {
+        snum <<= shift;
+        int chunkSize = it->first - 1;
+        snum += chunkSize;
+    }
+    
+
+    return snum;
+}
+////////////////////////////////////////////////////////////
+
+vector<int> numberToShapeVector(uint64_t snum) {
+    vector<int> svec;
+    uint64_t shift = _shiftAmount();
+
+    uint64_t mask = (1 << shift) - 1;
+
+    while (snum != 0) {
+        int chunkSize = (snum & mask) + 1;
+        snum >>= shift;
+        svec.push_back(chunkSize);
+    }
+
+    return svec;
+}
+
 

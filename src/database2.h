@@ -38,20 +38,21 @@ uint64_t shape
 #define DB_GET_BOUND(entry, index) ((int8_t *) (entry + 1 + 2 * sizeof(uint64_t)))[index]
 #define DB_SET_BOUND(entry, index, bound) ((int8_t *) (entry + 1 + 2 * sizeof(uint64_t)))[index] = bound
 
-#define DB_GET_UDMOVECOUNT(entry) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t)))
-#define DB_SET_UDMOVECOUNT(entry, count) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t))) = count
+#define DB_GET_METRIC(entry) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t)))
+#define DB_SET_METRIC(entry, val) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t))) = val
 
 
 #define DB_GET_LINK(entry) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + sizeof(int)))
 #define DB_SET_LINK(entry, link) *((int *) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + sizeof(int))) = link
 
-#define DB_GET_LENGTH(entry) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int)))
-#define DB_SET_LENGTH(entry, length) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int))) = length
+#define DB_GET_NUMBER(entry) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int)))
+#define DB_SET_NUMBER(entry, number) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 2 * sizeof(int))) = number
 
-#define DB_GET_NUMBER(entry) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int)))
-#define DB_SET_NUMBER(entry, number) *((int * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int))) = number
 
-uint64_t shapeToID(std::vector<int> &shape);
+#define DB_GET_SHAPE(entry) *((uint64_t * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int)))
+#define DB_SET_SHAPE(entry, shape) *((uint64_t * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int))) = shape
+
+uint64_t shapeToID(const std::vector<int> &shape);
 size_t countShape(const std::vector<int> &shape);
 
 constexpr uint64_t _shiftAmount() {
@@ -83,8 +84,8 @@ struct ShapeNode {
 class Database {
   private:
     FILE *file;
-    char *data;
-    char *table;
+    unsigned char *data;
+    unsigned char *table;
 
     uint64_t shapeIndexEntries;
     uint64_t gameEntries;
@@ -120,6 +121,7 @@ class Database {
 
     void load();
     void save();
+    int getEntryLink(unsigned char *entry);
 
 
 };

@@ -139,7 +139,8 @@ void Database::initMemory() {
 
     cout << "Total bytes: " << totalBytes << endl;
 
-    data = new char[totalBytes];
+    //data = new char[totalBytes];
+    data = (char *) calloc(totalBytes, 1);
 
     *((uint32_t *) data) = shapeIndexEntries;
 
@@ -181,13 +182,13 @@ uint64_t shapeToID(vector<int> &shape) {
     return id;
 }
 
-uint64_t shapeDataToID(const vector<pair<int, char*>> &shapeData) {
+uint64_t shapeDataToID(const vector<pair<int, char *>> &shapeData) {
     constexpr uint64_t shift = _shiftAmount();
 
     uint64_t id = 0;
 
     uint64_t exponent = 1;
-    for (const pair<int, char*> &chunk : shapeData) {
+    for (const pair<int, char *> &chunk : shapeData) {
         id += chunk.first * exponent;
         exponent <<= shift;
     }
@@ -214,7 +215,7 @@ Database::Database() {
 
 Database::~Database() {
     if (data != NULL) {
-        delete[] data;
+        free(data);
     }
 
     if (shapeTree != NULL) {
@@ -277,7 +278,7 @@ vector<pair<int, int>> getSubgames(int len, char *board) {
     return subgames;
 }
 
-bool shapeDataSort(const pair<int, char*> &x1, const pair<int, char*> &x2) {
+bool shapeDataSort(const pair<int, char *> &x1, const pair<int, char *> &x2) {
     return x1.first > x2.first;
 }
 
@@ -313,13 +314,13 @@ uint64_t Database::searchShapeIndex(uint64_t shapeID) {
 
 uint64_t Database::getIdx(int len, char *board) {
     vector<pair<int, int>> subgames = getSubgames(len, board);
-    vector<pair<int, char*>> shapeData;
+    vector<pair<int, char *>> shapeData;
 
     for (const pair<int, int> &sg : subgames) {
         int l = sg.second - sg.first;
         char *p = board + sg.first;
 
-        shapeData.push_back(pair<int, char*>(l, p));
+        shapeData.push_back(pair<int, char *>(l, p));
     }
 
     sort(shapeData.begin(), shapeData.end(), shapeDataSort);
@@ -333,7 +334,7 @@ uint64_t Database::getIdx(int len, char *board) {
 
     int index = 0;
     int power = 1;
-    for (pair<int, char*> &chunk : shapeData) {
+    for (pair<int, char *> &chunk : shapeData) {
         for (int i = 0; i < chunk.first; i++) {
             index += chunk.second[i] == 2 ? power : 0;
             power *= 2;

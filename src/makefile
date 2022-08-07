@@ -35,7 +35,7 @@ cleanall: clean
 rmdb:
 	-rm database.bin
 
-rmdb2:
+rm2:
 	-rm database2.bin
 
 #@echo "This is a W position"

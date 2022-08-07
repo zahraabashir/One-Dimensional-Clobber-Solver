@@ -38,23 +38,6 @@ bool shapeListSort(const ShapeNode *n1, const ShapeNode *n2) {
 }
 
 
-void processBoard(int len, char *board, char *boardText) {
-    unsigned char *entry = db->get(len, board);
-
-    cout << ((uint64_t *) entry) << endl;
-
-    if (entry == 0) {
-        cout << "Failed to find entry for: " << boardText << endl;
-        while (1) {
-        }
-    }
-
-
-
-
-
-}
-
 int main() {
     db = new Database();
     db->initData();
@@ -107,8 +90,25 @@ int main() {
 
             cout << shape << " |" << node->bits <<  "| (" << number << "/" << maxGame << ")" << endl;
             cout << boardText << endl;
-            //Do something with this game
-            processBoard(boardSize - 1, board, boardText);
+
+            ////////////////////Process board///////////////////////////////////////////////
+            unsigned char *entry = db->get(boardSize - 1, board);
+            cout << ((uint64_t *) entry) << endl;
+
+            if (entry == 0) {
+                cout << "Failed to find entry for: " << boardText << endl;
+                while (1) {
+                }
+            }
+
+            ///////////////////End of process board/////////////////////////////////////////
+
+
+
+
+
+
+
             cout << endl;
         }
 

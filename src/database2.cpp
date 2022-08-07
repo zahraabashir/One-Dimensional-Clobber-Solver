@@ -339,7 +339,7 @@ uint64_t Database::getIdx(int len, char *board) {
         }
     }
 
-    return offset + index;
+    return offset + (index * DB_ENTRY_SIZE);
 }
 
 unsigned char *Database::get(int len, char *board) {

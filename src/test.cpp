@@ -7,12 +7,17 @@ int main() {
     Game g1("BWBW");
     Game g2("WWWWB");
 
-    cout << g1 << endl;
-    cout << g1.chr(0) << endl;
-    g1.chr(1) = 'B';
-    cout << g1 << endl;
 
-    cout << ((int) g1[0]) << endl;
+    Game g3 = g1 + g2;
+    cout << g3 << " " << g3.size << endl;
+
+    Game g4 = g1 - g2;
+    cout << g4 << " " << g4.size << endl;
+
+    Game g5;
+    cin >> g5;
+    cout << g5;
+    
 
 
     return 0;

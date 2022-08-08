@@ -40,6 +40,8 @@ struct __GameCharView {
 
 
 Game operator+(const Game &g1, const Game &g2);
+Game operator-(const Game &g1, const Game &g2);
 Game operator-(const Game &g);
 
 std::ostream &operator<<(std::ostream &os, const Game &g);
+std::istream &operator>>(std::istream &is, Game &g);

@@ -92,6 +92,12 @@ Game operator+(const Game &g1, const Game &g2) {
     return g;
 }
 
+
+Game operator-(const Game &g1, const Game &g2) {
+    Game g = g1 + (-g2);
+    return g;
+}
+
 Game operator-(const Game &g) {
     Game g2(g.size);
 
@@ -120,7 +126,7 @@ void __GameCharView::operator=(char c) {
     g->data[i] = charToPlayerNumber(c);
 }
 
-////////////////////////////// ostream operators
+////////////////////////////// stream operators
 ostream &operator<<(ostream &os, const Game &g) {
     for (int i = 0; i < g.size; i++) {
         os << playerNumberToChar(g.data[i]);
@@ -129,3 +135,15 @@ ostream &operator<<(ostream &os, const Game &g) {
     return os;
 }
 
+istream &operator>>(istream &is, Game &g) {
+    string str;
+    is >> str;
+
+    g.resize(str.size());
+
+    for (int i = 0; i < str.size(); i++) {
+        g.data[i] = charToPlayerNumber(str[i]);
+    }
+
+    return is;
+}

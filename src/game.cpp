@@ -161,11 +161,11 @@ Game operator+(const Game &g1, const string &str) {
     return g2;
 }
 
-Game operator+(const Game &g1, char c) {
+Game operator+(const Game &g1, uint8_t c) {
     Game g2(g1.size + 1);
 
     memcpy(g2.data, g1.data, g1.size);
-    g2.data[g1.size] = charToPlayerNumber(c);
+    g2.data[g1.size] = c;
 
     return g2;
 }

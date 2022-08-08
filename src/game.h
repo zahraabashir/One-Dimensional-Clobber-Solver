@@ -57,7 +57,7 @@ struct __GameCharView {
 
 Game operator+(const Game &g1, const Game &g2);
 Game operator+(const Game &g1, const std::string &str);
-Game operator+(const Game &g1, char c);
+Game operator+(const Game &g1, uint8_t c);
 Game operator-(const Game &g1, const Game &g2);
 Game operator-(const Game &g);
 

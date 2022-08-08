@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 
 struct __GameCharView;
@@ -16,6 +17,7 @@ struct Game {
     Game(const std::string &boardText);
     Game(int size, char *board);
     Game(const Game &game);
+    Game(const std::vector<int> &shape, int number);
 
     ~Game();
 
@@ -23,6 +25,7 @@ struct Game {
 
     void resize(int newSize);
     void operator=(const Game &g);
+
 
     __GameCharView chr(int i);
 

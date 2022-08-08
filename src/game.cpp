@@ -46,6 +46,45 @@ Game::Game(const Game &game) {
     memcpy(data, game.data, size);
 }
 
+Game::Game(const vector<int> &shape, int number) {
+    size = 0;
+    data = NULL;
+
+    int newSize = shape.size() - 1;
+
+    for (int chunkSize : shape) {
+        newSize += chunkSize;
+    }
+
+    if (newSize <= 0) {
+        return;
+    }
+
+    resize(newSize);
+
+    {
+        int shapeIdx = 0;
+        int currentChunk = 0;
+        int shift = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (currentChunk >= shape[shapeIdx]) {
+                currentChunk = 0;
+                shapeIdx += 1;
+                data[i] = 0;
+
+                continue;
+            }
+
+            currentChunk += 1;
+
+            data[i] = ((number >> shift) & 1) == 0 ? 1 : 2;
+            shift += 1;
+        }
+    }
+
+}
+
 Game::~Game() {
     if (size > 0) {
         free(data);
@@ -94,7 +133,12 @@ Game operator+(const Game &g1, const Game &g2) {
 
 
 Game operator-(const Game &g1, const Game &g2) {
-    Game g = g1 + (-g2);
+    Game g = g1 + g2;
+
+    for (int i = g1.size + (g1.size >= 0 ? 1 : 0); i < g.size; i++) {
+        g.data[i] = opponentNumber(g.data[i]);
+    }
+
     return g;
 }
 

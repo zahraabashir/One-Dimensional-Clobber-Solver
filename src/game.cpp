@@ -98,32 +98,23 @@ Game operator-(const Game &g) {
     return g2;
 }
 
-__GameCharView Game::chars() {
-    return __GameCharView(this);
+__GameCharView Game::chr(int i) {
+    return __GameCharView(this, i);
 }
 
 ////////////////////////////// __GameCharView
-__GameCharView::__GameCharView(Game *g) {
-    this->g = g;
-}
-
-__GameCharViewBracket __GameCharView::operator[](int i) {
-    return __GameCharViewBracket(g, i);
-}
-////////////////////////////// __GameCharViewBracket
-__GameCharViewBracket::__GameCharViewBracket(Game *g, int i) {
+__GameCharView::__GameCharView(Game *g, int i) {
     this->g = g;
     this->i = i;
 }
 
-__GameCharViewBracket::operator char() {
+__GameCharView::operator char() {
     return playerNumberToChar(g->data[i]);
 }
 
-void __GameCharViewBracket::operator=(char c) {
+void __GameCharView::operator=(char c) {
     g->data[i] = charToPlayerNumber(c);
 }
-
 
 ////////////////////////////// ostream operators
 ostream &operator<<(ostream &os, const Game &g) {
@@ -134,15 +125,3 @@ ostream &operator<<(ostream &os, const Game &g) {
     return os;
 }
 
-ostream &operator<<(ostream &os, const __GameCharView &view) {
-    for (int i = 0; i < view.g->size; i++) {
-        os << playerNumberToChar(view.g->data[i]);
-    }
-
-    return os;
-}
-
-ostream &operator<<(ostream &os, const __GameCharViewBracket &view) {
-    os << playerNumberToChar(view.g->data[view.i]);
-    return os;
-}

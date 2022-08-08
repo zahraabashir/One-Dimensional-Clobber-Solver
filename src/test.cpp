@@ -8,13 +8,10 @@ int main() {
     Game g2("WWWWB");
 
     cout << g1 << endl;
-
-    g1.chars()[3] = 'B';
+    cout << g1.chr(0) << endl;
+    g1.chr(1) = 'B';
     cout << g1 << endl;
 
-    cout << g1.chars() << endl;
-
-    cout << g1.chars()[2] << endl;
 
     return 0;
 }

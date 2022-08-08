@@ -28,7 +28,21 @@ struct Game {
     void operator=(const Game &g);
 
 
+
     __GameCharView chr(int i);
+
+    //get moves
+
+
+    void play(int from, int to, char *undoBuffer);
+    void undo(char *undoBuffer);
+    int hash(int player);
+    std::vector<std::pair<int, int>> moves(int player);
+
+  private:
+    void __generateMoves(const int &player, const int &opponent,
+        int idx, int moveDepth, std::vector<std::pair<int, int>> &moves);
+
 
 };
 

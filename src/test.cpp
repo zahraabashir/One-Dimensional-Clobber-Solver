@@ -1,5 +1,6 @@
 #include <iostream>
 #include "game.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -15,8 +16,10 @@ int main() {
     cout << g4 << " " << g4.size << endl;
 
     Game g5;
-    cin >> g5;
-    cout << g5;
+    //cin >> g5;
+    //cout << g5;
+
+    cout << g5.moves(1) << endl;
     
 
 

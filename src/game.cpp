@@ -173,6 +173,77 @@ __GameCharView Game::chr(int i) {
     return __GameCharView(this, i);
 }
 
+void Game::play(int from, int to, char *undoBuffer) {
+    if (undoBuffer != NULL) {
+        int minIdx = std::min<int>(from, to);
+        ((int *) undoBuffer)[0] = minIdx;
+        ((char *) undoBuffer)[0 + sizeof(int)] = data[minIdx];
+        ((char *) undoBuffer)[0 + sizeof(int) + 1] = data[minIdx + 1];
+    }
+    
+    data[to] = data[from];
+    data[from] = EMPTY;
+}
+
+void Game::undo(char *undoBuffer) {
+    int start = ((int *) undoBuffer)[0];
+    data[start] = (char) undoBuffer[0 + sizeof(int)];
+    data[start + 1] = (char) undoBuffer[0 + sizeof(int) + 1];
+}
+
+int Game::hash(int player) {
+    int result = 1 * (player - 1);
+    int cumulativePower = 2;
+
+    for (size_t i = 0; i < size; i++) {
+        result += cumulativePower * data[i];
+        cumulativePower *= 3;
+    }
+    return result;
+}
+
+
+vector<pair<int, int>> Game::moves(int player) {
+    int opponent = opponentNumber(player);
+    vector<pair<int, int>> moves(0);
+    __generateMoves(player, opponent, 0, 0, moves);
+    return moves;
+}
+
+void Game::__generateMoves(const int &player, const int &opponent,
+    int idx, int moveDepth, vector<pair<int, int>> &moves) {
+
+    if (idx >= size) {
+        moves.resize(moveDepth);
+        return;
+    }
+
+    char *c2 = &data[idx];
+    bool move1 = false;
+    bool move2 = false;
+
+    if (*c2 == player) {
+        char *c1 = &data[idx - 1];
+        char *c3 = &data[idx + 1];
+        move1 = idx > 0 && *c1 == opponent;
+        move2 = (idx + 1 < size) && *c3 == opponent;
+    }
+
+    __generateMoves(player, opponent, idx + 1, moveDepth + move1 + move2, moves);
+
+    if (move1) {
+        moves[moveDepth] = pair<int, int>(idx, idx - 1);
+    }
+    if (move2) {
+        moves[moveDepth + move1] = pair<int, int>(idx, idx + 1);
+    }
+}
+
+
+
+
+
+
 ////////////////////////////// __GameCharView
 __GameCharView::__GameCharView(Game *g, int i) {
     this->g = g;

@@ -46,6 +46,23 @@ Game::Game(const Game &game) {
     memcpy(data, game.data, size);
 }
 
+Game::Game(const vector<int> &shape) {
+    size = 0;
+    data = NULL;
+
+    int newSize = shape.size() - 1;
+
+    for (int chunkSize : shape) {
+        newSize += chunkSize;
+    }
+
+    if (newSize <= 0) {
+        return;
+    }
+
+    resize(newSize);
+}
+
 Game::Game(const vector<int> &shape, int number) {
     size = 0;
     data = NULL;

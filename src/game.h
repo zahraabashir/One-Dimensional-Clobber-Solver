@@ -17,6 +17,7 @@ struct Game {
     Game(const std::string &boardText);
     Game(int size, char *board);
     Game(const Game &game);
+    Game(const std::vector<int> &shape);
     Game(const std::vector<int> &shape, int number);
 
     ~Game();

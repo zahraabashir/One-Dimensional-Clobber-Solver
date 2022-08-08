@@ -19,6 +19,8 @@ struct Game {
 
     ~Game();
 
+    char &operator[](int i);
+
     void resize(int newSize);
     void operator=(const Game &g);
 

@@ -12,6 +12,8 @@ int main() {
     g1.chr(1) = 'B';
     cout << g1 << endl;
 
+    cout << ((int) g1[0]) << endl;
+
 
     return 0;
 }

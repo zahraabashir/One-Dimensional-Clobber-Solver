@@ -52,6 +52,10 @@ Game::~Game() {
     }
 }
 
+char &Game::operator[](int i) {
+    return data[i];
+}
+
 void Game::resize(int newSize) {
     if (size == newSize) {
         return;

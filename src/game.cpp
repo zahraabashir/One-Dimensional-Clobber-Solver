@@ -117,18 +117,20 @@ void Game::resize(int newSize) {
         return;
     }
 
+    char *newData = NULL;
+
+    if (newSize > 0) {
+        newData = (char *) calloc(newSize, 1);
+    }
+
+    memcpy(newData, data, min(size, newSize));
+
     if (size > 0) {
         free(data);
     }
 
     size = newSize;
-
-    if (size == 0) {
-        data = NULL;
-        return;
-    }
-
-    data = (char *) calloc(size, 1);
+    data = newData;
 }
 
 void Game::operator=(const Game &g) {
@@ -146,6 +148,26 @@ Game operator+(const Game &g1, const Game &g2) {
     memcpy(g.data + g1.size + space, g2.data, g2.size);
 
     return g;
+}
+
+Game operator+(const Game &g1, const string &str) {
+    Game g2(g1.size + str.size());
+
+    memcpy(g2.data, g1.data, g1.size);
+    for (int i = 0; i < str.size(); i++) {
+        g2.data[g1.size + i] = charToPlayerNumber(str[i]);
+    }
+
+    return g2;
+}
+
+Game operator+(const Game &g1, char c) {
+    Game g2(g1.size + 1);
+
+    memcpy(g2.data, g1.data, g1.size);
+    g2.data[g1.size] = charToPlayerNumber(c);
+
+    return g2;
 }
 
 

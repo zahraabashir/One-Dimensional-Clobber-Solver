@@ -14,11 +14,11 @@ FLAGS = -Wall --std=c++17 -g
 default: Test
 
 run: TheSolvers
-	./TheSolvers BWBWBWBWBWBW W 200
+	-./TheSolvers BWBWBWBWBWBW W 200
 
 Test: game.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o $@
-	./Test
+	-./Test
 
 TheSolvers: game.o main.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
@@ -71,15 +71,15 @@ ptest: TheSolvers
 
 db: DBManage
 	touch database.bin
-	./DBManage
+	-./DBManage
 
 db2: DBManage2
 	touch database2.bin
-	./DBManage2
+	-./DBManage2
 
 dbtest: database2.o dbtest.o utils.o state.o
 	$(CC) $(FLAGS) $^ -o $@
-	./dbtest
+	-./dbtest
 
 resetReferenceCache:
 	echo -e "{\n}" > instructorSolution/cachedOutcomes.json
@@ -88,4 +88,4 @@ referenceSolver:
 	make -C instructorSolution/sample_c++/code
 
 hardtest: TheSolvers
-	time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500
+	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500

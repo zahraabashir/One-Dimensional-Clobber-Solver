@@ -6,12 +6,16 @@
 #include "options.h"
 #include <cstring>
 
+#include "game.h"
+
 
 
 using namespace std;
 
 
 int main(int argc, char **argv) {
+
+
     auto start = std::chrono::steady_clock::now();
 
     if (argc < 4) {

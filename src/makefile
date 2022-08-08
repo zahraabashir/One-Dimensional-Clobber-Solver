@@ -6,12 +6,21 @@ SHELL := /bin/bash
 CC = g++
 FLAGS = -Wall --std=c++17 -g
 
+
 .PHONY: dbtest
+.PHONY: default
+
+
+default: Test
 
 run: TheSolvers
 	./TheSolvers BWBWBWBWBWBW W 200
 
-TheSolvers: main.o database2.o utils.o state.o solver.o bound.o
+Test: game.o test.o utils.o
+	$(CC) $(FLAGS) $^ -o $@
+	./Test
+
+TheSolvers: game.o main.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
 DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o
@@ -27,7 +36,7 @@ DBManage2: dbmanage2.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o TheSolvers DBManage dbtest DBManage2
+	-rm *.o TheSolvers DBManage dbtest DBManage2 Test
 
 cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code

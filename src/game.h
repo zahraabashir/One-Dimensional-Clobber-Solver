@@ -31,8 +31,6 @@ struct Game {
 
     __GameCharView chr(int i);
 
-    //get moves
-
 
     void play(int from, int to, char *undoBuffer);
     void undo(char *undoBuffer);

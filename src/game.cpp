@@ -232,8 +232,8 @@ vector<pair<int, int>> Game::moves(int player) {
     return moves;
 }
 
-vector<pair<int>> Game::shape() {
-    vector<pair<int>> shape;
+vector<int> Game::shape() {
+    vector<int> shape;
 
     int chunkSize = 0;
 
@@ -242,14 +242,14 @@ vector<pair<int>> Game::shape() {
             chunkSize += 1;
         } else {
             if (chunkSize > 0) {
-                shape.push_back(pair<int>(chunkSize));
+                shape.push_back(chunkSize);
                 chunkSize = 0;
             }
         }
     }
 
     if (chunkSize > 0) {
-        shape.push_back(pair<int>(chunkSize));
+        shape.push_back(chunkSize);
     }
 
     return shape;

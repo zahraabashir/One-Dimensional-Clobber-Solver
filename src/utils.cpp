@@ -99,7 +99,7 @@ char *generateGameFromShape(uint64_t shape, int game) {
 //THESE FUNCTIONS MUST BE CHANGED TOGETHER
 
 
-uint64_t shapeVectorToNumber(const vector<int> &svec) {
+uint64_t shapeToNumber(const vector<int> &svec) {
     uint64_t snum = 0;
     uint64_t shift = _shiftAmount();
 
@@ -128,7 +128,7 @@ uint64_t shapeDataToID(const vector<pair<int, char *>> &shapeData) {
 }
 ////////////////////////////////////////////////////////////
 
-vector<int> numberToShapeVector(uint64_t snum) {
+vector<int> numberToShape(uint64_t snum) {
     vector<int> svec;
     uint64_t shift = _shiftAmount();
 
@@ -142,5 +142,6 @@ vector<int> numberToShapeVector(uint64_t snum) {
 
     return svec;
 }
+
 
 

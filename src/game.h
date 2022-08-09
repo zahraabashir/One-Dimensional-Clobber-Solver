@@ -34,7 +34,7 @@ struct Game {
     int hash(int player);
     std::vector<std::pair<int, int>> moves(int player);
 
-    std::vector<std::pair<int>> shape();
+    std::vector<int> shape();
     int number();
 
   private:

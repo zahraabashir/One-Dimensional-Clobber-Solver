@@ -52,7 +52,6 @@ uint64_t shape
 #define DB_GET_SHAPE(entry) *((uint64_t * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int)))
 #define DB_SET_SHAPE(entry, shape) *((uint64_t * ) (entry + 1 + 2 * sizeof(uint64_t) + 2 * sizeof(int8_t) + 3 * sizeof(int))) = shape
 
-uint64_t shapeToID(const std::vector<int> &shape);
 size_t countShape(const std::vector<int> &shape);
 
 constexpr uint64_t _shiftAmount() {

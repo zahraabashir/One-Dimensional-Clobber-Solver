@@ -40,7 +40,7 @@ void Database::genShapes(ShapeNode *node, int prev, const vector<int> &shape, in
 
         ShapeNode *node2 = new ShapeNode();
         node2->shape = s;
-        node2->id = shapeToID(node2->shape);
+        node2->id = shapeToNumber(node2->shape);
         node2->bits = 0;
         for (int chunkSize : node2->shape) {
             node2->bits += chunkSize;
@@ -176,24 +176,6 @@ void Database::initMemory() {
     // entries
 }
 
-uint64_t shapeToID(const vector<int> &shape) {
-    uint64_t snum = shapeVectorToNumber(shape);
-
-
-    return snum;
-    //////////////////////////
-    constexpr uint64_t shift = _shiftAmount();
-
-    uint64_t id = 0;
-
-    uint64_t exponent = 1;
-    for (int chunk : shape) {
-        id += chunk * exponent; // shoul probably subtract 1 from chunk
-        exponent <<= shift;
-    }
-
-    return id;
-}
 
 
 ShapeNode::~ShapeNode() {

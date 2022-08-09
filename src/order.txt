@@ -1,7 +1,7 @@
 game
 utils
 bound
-test
+test (make into unit test, maybe separate from test.cpp)
 
 database2
 dbmanage2

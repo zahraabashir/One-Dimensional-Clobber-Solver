@@ -232,31 +232,24 @@ vector<pair<int, int>> Game::moves(int player) {
     return moves;
 }
 
-vector<pair<int, char *>> Game::shape() {
-    vector<pair<int, char *>> shape;
+vector<pair<int>> Game::shape() {
+    vector<pair<int>> shape;
 
     int chunkSize = 0;
-    char *chunkPtr = NULL;
 
     for (int i = 0; i < size; i++) {
         if (data[i] != 0) {
             chunkSize += 1;
-
-            if (chunkPtr == NULL) {
-                chunkPtr = data + i;
-            }
         } else {
             if (chunkSize > 0) {
-                shape.push_back(pair<int, char *>(chunkSize, chunkPtr));
+                shape.push_back(pair<int>(chunkSize));
                 chunkSize = 0;
-                chunkPtr = NULL;
             }
-
         }
     }
 
     if (chunkSize > 0) {
-        shape.push_back(pair<int, char *>(chunkSize, chunkPtr));
+        shape.push_back(pair<int>(chunkSize));
     }
 
     return shape;

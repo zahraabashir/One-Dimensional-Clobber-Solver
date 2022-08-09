@@ -30,7 +30,7 @@ Game::Game(const string &boardText) {
     }
 }
 
-Game::Game(int size, char *board) {
+Game::Game(int size, const char *board) {
     this->size = 0;
     data = NULL;
 
@@ -112,6 +112,10 @@ char &Game::operator[](int i) {
     return data[i];
 }
 
+const char &Game::operator[](int i) const {
+    return data[i];
+}
+
 void Game::resize(int newSize) {
     if (size == newSize) {
         return;
@@ -138,61 +142,12 @@ void Game::operator=(const Game &g) {
     memcpy(data, g.data, size);
 }
 
-Game operator+(const Game &g1, const Game &g2) {
-    int space = (g1.size != 0 && g2.size != 0) ? 1 : 0;
-    int newSize = g1.size + g2.size + space;
-
-    Game g(newSize);
-
-    memcpy(g.data, g1.data, g1.size);
-    memcpy(g.data + g1.size + space, g2.data, g2.size);
-
-    return g;
-}
-
-Game operator+(const Game &g1, const string &str) {
-    Game g2(g1.size + str.size());
-
-    memcpy(g2.data, g1.data, g1.size);
-    for (int i = 0; i < str.size(); i++) {
-        g2.data[g1.size + i] = charToPlayerNumber(str[i]);
-    }
-
-    return g2;
-}
-
-Game operator+(const Game &g1, uint8_t c) {
-    Game g2(g1.size + 1);
-
-    memcpy(g2.data, g1.data, g1.size);
-    g2.data[g1.size] = c;
-
-    return g2;
-}
-
-
-Game operator-(const Game &g1, const Game &g2) {
-    Game g = g1 + g2;
-
-    for (int i = g1.size + (g1.size >= 0 ? 1 : 0); i < g.size; i++) {
-        g.data[i] = opponentNumber(g.data[i]);
-    }
-
-    return g;
-}
-
-Game operator-(const Game &g) {
-    Game g2(g.size);
-
-    for (int i = 0; i < g.size; i++) {
-        g2.data[i] = opponentNumber(g.data[i]);
-    }
-
-    return g2;
-}
-
 __GameCharView Game::chr(int i) {
-    return __GameCharView(this, i);
+    return __GameCharView(data, i);
+}
+
+__GameCharViewConst Game::chr(int i) const {
+    return __GameCharViewConst(data, i);
 }
 
 void Game::play(int from, int to, char *undoBuffer) {
@@ -207,32 +162,31 @@ void Game::play(int from, int to, char *undoBuffer) {
     data[from] = EMPTY;
 }
 
-void Game::undo(char *undoBuffer) {
+void Game::undo(const char *undoBuffer) {
     int start = ((int *) undoBuffer)[0];
     data[start] = (char) undoBuffer[0 + sizeof(int)];
     data[start + 1] = (char) undoBuffer[0 + sizeof(int) + 1];
 }
 
-int Game::hash(int player) {
+int Game::hash(int player) const {
     int result = 1 * (player - 1);
     int cumulativePower = 2;
 
-    for (size_t i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         result += cumulativePower * data[i];
         cumulativePower *= 3;
     }
     return result;
 }
 
-
-vector<pair<int, int>> Game::moves(int player) {
+vector<pair<int, int>> Game::moves(int player) const {
     int opponent = opponentNumber(player);
     vector<pair<int, int>> moves(0);
     __generateMoves(player, opponent, 0, 0, moves);
     return moves;
 }
 
-vector<int> Game::shape() {
+vector<int> Game::shape() const {
     vector<int> shape;
 
     int chunkSize = 0;
@@ -255,7 +209,7 @@ vector<int> Game::shape() {
     return shape;
 }
 
-int Game::number() {
+int Game::number() const {
     int val = 0;
 
     int power = 1;
@@ -271,10 +225,68 @@ int Game::number() {
     return val;
 }
 
+void Game::operator+=(const Game &g) {
+    int space = (size != 0 && g.size != 0) ? 1 : 0;
+    int newSize = size + g.size + space;
+    int oldSize = size;
 
+    resize(newSize);
+
+    memcpy(data + oldSize + space, g.data, g.size);
+
+}
+
+void Game::operator-=(const Game &g) {
+    int space = (size != 0 && g.size != 0) ? 1 : 0;
+    int newSize = size + g.size + space;
+    int oldSize = size;
+
+    resize(newSize);
+
+    for (int i = 0; i < g.size; i++) {
+        data[oldSize + space + i] = opponentNumber(g.data[i]);
+    }
+
+}
+
+void Game::operator+=(const std::string &str) {
+    int newSize = size + str.size();
+    int oldSize = size;
+    resize(newSize);
+
+    for (int i = 0; i < str.size(); i++) {
+        data[oldSize + i] = charToPlayerNumber(str[i]);
+    }
+}
+
+void Game::operator-=(const std::string &str) {
+    int newSize = size + str.size();
+    int oldSize = size;
+    resize(newSize);
+
+    for (int i = 0; i < str.size(); i++) {
+        data[oldSize + i] = opponentNumber(charToPlayerNumber(str[i]));
+    }
+}
+
+void Game::operator+=(uint8_t c) {
+    resize(size + 1);
+    data[size - 1] = c;
+}
+
+void Game::operator-=(uint8_t c) {
+    resize(size + 1);
+    data[size - 1] = opponentNumber(c);
+}
+
+void Game::negate() {
+    for (int i = 0; i < size; i++) {
+        data[i] = opponentNumber(data[i]);
+    }
+}
 
 void Game::__generateMoves(const int &player, const int &opponent,
-    int idx, int moveDepth, vector<pair<int, int>> &moves) {
+    int idx, int moveDepth, vector<pair<int, int>> &moves) const {
 
     if (idx >= size) {
         moves.resize(moveDepth);
@@ -302,23 +314,103 @@ void Game::__generateMoves(const int &player, const int &opponent,
     }
 }
 
+Game operator+(const Game &g1, const Game &g2) {
+    int space = (g1.size != 0 && g2.size != 0) ? 1 : 0;
+    int newSize = g1.size + g2.size + space;
+
+    Game g(newSize);
+
+    memcpy(g.data, g1.data, g1.size);
+    memcpy(g.data + g1.size + space, g2.data, g2.size);
+
+    return g;
+}
+
+Game operator-(const Game &g1, const Game &g2) {
+    Game g = g1 + g2;
+
+    int space = (g1.size != 0 && g2.size != 0);
+
+    for (int i = 0; i < g2.size; i++) {
+        g[g1.size + space + i] = opponentNumber(g2[i]);
+    } 
+
+    return g;
+}
 
 
+Game operator+(const Game &g1, const string &str) {
+    Game g2(g1.size + str.size());
 
+    memcpy(g2.data, g1.data, g1.size);
+    for (int i = 0; i < str.size(); i++) {
+        g2.data[g1.size + i] = charToPlayerNumber(str[i]);
+    }
 
+    return g2;
+}
+
+Game operator-(const Game &g1, const string &str) {
+    Game g2(g1.size + str.size());
+
+    memcpy(g2.data, g1.data, g1.size);
+    for (int i = 0; i < str.size(); i++) {
+        g2.data[g1.size + i] = opponentNumber(charToPlayerNumber(str[i]));
+    }
+
+    return g2;
+}
+
+Game operator+(const Game &g1, uint8_t c) {
+    Game g2(g1.size + 1);
+
+    memcpy(g2.data, g1.data, g1.size);
+    g2.data[g1.size] = c;
+
+    return g2;
+}
+
+Game operator-(const Game &g1, uint8_t c) {
+    Game g2(g1.size + 1);
+
+    memcpy(g2.data, g1.data, g1.size);
+    g2.data[g1.size] = c;
+
+    return g2;
+}
+
+Game operator-(const Game &g) {
+    Game g2(g.size);
+
+    for (int i = 0; i < g.size; i++) {
+        g2.data[i] = opponentNumber(g.data[i]);
+    }
+
+    return g2;
+}
 
 ////////////////////////////// __GameCharView
-__GameCharView::__GameCharView(Game *g, int i) {
-    this->g = g;
+__GameCharView::__GameCharView(char *data, int i) {
+    this->data = data;
     this->i = i;
 }
 
-__GameCharView::operator char() {
-    return playerNumberToChar(g->data[i]);
+__GameCharView::operator char() const {
+    return playerNumberToChar(data[i]);
 }
 
 void __GameCharView::operator=(char c) {
-    g->data[i] = charToPlayerNumber(c);
+    data[i] = charToPlayerNumber(c);
+}
+
+////////////////////////////// __GameCharViewConst
+__GameCharViewConst::__GameCharViewConst(const char *data, int i) {
+    this->data = data;
+    this->i = i;
+}
+
+__GameCharViewConst::operator char() const {
+    return playerNumberToChar(data[i]);
 }
 
 ////////////////////////////// stream operators

@@ -1,0 +1,18 @@
+game
+utils
+bound
+test
+
+database2
+dbmanage2
+dbtest
+
+main
+
+database (remove)
+dbmanage (remove)
+state (remove)
+
+solver
+
+options

@@ -11,7 +11,6 @@ struct Game {
     char *data;
     int size;
 
-
     Game();
     Game(int size);
     Game(const std::string &boardText);
@@ -27,8 +26,6 @@ struct Game {
     void resize(int newSize);
     void operator=(const Game &g);
 
-
-
     __GameCharView chr(int i);
 
 
@@ -36,6 +33,9 @@ struct Game {
     void undo(char *undoBuffer);
     int hash(int player);
     std::vector<std::pair<int, int>> moves(int player);
+
+    std::vector<std::pair<int, char *>> shape();
+    int number();
 
   private:
     void __generateMoves(const int &player, const int &opponent,

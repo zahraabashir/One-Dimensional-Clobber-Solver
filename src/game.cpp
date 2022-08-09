@@ -232,6 +232,54 @@ vector<pair<int, int>> Game::moves(int player) {
     return moves;
 }
 
+vector<pair<int, char *>> Game::shape() {
+    vector<pair<int, char *>> shape;
+
+    int chunkSize = 0;
+    char *chunkPtr = NULL;
+
+    for (int i = 0; i < size; i++) {
+        if (data[i] != 0) {
+            chunkSize += 1;
+
+            if (chunkPtr == NULL) {
+                chunkPtr = data + i;
+            }
+        } else {
+            if (chunkSize > 0) {
+                shape.push_back(pair<int, char *>(chunkSize, chunkPtr));
+                chunkSize = 0;
+                chunkPtr = NULL;
+            }
+
+        }
+    }
+
+    if (chunkSize > 0) {
+        shape.push_back(pair<int, char *>(chunkSize, chunkPtr));
+    }
+
+    return shape;
+}
+
+int Game::number() {
+    int val = 0;
+
+    int power = 1;
+    for (int i = 0; i < size; i++) {
+        if (data[i] == 0) {
+            continue;
+        }
+
+        val += data[i] == 2 ? 1 : 0;
+        power *= 2;
+    }
+
+    return val;
+}
+
+
+
 void Game::__generateMoves(const int &player, const int &opponent,
     int idx, int moveDepth, vector<pair<int, int>> &moves) {
 

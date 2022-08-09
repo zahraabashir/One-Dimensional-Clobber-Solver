@@ -6,13 +6,38 @@ using namespace std;
 
 int main() {
 
-    Game g1("BWBW");
-    cout << g1 << endl;
 
-    g1 = g1 + 1;
-    cout << g1 << endl;
+    Bitvector b;
 
+    cout << b << endl << endl;
 
+    b[0] = 1;
+
+    cout << b << endl << endl;
+    
+
+    b[2] = 1;
+
+    cout << b << endl << endl;
+
+    b[127] = 1;
+    cout << b << endl << endl;
+
+    b[63] = 1;
+    cout << b << endl << endl;
+
+    b[64] = 1;
+    cout << b << endl << endl;
+
+    b[65] = 1;
+    cout << b << endl << endl;
+
+    Bitvector b2;
+
+    cout << b2 << endl << endl;
+
+    b2 = b;
+    cout << b2 << endl << endl;
 
     
 

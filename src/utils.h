@@ -1,5 +1,7 @@
 #pragma once
 
+#include "options.h"
+
 #include <ostream>
 #include <vector>
 
@@ -125,3 +127,40 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
 
 uint64_t shapeToNumber(const std::vector<int> &shape);
 std::vector<int> numberToShape(uint64_t number);
+
+
+////////////////////////////// Bitvector stuff
+
+struct __BitvectorBracket;
+struct __BitvectorBracketConst;
+
+struct Bitvector {
+    uint64_t data[BIT_VECTOR_SIZE];
+    static const int size = BIT_VECTOR_SIZE * 64;
+
+    Bitvector();
+    void operator=(const Bitvector &v);
+
+    __BitvectorBracket operator[](int i);
+    __BitvectorBracketConst operator[](int i) const;
+};
+
+struct __BitvectorBracket {
+    uint64_t *data;
+    int i;
+
+    __BitvectorBracket(uint64_t *data, int i);
+    void operator=(bool val);
+    operator bool();
+};
+
+struct __BitvectorBracketConst {
+    const uint64_t *data;
+    int i;
+
+    __BitvectorBracketConst(const uint64_t *data, int i);
+    operator bool() const;
+};
+
+
+std::ostream &operator<<(std::ostream &os, const Bitvector &v);

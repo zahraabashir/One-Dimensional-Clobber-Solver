@@ -39,3 +39,4 @@
 // games are only substituted if they are in the database, and have both dominance and bound information (so the minimum of these will determine what games can be substituted)
 
 
+#define BIT_VECTOR_SIZE 2

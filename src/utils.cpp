@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <iostream>
 #include <vector>
+#include <cstring>
 #include "database2.h"
 
 using namespace std;
@@ -145,3 +146,61 @@ vector<int> numberToShape(uint64_t snum) {
 
 
 
+
+//////////////////////////////
+
+Bitvector::Bitvector() {
+    for (int i = 0; i < BIT_VECTOR_SIZE; i++) {
+        data[i] = 0;
+    }
+}
+
+void Bitvector::operator=(const Bitvector &v) {
+    memcpy(data, v.data, BIT_VECTOR_SIZE * sizeof(uint64_t));
+}
+
+__BitvectorBracket Bitvector::operator[](int i) {
+    return __BitvectorBracket(data, i);
+}
+
+__BitvectorBracketConst Bitvector::operator[](int i) const {
+    return __BitvectorBracketConst(data, i);
+}
+
+__BitvectorBracket::__BitvectorBracket(uint64_t *data, int i) {
+    this->data = data;
+    this->i = i;
+}
+
+void __BitvectorBracket::operator=(bool val) {
+    uint64_t &block = data[i / 64];
+    uint64_t mask = ((uint64_t) -1) ^ (((uint64_t) 1) << (i % 64));
+
+    block &= mask;
+
+    block |= ((uint64_t) val) << (i % 64);
+}
+
+__BitvectorBracket::operator bool() {
+    const uint64_t &block = data[i / 64];
+    return (block >> (i % 64)) & 1;
+}
+
+__BitvectorBracketConst::__BitvectorBracketConst(const uint64_t *data, int i) {
+    this->data = data;
+    this->i = i;
+}
+
+__BitvectorBracketConst::operator bool() const {
+    const uint64_t &block = data[i / 64];
+    return (block >> (i % 64)) & 1;
+}
+
+std::ostream &operator<<(std::ostream &os, const Bitvector &v) {
+    for (int i = v.size - 1; i >= 0; i--) {
+        os << v[i];
+    }
+
+    return os;
+
+}

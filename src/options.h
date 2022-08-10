@@ -41,4 +41,4 @@
 
 // Force the solver to make a move at the root node, even if the root node is already solved in the transposition table
 // Without this option, moves printed to stdout are invalid after the first input is solved
-#define FORCE_ROOT_MOVE
+//#define FORCE_ROOT_MOVE

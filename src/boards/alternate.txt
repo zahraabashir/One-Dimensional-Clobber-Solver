@@ -1,4 +1,6 @@
 c
+pb
+sm
 BW ; A2
 BWBW ; A4
 BWBWBW ; A6

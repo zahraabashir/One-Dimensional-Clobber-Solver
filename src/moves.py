@@ -203,6 +203,7 @@ with open("inpipe", "r") as inpipe:
 
         for c in children:
             if solveChildren:
+                print(c)
                 moves2 = getMoves(c, opponent)
                 children2 = [playMove(c, m2) for m2 in moves2]
                 oc = []
@@ -212,6 +213,8 @@ with open("inpipe", "r") as inpipe:
                     else:
                         oc.append(False)
                 outcomes.append(oc)
+                printOutcomeVector(oc, False)
+                print("")
             else:
                 if solve(c, opponent):
                     outcomes.append(False)
@@ -220,7 +223,8 @@ with open("inpipe", "r") as inpipe:
         storedOutcomeVectors.append(outcomes)
         storedComments.append(comment)
 
-        printOutcomeVector(outcomes, solveChildren)
+        if not solveChildren:
+            printOutcomeVector(outcomes, solveChildren)
         print("")
         print("")
 

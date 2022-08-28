@@ -60,6 +60,32 @@ State::~State() {
     }
 }
 
+#include <md4.h>
+#define USEMD
+
+#if defined(USEMD)
+
+int State::code(int player) {
+    uint8_t data[boardSize + 1];
+
+    for (int i = 0; i < boardSize; i++) {
+        data[i] = board[i] + 1;
+    }
+    data[boardSize] = player;
+
+    MD4_CTX ctx;
+    MD4Init(&ctx);
+    MD4Update(&ctx, data, boardSize + 1);
+
+    uint8_t hash[MD4_DIGEST_LENGTH];
+
+    MD4Final(hash, &ctx);
+
+    return *((int *) hash);
+}
+
+#else
+
 int State::code(int player) {
     int result = 1 * (player - 1);
     int cumulativePower = 2;
@@ -70,6 +96,10 @@ int State::code(int player) {
     }
     return result;
 }
+
+#endif
+
+
 
 /*
 bool State::operator==(const State &s) {

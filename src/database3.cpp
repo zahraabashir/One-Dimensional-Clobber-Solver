@@ -155,7 +155,8 @@ void Database::init() {
     */
 
     //Header...
-    *((size_t *) data) = indexEntryCount;
+    ((size_t *) data)[0] = indexEntryCount;
+    ((size_t *) data)[1] = entryCount;
 
     //Index...
     index = data + headerSize;
@@ -213,4 +214,7 @@ void Database::load() {
 
     fread(data, 1, size, file);
     fclose(file);
+
+    indexEntryCount = ((size_t *) data)[0];
+    entryCount = ((size_t *) data)[1];
 }

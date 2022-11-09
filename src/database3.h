@@ -18,8 +18,9 @@ class Database {
     /*
         header contains:
         size_t indexEntryCount
+        size_t entryCount
     */
-    const static size_t headerSize = sizeof(size_t);
+    const static size_t headerSize = 2 * sizeof(size_t);
 
     const static size_t indexEntrySize = 2 * sizeof(uint64_t);
     size_t indexEntryCount;

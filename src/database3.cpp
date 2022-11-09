@@ -278,12 +278,13 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
     uint64_t snum = shapeDataToNumber(shapeData);
 
     //Binary search index to find table section
-    size_t low = 0;
-    size_t high = indexEntryCount - 1;
+    int low = 0;
+    int high = indexEntryCount - 1;
     uint64_t sectionOffset = -1;
 
+
     while (low <= high) {
-        size_t i = (low + high) / 2;
+        int i = (low + high) / 2;
 
         uint64_t x = index[2 * i];
 
@@ -311,7 +312,7 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
         const uint8_t *ptr = std::get<1>(sd);
 
         for (int i = 0; i < chunk; i++) {
-            relativeOffset += cumulativePower * (*ptr);
+            relativeOffset += cumulativePower * ((*ptr) - 1);
             cumulativePower <<= 1;
         }
     }

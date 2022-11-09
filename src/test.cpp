@@ -6,7 +6,14 @@ using namespace std;
 
 int main() {
     Database db;
-    db.save();
+
+    uint8_t arr[] = {1, 2, 1, 2};
+    size_t len = sizeof(arr) / sizeof(uint8_t);
+
+
+    uint64_t idx = db.getIdx(arr, len);
+    cout << idx << endl;
+
 
 
 

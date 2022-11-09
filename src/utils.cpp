@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
-#include "database2.h"
+#include "database3.h"
 
 using namespace std;
 
@@ -90,6 +90,8 @@ char *generateGame(int length, int game) {
 
 ////////////////////////////////////////New DB stuff
 
+/*
+
 //TODO implement this
 char *generateGameFromShape(uint64_t shape, int game) {
     char *board = new char[4];
@@ -148,6 +150,8 @@ vector<int> numberToShape(uint64_t snum) {
 
 
 //////////////////////////////
+
+*/
 
 Bitvector::Bitvector() {
     for (int i = 0; i < BIT_VECTOR_SIZE; i++) {

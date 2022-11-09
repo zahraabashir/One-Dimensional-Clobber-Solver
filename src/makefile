@@ -16,7 +16,7 @@ default: Test
 run: TheSolvers
 	-./TheSolvers BWBWBWBWBWBW W 200
 
-Test: game.o test.o utils.o
+Test: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o $@
 	-./Test
 

@@ -1,17 +1,11 @@
 #include <iostream>
-#include "game.h"
 #include "utils.h"
+#include "database3.h"
 
 using namespace std;
 
 int main() {
-    
-    Game g("BWBW");
-    g -= 2;
-
-    cout << g << endl;
-
-
+    Database db;
 
 
 

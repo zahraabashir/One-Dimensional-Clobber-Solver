@@ -1,3 +1,4 @@
+#error Don't use DB2
 #pragma once
 
 #include "options.h"

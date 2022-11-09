@@ -50,6 +50,8 @@ vector<int> numberToShape(uint64_t number) {
     while (number) {
         int chunk = (number & shapeNumberMask()) + 1;
         shape.push_back(chunk);
+
+        number >>= shapeNumberShift();
     }
 
     return shape;
@@ -92,6 +94,7 @@ vector<vector<int>> makeShapes() {
 Database::Database() {
     cout << "Making DB" << endl;
 
+
     init();
 
 }
@@ -105,7 +108,9 @@ void Database::init() {
     //    for (int chunk : shape) {
     //        cout << chunk << " ";
     //    }
-    //    cout << " | " << shapeToNumber(shape) << endl;
+    //    cout << " | " << shapeToNumber(shape) << " -- ";
+
+    //    cout << (numberToShape(shapeToNumber(shape)) == shape) << endl;
     //}
 
 
@@ -150,7 +155,7 @@ void Database::init() {
     */
 
     //Header...
-    //TODO
+    *((size_t *) data) = indexEntryCount;
 
     //Index...
     index = data + headerSize;

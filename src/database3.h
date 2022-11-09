@@ -13,8 +13,13 @@ class Database {
   private:
     FILE *file; // read/write from here
     uint8_t *data; // load database into this array
+    uint8_t *index;
 
-    const static size_t headerSize = 8; //TODO
+    /*
+        header contains:
+        size_t indexEntryCount
+    */
+    const static size_t headerSize = sizeof(size_t);
 
     const static size_t indexEntrySize = 2 * sizeof(uint64_t);
     size_t indexEntryCount;
@@ -22,7 +27,6 @@ class Database {
     static constexpr size_t entrySize = 8; //TODO
     size_t entryCount;
 
-    uint8_t *index;
 
   public:
     size_t size;

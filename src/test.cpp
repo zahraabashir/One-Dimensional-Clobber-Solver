@@ -7,7 +7,9 @@ using namespace std;
 int main() {
     Database db;
 
-    uint8_t arr[] = {1, 2, 1, 2};
+    cout << "-1 is " << (uint64_t) -1 << endl;
+
+    uint8_t arr[] = {1, 2, 1, 2, 0, 2, 1};
     size_t len = sizeof(arr) / sizeof(uint8_t);
 
 

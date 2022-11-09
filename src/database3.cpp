@@ -257,6 +257,10 @@ vector<tuple<int, const uint8_t *>> computeShapeData(const uint8_t *board, size_
         }
     }
 
+    if (chunk > 1) {
+        shape.push_back(tuple<int, const uint8_t *>(chunk, ptr));
+    }
+
     return shape;
 }
 

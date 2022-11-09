@@ -9,6 +9,59 @@
 #define OC_P 3
 #define OC_N 4
 
+template <class T>
+struct _SZ {
+    static constexpr size_t size() {
+        return sizeof(T);
+    }
+};
+
+#define sz(T) (_SZ<T>::size())
+
+struct DBLayout {
+    static constexpr size_t arr[] = {
+        sz(uint8_t),        // outcome
+        sz(uint64_t[2]),    // domBlack/domWhite
+        sz(uint8_t[2]),     // low/high bounds
+        sz(uint64_t),       // simplicity metric
+        sz(uint64_t),       //link
+        sz(uint64_t),       //shape
+        sz(uint32_t),       //number
+    };
+
+    static constexpr size_t N = sizeof(arr) / sizeof(size_t);
+
+    static constexpr size_t size() {
+        size_t sum = 0;
+
+        for (size_t i = 0; i < N; i++) {
+            sum += arr[i];
+        }
+
+        return sum;
+    }
+};
+
+template <class Layout, size_t index>
+struct Offset {
+    constexpr operator size_t() {
+        static_assert(index < Layout::N, "Offset template bad index");
+        return Layout::arr[index - 1] + Offset<Layout, index - 1>();
+
+    }
+
+};
+
+template <class Layout>
+struct Offset<Layout, 0> {
+    constexpr operator size_t() {
+        static_assert(0 < Layout::N, "Offset template bad index");
+        return 0;
+    }
+};
+
+
+
 class Database {
   private:
     FILE *file; // read/write from here
@@ -25,7 +78,7 @@ class Database {
     const static size_t indexEntrySize = 2 * sizeof(uint64_t);
     size_t indexEntryCount;
 
-    static constexpr size_t entrySize = 8; //TODO
+    static constexpr size_t entrySize = DBLayout::size();
     size_t entryCount;
 
 

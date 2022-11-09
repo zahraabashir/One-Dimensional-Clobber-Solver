@@ -18,6 +18,16 @@ struct _SZ {
 
 #define sz(T) (_SZ<T>::size())
 
+enum {
+    DB_OUTCOME = 0,
+    DB_DOMINANCE,
+    DB_BOUNDS,
+    DB_METRIC,
+    DB_LINK,
+    DB_SHAPE,
+    DB_NUMBER,
+};
+
 struct DBLayout {
     static constexpr size_t arr[] = {
         sz(uint8_t),        // outcome
@@ -66,7 +76,7 @@ class Database {
   private:
     FILE *file; // read/write from here
     uint8_t *data; // load database into this array
-    uint8_t *index;
+    uint64_t *index;
 
     /*
         header contains:
@@ -92,9 +102,9 @@ class Database {
     void save();
     void load();
 
-    uint64_t getIdx(uint8_t *board, size_t len);
+    uint64_t getIdx(const uint8_t *board, size_t len);
 
-    uint8_t *get(uint8_t *board, size_t len);
+    uint8_t *get(const uint8_t *board, size_t len);
     uint8_t *getFromIdx(uint64_t idx);
 };
 

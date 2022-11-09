@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <tuple>
 
 using namespace std;
 
@@ -43,6 +44,20 @@ uint64_t shapeToNumber(const vector<int> &shape) {
 
     return num;
 }
+
+uint64_t shapeDataToNumber(const vector<tuple<int, const uint8_t *>> &shape) {
+    uint64_t num = 0;
+
+    for (auto it = shape.rbegin(); it != shape.rend(); it++) {
+        int chunk = std::get<0>(*it);
+
+        num = (num << shapeNumberShift());
+        num |= (chunk - 1);
+    }
+
+    return num;
+}
+
 
 vector<int> numberToShape(uint64_t number) {
     vector<int> shape;
@@ -159,7 +174,7 @@ void Database::init() {
     ((size_t *) data)[1] = entryCount;
 
     //Index...
-    index = data + headerSize;
+    index = (uint64_t *) (data + headerSize);
 
     size_t cumulativeEntries = 0;
     for (size_t i = 0; i < shapeList.size(); i++) {
@@ -168,7 +183,7 @@ void Database::init() {
         uint64_t shapeNumber = shapeToNumber(shape);
         uint64_t offset = (headerSize + indexEntrySize * indexEntryCount) + cumulativeEntries * entrySize;
 
-        uint8_t *entry = (index + i * indexEntrySize);
+        uint8_t *entry = (((uint8_t *) index) + i * indexEntrySize);
 
         //cout << "Writing to " << (int) (entry - index) << endl;
 
@@ -217,4 +232,102 @@ void Database::load() {
 
     indexEntryCount = ((size_t *) data)[0];
     entryCount = ((size_t *) data)[1];
+}
+
+
+// (chunkSize, start)
+vector<tuple<int, const uint8_t *>> computeShapeData(const uint8_t *board, size_t len) {
+    vector<tuple<int, const uint8_t *>> shape;
+
+    int chunk = 0;
+    const uint8_t *ptr = board;    
+
+    for (size_t i = 0; i < len; i++) {
+        if (board[i] != 0) {
+            if (chunk == 0) { //new chunk
+                ptr = board + i;
+            }
+
+            chunk += 1;
+        } else {
+            if (chunk > 1) { //complete chunk
+                shape.push_back(tuple<int, const uint8_t *>(chunk, ptr));
+            }
+            chunk = 0;
+        }
+    }
+
+    return shape;
+}
+
+
+uint64_t Database::getIdx(const uint8_t *board, size_t len) {
+    if (len > DB_MAX_BITS) {
+        return -1;
+    }
+
+    //Compute shape of given game and sort it
+    vector<tuple<int, const uint8_t *>> shapeData = computeShapeData(board, len);
+    sort(shapeData.begin(), shapeData.end(),
+        [](const tuple<int, const uint8_t *> &s1, const tuple<int, const uint8_t *> &s2) {
+            return std::get<0>(s1) > std::get<0>(s2);
+        }
+    );
+
+    //Get shape number
+    uint64_t snum = shapeDataToNumber(shapeData);
+
+    //Binary search index to find table section
+    size_t low = 0;
+    size_t high = indexEntryCount - 1;
+    uint64_t sectionOffset = -1;
+
+    while (low <= high) {
+        size_t i = (low + high) / 2;
+
+        uint64_t x = index[2 * i];
+
+        if (x < snum) {
+            low = i + 1;
+        } else if (x > snum) {
+            high = i - 1;
+        } else {
+            sectionOffset = index[2 * i + 1];
+            break;
+        }
+    }
+
+    if (sectionOffset == (uint64_t) -1) {
+        return -1;
+    }
+
+
+    //Compute offset into table section
+    uint64_t relativeOffset = 0;
+    uint64_t cumulativePower = 1;
+
+    for (const tuple<int, const uint8_t *> &sd : shapeData) {
+        const int &chunk = std::get<0>(sd);
+        const uint8_t *ptr = std::get<1>(sd);
+
+        for (int i = 0; i < chunk; i++) {
+            relativeOffset += cumulativePower * (*ptr);
+            cumulativePower <<= 1;
+        }
+    }
+
+    return sectionOffset + relativeOffset;
+}
+
+uint8_t *Database::get(const uint8_t *board, size_t len) {
+    uint64_t idx = getIdx(board, len);
+    if (idx == (uint64_t) -1) {
+        return 0;
+    }
+
+    return data + idx;
+}
+
+uint8_t *Database::getFromIdx(uint64_t idx) {
+    return data + idx;
 }

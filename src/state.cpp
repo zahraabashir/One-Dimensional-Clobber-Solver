@@ -48,7 +48,7 @@ int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
 
 
 
-int code(uint8_t *board, size_t len, int player) {
+int getCode(uint8_t *board, size_t len, int player) {
     int result = 1 * (player - 1);
     int cumulativePower = 2;
 

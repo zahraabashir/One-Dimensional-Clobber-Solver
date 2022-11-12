@@ -11,9 +11,9 @@ FLAGS = -Wall --std=c++17 -g
 .PHONY: default
 
 
-default: compTest
+default: run
 
-compTest: state.o
+compTest: solver.o
 
 
 run: TheSolvers
@@ -23,7 +23,7 @@ miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test
 	-time ./Test
 
-TheSolvers: game.o main.o database2.o utils.o state.o solver.o bound.o
+TheSolvers: main.o database3.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
 DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o

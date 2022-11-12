@@ -1,174 +1,109 @@
 #pragma once
 
-
-#include "state.h"
-#include "database2.h"
-#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <random>
-#include "bound.h"
+
 #include "options.h"
+#include "database3.h"
 
-
-
-#if defined(SOLVER_FIX_MEMORY_LEAK)
-
-
-#define BOARDLEN(te) FIXED_BOARD_SIZE 
-#define BOARDPTR(te) (te) //char[]
-#define PLAYER(te) *(te + FIXED_BOARD_SIZE) //uint8_t
-#define OUTCOME(te) *(te + FIXED_BOARD_SIZE + 1) //uint8_t
-#define BESTMOVE(te) *(te + FIXED_BOARD_SIZE + 2) //uint8_t
-#define DEPTH(te) *((unsigned int *) (te + FIXED_BOARD_SIZE + 3)) //unsigned int
-#define HEURISTIC(te) *(te + FIXED_BOARD_SIZE + 3 + sizeof(unsigned int)) //int8_t
-
-#define RESIZETTBOARD(entry, newSize)
-#define RESIZESTATEBOARD(state, newSize)
-
-#else
-
-#define BOARDLEN(te) *(te) //uint8_t
-#define BOARDPTR(te) *((char **) (te + 1)) //char *
-#define PLAYER(te) *(te + 1 + sizeof(char *)) //uint8_t
-#define OUTCOME(te) *(te + 1 + sizeof(char *) + 1) //uint8_t
-#define BESTMOVE(te) *(te + 1 + sizeof(char *) + 2) //uint8_t
-#define DEPTH(te) *((unsigned int *) (te + 1 + sizeof(char *) + 3)) //unsigned int
-#define HEURISTIC(te) *(te + 1 + sizeof(char *) + 3 + sizeof(unsigned int)) //int8_t
-
-#define RESIZETTBOARD(entry, newSize) \
-{ \
-    uint8_t oldSize = BOARDLEN(entry); \
-    if (oldSize != newSize) { \
-        if (oldSize != 0) { \
-            delete[] BOARDPTR(entry); \
-        } \
-        if (newSize != 0) { \
-            BOARDPTR(entry) = new char[newSize]; \
-        } \
-        BOARDLEN(entry) = newSize; \
-    } \
-}
-
-#define RESIZESTATEBOARD(state, newSize) \
-{ \
-    int oldSize = state->boardSize; \
-    if (oldSize != newSize) { \
-        if (oldSize != 0) { \
-            delete[] state->board; \
-        } \
-        if (newSize != 0) { \
-            state->board = new char[newSize]; \
-        } \
-        state->boardSize = newSize; \
-    } \
-}
-
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
+#define BLOCK_SIZE 8
 
 extern int node_count;
 extern int best_from;
 extern int best_to;
 
-class BasicSolver {
+struct TTLayout {
+    static constexpr size_t arr[] = {
+        sz(uint8_t),        // board length
+        sz(uint8_t *),      // board pointer
+        sz(uint8_t),        // player
+        sz(uint8_t),        // outcome
+        sz(uint8_t[3]),     // best moves
+        sz(unsigned int),   // depth
+        sz(int8_t),         // heuristic
+    };
+
+    static constexpr size_t N = sizeof(arr) / sizeof(size_t);
+
+    //size of one entry
+    static constexpr size_t size() {
+        size_t sum = 0;
+
+        for (size_t i = 0; i < N; i++) {
+            sum += arr[i];
+        }
+
+        return sum;
+    }
+};
+
+enum {
+    TT_LENGTH = 0,
+    TT_BOARD,
+    TT_PLAYER,
+    TT_OUTCOME,
+    TT_BEST_MOVES,
+    TT_DEPTH,
+    TT_HEURISTIC,
+};
+
+uint8_t *tt_get_length(uint8_t *entry);
+uint8_t **tt_get_board(uint8_t *entry);
+uint8_t *tt_get_player(uint8_t *entry);
+uint8_t *tt_get_outcome(uint8_t *entry);
+uint8_t *tt_get_best_moves(uint8_t *entry);
+unsigned int *tt_get_depth(uint8_t *entry);
+int8_t *tt_get_heuristic(uint8_t *entry);
+
+class Solver {
   private:
-    int maxDepth;
+    size_t boardLen;
+
+    //size_t tableEntryCount;
+    static constexpr size_t blockHeaderSize = BLOCK_SIZE;
+    size_t blockCount;
+    static constexpr size_t tableEntrySize = TTLayout::size();
+    size_t tableSize;
+
+    size_t totalBlockSize;
+
     bool doABPrune;
+    bool limitCompletions;
+    uint64_t maxCompleted;
+    uint64_t completed;
 
-    size_t entryCount;
 
-    //this limits the number of searches, for the current depth, that can reach leaf nodes
-    //search is aborted after this
-    int64_t maxCompleted;
-    int64_t completed;
+    int maxDepth;
+
+
+
+  public:
+    int codeLength;
+    int codeMask;
+
+    uint8_t *table;
 
     Database *db;
-
     std::default_random_engine *rng;
 
-    void simplify(State *state, int depth);
-  public:
-    int rootPlayer;
-    int boardSize;
 
-    //unset to allow searches to reach leaf nodes uninterrupted
-    bool limitCompletions;
+    Solver(size_t boardLen, Database *db);
+    ~Solver();
 
-    double timeLimit;
-    std::chrono::time_point<std::chrono::steady_clock> startTime;
-    
+    int solveID(uint8_t *board, size_t len, int n);
 
-    //check this after calling updateTime to see if time is up
-    bool outOfTime;
+    std::pair<int, bool> searchID(uint8_t *board, size_t boardLen, 
+        int n, int p, int depth);
 
 
-    //transposition table data
-    char *table;
+    uint8_t *getBlockPtr(int code);
 
-    int bitMask; //bit mask for State code used to index table
-    int codeLength; //how many bits to use as index from the State's code
-    int tableEntrySize; //size in bytes of 1 table entry
-
-
-    BasicSolver(int rootPlayer, int boardSize, Database *db);
-    ~BasicSolver();
-
-    //true if the given entry matches the state and player
-    bool validateTableEntry(State *state, int p, char *entry);
-
-
-    //call this to run the iterative deepening solver
-    int solveID(State *state, int p, int n);
-
-
-    /*      rootSearchID, searchID
-
-        Visitors for the root and other nodes, in ID solver. Depth starts at 0 and increases with each recursive call.
-
-    if the bool is true, the int is the player who wins, otherwise it is the heuristic score
-    */
-    #if defined(SOLVER_ALPHA_BETA )
-    std::pair<int, bool> rootSearchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2);
-    std::pair<int, bool> searchID(State *state, int p, int n, int depth, Bound alpha, Bound beta, Bound &rb1, Bound &rb2);
-    #else
-    std::pair<int, bool> rootSearchID(State *state, int p, int n, int depth);
-    std::pair<int, bool> searchID(State *state, int p, int n, int depth);
-    #endif
-
-
-    //basic solver functions
-    //int solve(State *state, int p, int n);
-    //int solveRoot(State *state, int p, int n);
-
-
-    //return a table entry pointer based on a State's code. Use validateTableEntry
-    //to see if the entry is a match
-    char *getTablePtr(int code);
-
-    //Call this when a node is being visited
-    //check outOfTime to see if time is up
-    void updateTime();
-
-    //void setTableEntry(int code, char *board, char player, char outcome);
-
-
-    int checkBounds(State *state);
-
-    void generateBounds(State *state, Bound &alpha, Bound &beta);
-
-
+    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player);
 };
 
 
 
-std::vector<std::pair<int, int>> generateSubgames(State *state);
+
+
+

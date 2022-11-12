@@ -4,7 +4,7 @@
 #include "solver.h"
 #include "options.h"
 #include <cstring>
-#include <chrono.h>
+#include <chrono>
 
 //#include "game.h"
 
@@ -26,12 +26,14 @@ int main(int argc, char **argv) {
     for (size_t i = 0; i < boardLen; i++) {
         board[i] = charToPlayerNumber(argv[1][i]);
     }
+    cout << "Done copying" << endl;
 
     int rootPlayer = charToPlayerNumber(*argv[2]);
 
     Solver solver(boardLen, &db);
 
     auto startTime = std::chrono::steady_clock::now();
+    cout << "About to solve" << endl;
     int result = solver.solveID(board, boardLen, rootPlayer);
 
     //Print output

@@ -3,6 +3,7 @@
 #include "state.h"
 #include <cstring>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -59,6 +60,40 @@ int8_t *tt_get_heuristic(uint8_t *entry) {
         return 0;
     }
     return (int8_t *) (entry + Offset<TTLayout, TT_HEURISTIC>());
+}
+
+vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
+    vector<pair<int, int>> subgames;
+
+    int start = -1;
+    int end = -1;
+
+    int foundMask = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (start == -1 && board[i] != 0) {
+            start = i;
+            foundMask = 0;
+        }
+        
+        if (board[i] != 0) {
+            foundMask |= board[i];
+        }
+
+        if (start != -1 && board[i] == 0) {
+            if (foundMask == 3) {
+                subgames.push_back(pair<int, int>(start, i));
+            }
+            start = -1;
+        }
+    }
+
+    if (start != -1) {
+        subgames.push_back(pair<int, int>(start, len));
+    }
+
+          
+    return subgames;
 }
 
 
@@ -176,14 +211,17 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         return pair<int, bool>(cachedOutcome, true);
     }
 
-/*
 
 
     //generate subgames, look them up in the database
-    vector<pair<int, int>> subgames = generateSubgames(state);
+    vector<pair<int, int>> subgames = generateSubgames(sboard, sboardLen);
 
     //sort subgames by length
-    sort(subgames.begin(), subgames.end(), subgameLengthCompare);
+    sort(subgames.begin(), subgames.end(),
+        [](const pair<int, int> &a, const pair<int, int> &b) {
+            return (a.second - a.first) > (b.second - b.first);
+        }
+    );
 
     vector<int> lengths;
     vector<int> outcomes;
@@ -204,15 +242,14 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         int length = it->second - it->first;
         lengths.push_back(length);
 
-        unsigned char *entry = db->get(length, &state->board[it->first]);
-        int outcome = DB_GET_OUTCOME(entry);
-        //int outcome = db->get(length, &state->board[it->first]);
+        uint8_t *dbEntry = db->get(&sboard[it->first], length);
+        int outcome = *db_get_outcome(dbEntry);
         outcomes.push_back(outcome);
 
         counts[outcome] += 1;
         outcomeMask |= (1 << outcome);
 
-        if ((outcome == OC_B && p == WHITE) || (outcome == OC_W && p == BLACK)) {
+        if ((outcome == OC_B && n == WHITE) || (outcome == OC_W && n == BLACK)) {
             uint64_t mask = 1;
 
             for (int i = 1; i < length; i++) {
@@ -225,170 +262,81 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
-    //Only Bs
-    if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
 
-        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, state->boardSize);
-            memcpy(BOARDPTR(entry), state->board, state->boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = BLACK;
-            BESTMOVE(entry) = 0;
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = 127 * (p == BLACK ? 1 : -1);
-        }        
+    if (depth > 0) {
+        //Only Bs
+        if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
 
-        RESIZESTATEBOARD(state, oldBoardSize);
-        memcpy(state->board, oldBoard, state->boardSize);
-
-        return pair<int, bool>(OC_B, true);
-    }
-
-    //Only Ws
-    if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
-
-        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, state->boardSize);
-            memcpy(BOARDPTR(entry), state->board, state->boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = WHITE;
-            BESTMOVE(entry) = 0;
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = 127 * (p == WHITE ? 1 : -1);
-        }        
-
-        RESIZESTATEBOARD(state, oldBoardSize);
-        memcpy(state->board, oldBoard, state->boardSize);
-
-        return pair<int, bool>(OC_W, true);
-    }
-
-    //Only one N
-    if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
-        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, state->boardSize);
-            memcpy(BOARDPTR(entry), state->board, state->boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = p;
-            BESTMOVE(entry) = 0;
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = 127;
-        }        
-
-        RESIZESTATEBOARD(state, oldBoardSize);
-        memcpy(state->board, oldBoard, state->boardSize);
-
-        return pair<int, bool>(p, true); //current player wins
-    }
-
-
-    //Use differences
-    #if defined(SOLVER_DELETE_SUBGAMES)
-    char boardCopy[state->boardSize];
-    int boardCopySize = state->boardSize;
-    memcpy(boardCopy, state->board, state->boardSize);
-
-    for (int i = 0; i < subgames.size(); i++) {
-        //if ((skipDelete >> i) & ((uint64_t) 1)) {
-        //    continue;
-        //}
-
-        pair<int, int> &sg = subgames[i];
-
-        if (outcomes[i] == p) {
-            for (int j = 0; j < lengths[i]; j++) {
-                state->board[sg.first + j] = 0;
-            }
-           
-            //uint64_t leftSkip = skipDelete & (((uint64_t) -1) >> (64 - i));
-            //uint64_t rightSkip = skipDelete & (((uint64_t) -1) << (i + 1));
-            //uint64_t newSkip = leftSkip | rightSkip;
-            //uint64_t newSkip = 0;
-
-            //cout << sumBits(skipDelete) << " " << sumBits(leftSkip) << " " << sumBits(rightSkip) << " " << sumBits(newSkip) << endl;
-
-
-
-            //Don't swap players or increase depth -- we haven't played a move
-            #if defined(SOLVER_ALPHA_BETA)
-            Bound cb1, cb2;
-            pair<int, bool> result = searchID(state, p, n, depth, alpha, beta, cb1, cb2);
-            #else
-            pair<int, bool> result = searchID(state, p, n, depth);
-            #endif
-
-
-            if (outOfTime) {
-                //memcpy(state->board, oldBoard, state->boardSize);
-                return result;
-            }
-            RESIZESTATEBOARD(state, boardCopySize);
-            memcpy(state->board, boardCopy, state->boardSize);
-
-            if (result.second && result.first == p) {
-
-                if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                    //memcpy(entry, state->board, boardSize);
-                    RESIZETTBOARD(entry, state->boardSize);
-                    memcpy(BOARDPTR(entry), state->board, state->boardSize);
-                    PLAYER(entry) = p;
-                    OUTCOME(entry) = p;
-                    BESTMOVE(entry) = 0;
-                    DEPTH(entry) = depth;
-                    HEURISTIC(entry) = 127;
-                }        
-                RESIZESTATEBOARD(state, oldBoardSize);
-                memcpy(state->board, oldBoard, state->boardSize);
-
-                return result;
-            }
-
-            //skipDelete |= ((uint64_t) 1) << i;
-
-
-            #if defined(SOLVER_ALPHA_BETA)
-            if (doABPrune) {
-                bool abCut = false;
-
-                if (p == 1) {
-                    if (cb1 > rb1) {
-                        rb1 = cb1;
-                    }
-                    if (cb1 >= beta) {
-                        abCut = true;
-                    } else {
-                        if (cb1 > alpha) {
-                            alpha = cb1;
-                        }
-                    }
-                } else {
-                    if (cb2 < rb2) {
-                        rb2 = cb2;
-                    }
-                    if (cb2 <= alpha) {
-                        abCut = true;
-                    } else {
-                        if (cb2 < beta) {
-                            beta = cb2;
-                        }
-                    }
-                }
-
-                if (abCut && depth > 0 && doABPrune) {
-                    RESIZESTATEBOARD(state, oldBoardSize);
-                    memcpy(state->board, oldBoard, state->boardSize);
-                    return pair<int, bool>(0, false);
-                }
-            }
-            #endif
-
-
+            //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            if (true) {
+                *tt_get_outcome(entryPtr) = BLACK;
+                *tt_get_depth(entryPtr) = depth;
+                *tt_get_heuristic(entryPtr) = 127 * (n == BLACK ? 1 : -1);
+            }        
+            return pair<int, bool>(OC_B, true);
         }
+
+        //Only Ws
+        if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
+
+            //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            if (true) {
+                *tt_get_outcome(entryPtr) = WHITE;
+                *tt_get_depth(entryPtr) = depth;
+                *tt_get_heuristic(entryPtr) = 127 * (n == WHITE ? 1 : -1);
+            }        
+
+            return pair<int, bool>(OC_W, true);
+        }
+
+        //Only one N
+        if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
+            //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            if (true) {
+                *tt_get_outcome(entryPtr) = n;
+                *tt_get_depth(entryPtr) = depth;
+                *tt_get_heuristic(entryPtr) = 127;
+            }        
+            return pair<int, bool>(n, true); //current player wins
+        }
+
+
+        //Use differences
+        #if defined(SOLVER_DELETE_SUBGAMES)
+
+        for (int i = 0; i < subgames.size(); i++) {
+            uint8_t sboardCopy[sboardLen];
+            size_t sboardCopyLen = sboardLen;
+            memcpy(sboardCopy, sboard, sboardLen);
+
+            pair<int, int> &sg = subgames[i];
+
+            if (outcomes[i] == p) {
+                for (int j = 0; j < lengths[i]; j++) {
+                    sboardCopy[sg.first + j] = 0;
+                }
+
+                //Don't swap players or increase depth -- we haven't played a move
+                pair<int, bool> result = searchID(sboardCopy, sboardCopyLen, n, p, depth);
+
+                if (result.second && result.first == n) {
+
+                    //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                    if (true) {
+                        *tt_get_outcome(entryPtr) = n;
+                        *tt_get_depth(entryPtr) = depth;
+                        *tt_get_heuristic(entryPtr) = 127;
+                    }        
+                    return result;
+                }
+
+
+            }
+        }
+        #endif
     }
-    #endif
+
+    /*
 
     //generate moves
     //check for terminal
@@ -594,47 +542,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             delete[] moves;
             return pair<int, bool>(p, true);
         }
-
-        #if defined(SOLVER_ALPHA_BETA)
-        //update ab
-        if (doABPrune) {
-            bool abCut = false;
-
-            if (p == 1) {
-                if (cb1 > rb1) {
-                    rb1 = cb1;
-                }
-                if (cb1 >= beta) {
-                    abCut = true;
-                } else {
-                    if (cb1 > alpha) {
-                        alpha = cb1;
-                    }
-                }
-            } else {
-                if (cb2 < rb2) {
-                    rb2 = cb2;
-                }
-                if (cb2 <= alpha) {
-                    abCut = true;
-                } else {
-                    if (cb2 < beta) {
-                        beta = cb2;
-                    }
-                }
-            }
-
-            if (abCut && depth > 0 && doABPrune) {
-                RESIZESTATEBOARD(state, oldBoardSize);
-                memcpy(state->board, oldBoard, state->boardSize);
-                delete[] moves;
-                return pair<int, bool>(0, false);
-            }
-        }
-        #endif
-
-
-
 
         if (!result.second) {
             result.first *= -1;

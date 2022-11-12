@@ -54,7 +54,7 @@ int charToPlayerNumber(char c) {
 }
 
 
-void negateBoard(uint8_t *board size_t length) {
+void negateBoard(uint8_t *board, size_t length) {
     for (size_t i = 0; i < length; i++) {
         board[i] = opponentNumber(board[i]);
     }

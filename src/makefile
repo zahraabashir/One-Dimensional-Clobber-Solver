@@ -13,7 +13,7 @@ FLAGS = -Wall --std=c++17 -g
 
 default: compTest
 
-compTest: main.o
+compTest: state.o
 
 
 run: TheSolvers

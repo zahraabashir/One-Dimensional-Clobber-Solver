@@ -6,11 +6,8 @@
 #include <algorithm>
 
 
-int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
-    return _getMoves(board, len, player, opponentNumber(player), moveCount, 0, 0);
-}
 
-int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *moveCount, int idx, int moveDepth) {
+int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *moveCount, size_t idx, size_t moveDepth) {
     if (idx >= len) {
         if (moveDepth > 0) {
             *moveCount = moveDepth;
@@ -44,6 +41,11 @@ int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *mov
 
     return buffer;
 }
+
+int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
+    return _getMoves(board, len, player, opponentNumber(player), moveCount, 0, 0);
+}
+
 
 
 int code(uint8_t *board, size_t len, int player) {

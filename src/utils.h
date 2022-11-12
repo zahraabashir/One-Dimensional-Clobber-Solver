@@ -100,7 +100,7 @@ bool operator<(const triple<T1, T2, T3> &t1, const triple<T1, T2, T3> &t2) {
     return false;
 }
 
-void negateBoard(uint8_t *board size_t length);
+void negateBoard(uint8_t *board, size_t length);
 
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {

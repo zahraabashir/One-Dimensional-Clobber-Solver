@@ -6,6 +6,7 @@ using namespace std;
 
 int main() {
     Database db;
+    db.init();
 
     cout << "-1 is " << (uint64_t) -1 << endl;
 

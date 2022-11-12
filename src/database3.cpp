@@ -3,8 +3,62 @@
 #include <vector>
 #include <algorithm>
 #include <tuple>
+#include <cassert>
 
 using namespace std;
+
+uint8_t *db_get_outcome(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint8_t *) (entry + Offset<DBLayout, DB_OUTCOME>());
+}
+
+uint64_t *db_get_dominance(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint64_t *) (entry + Offset<DBLayout, DB_DOMINANCE>());
+}
+
+uint8_t *db_get_bounds(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint8_t *) (entry + Offset<DBLayout, DB_BOUNDS>());
+}
+
+uint64_t *db_get_metric(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint64_t *) (entry + Offset<DBLayout, DB_METRIC>());
+}
+
+uint64_t *db_get_link(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint64_t *) (entry + Offset<DBLayout, DB_LINK>());
+}
+
+uint64_t *db_get_shape(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint64_t *) (entry + Offset<DBLayout, DB_SHAPE>());
+}
+
+uint32_t *db_get_number(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint32_t *) (entry + Offset<DBLayout, DB_NUMBER>());
+}
+
+
+
+
 
 constexpr uint64_t shapeNumberMask() {
     uint64_t mask = 0;
@@ -107,11 +161,7 @@ vector<vector<int>> makeShapes() {
 
 
 Database::Database() {
-    cout << "Making DB" << endl;
-
-
-    init();
-
+    //cout << "Making DB" << endl;
 }
 
 void Database::init() {
@@ -183,12 +233,12 @@ void Database::init() {
         uint64_t shapeNumber = shapeToNumber(shape);
         uint64_t offset = (headerSize + indexEntrySize * indexEntryCount) + cumulativeEntries * entrySize;
 
-        uint8_t *entry = (((uint8_t *) index) + i * indexEntrySize);
+        uint64_t *entry = (uint64_t *) (((uint8_t *) index) + i * indexEntrySize);
 
         //cout << "Writing to " << (int) (entry - index) << endl;
 
-        ((uint64_t *) entry)[0] = shapeNumber;
-        ((uint64_t *) entry)[1] = offset;
+        entry[0] = shapeNumber;
+        entry[1] = offset;
 
         size_t sum = 0;
         for (int chunk : shape) {
@@ -232,6 +282,7 @@ void Database::load() {
 
     indexEntryCount = ((size_t *) data)[0];
     entryCount = ((size_t *) data)[1];
+    index = (uint64_t *) (data + headerSize);
 }
 
 
@@ -267,7 +318,7 @@ vector<tuple<int, const uint8_t *>> computeShapeData(const uint8_t *board, size_
 
 uint64_t Database::getIdx(const uint8_t *board, size_t len) {
     if (len > DB_MAX_BITS) {
-        return -1;
+        return DB_NOT_FOUND;
     }
 
     //Compute shape of given game and sort it
@@ -284,7 +335,7 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
     //Binary search index to find table section
     int low = 0;
     int high = indexEntryCount - 1;
-    uint64_t sectionOffset = -1;
+    uint64_t sectionOffset = DB_NOT_FOUND;
 
 
     while (low <= high) {
@@ -302,8 +353,9 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
         }
     }
 
-    if (sectionOffset == (uint64_t) -1) {
-        return -1;
+    if (sectionOffset == DB_NOT_FOUND) {
+        cerr << "DB NOT FOUND for valid size -- shouldn't happen" << endl;
+        return DB_NOT_FOUND;
     }
 
 
@@ -316,6 +368,7 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
         const uint8_t *ptr = std::get<1>(sd);
 
         for (int i = 0; i < chunk; i++) {
+            assert(*ptr > 0 && *ptr <= 2);
             relativeOffset += cumulativePower * ((*ptr) - 1);
             cumulativePower <<= 1;
         }
@@ -326,7 +379,7 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
 
 uint8_t *Database::get(const uint8_t *board, size_t len) {
     uint64_t idx = getIdx(board, len);
-    if (idx == (uint64_t) -1) {
+    if (idx == DB_NOT_FOUND) {
         return 0;
     }
 

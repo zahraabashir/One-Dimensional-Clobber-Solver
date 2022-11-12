@@ -9,6 +9,8 @@
 #define OC_P 3
 #define OC_N 4
 
+#define DB_NOT_FOUND ((uint64_t) -1)
+
 template <class T>
 struct _SZ {
     static constexpr size_t size() {
@@ -41,6 +43,7 @@ struct DBLayout {
 
     static constexpr size_t N = sizeof(arr) / sizeof(size_t);
 
+    //size of one entry
     static constexpr size_t size() {
         size_t sum = 0;
 
@@ -57,9 +60,7 @@ struct Offset {
     constexpr operator size_t() {
         static_assert(index < Layout::N, "Offset template bad index");
         return Layout::arr[index - 1] + Offset<Layout, index - 1>();
-
     }
-
 };
 
 template <class Layout>
@@ -69,6 +70,16 @@ struct Offset<Layout, 0> {
         return 0;
     }
 };
+
+
+uint8_t *db_get_outcome(const uint8_t *entry);
+uint64_t *db_get_dominance(const uint8_t *entry);
+uint8_t *db_get_bounds(const uint8_t *entry);
+uint64_t *db_get_metric(const uint8_t *entry);
+uint64_t *db_get_link(const uint8_t *entry);
+uint64_t *db_get_shape(const uint8_t *entry);
+uint32_t *db_get_number(const uint8_t *entry);
+
 
 
 

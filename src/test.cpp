@@ -20,7 +20,7 @@ int main() {
 
 
         // Uncomment to test database get
-    /*
+    ///*
     cout << "Testing database get" << endl;
     uint64_t totalChecked = 0;
 
@@ -61,7 +61,7 @@ int main() {
         cout << "Done testing " << len << endl;
     }
     cout << "Checked " << totalChecked << endl;
-    */
+    //*/
 
 
 

@@ -11,14 +11,14 @@ FLAGS = -Wall --std=c++17 -g
 .PHONY: default
 
 
-default: Test
+default: miscTest
 
 run: TheSolvers
 	-./TheSolvers BWBWBWBWBWBW W 200
 
-Test: database3.o test.o utils.o
-	$(CC) $(FLAGS) $^ -o $@
-	-./Test
+miscTest: database3.o test.o utils.o
+	$(CC) $(FLAGS) $^ -o Test
+	-time ./Test
 
 TheSolvers: game.o main.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@

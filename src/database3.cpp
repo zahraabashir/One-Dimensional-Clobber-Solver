@@ -329,6 +329,10 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
         }
     );
 
+    if (shapeData.size() == 0) {
+        return DB_NOT_FOUND;
+    }
+
     //Get shape number
     uint64_t snum = shapeDataToNumber(shapeData);
 

@@ -5,8 +5,13 @@
 #include <cstring>
 #include <algorithm>
 
-int *State::generateMoves(const int &player, const int &opponent, size_t *moveCount, int idx, int moveDepth) {
-    if (idx >= boardSize) {
+
+int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
+    return _getMoves(board, len, player, opponentNumber(player), moveCount, 0, 0);
+}
+
+int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *moveCount, int idx, int moveDepth) {
+    if (idx >= len) {
         if (moveDepth > 0) {
             *moveCount = moveDepth;
             return new int[moveDepth * 2];
@@ -15,18 +20,18 @@ int *State::generateMoves(const int &player, const int &opponent, size_t *moveCo
         return nullptr;
     }
 
-    char *c2 = &board[idx];
+    uint8_t *c2 = &board[idx];
     bool move1 = false;
     bool move2 = false;
 
     if (*c2 == player) {
-        char *c1 = &board[idx - 1];
-        char *c3 = &board[idx + 1];
+        uint8_t *c1 = &board[idx - 1];
+        uint8_t *c3 = &board[idx + 1];
         move1 = idx > 0 && *c1 == opponent;
-        move2 = (idx + 1 < boardSize) && *c3 == opponent; //check probably not needed -- null terminator
+        move2 = (idx + 1 < len) && *c3 == opponent;
     }
 
-    int *buffer = generateMoves(player, opponent, moveCount, idx + 1, moveDepth + move1 + move2);
+    int *buffer = _getMoves(board, len, player, opponent, moveCount, idx + 1, moveDepth + move1 + move2);
 
     if (move1) {
         buffer[moveDepth * 2] = idx;
@@ -40,74 +45,32 @@ int *State::generateMoves(const int &player, const int &opponent, size_t *moveCo
     return buffer;
 }
 
-State::State() {
-}
 
-State::State(std::string board, int player) {
-    this->boardSize = board.length();
-    this->board = new char[this->boardSize];
-    //this->player = player;
-
-    for (int i = 0; i < this->boardSize; i++) {
-        this->board[i] = charToPlayerNumber(board[i]);
-    }
-
-}
-
-State::~State() {
-    if (this->boardSize != 0) {
-        delete[] board;
-    }
-}
-
-int State::code(int player) {
+int code(uint8_t *board, size_t len, int player) {
     int result = 1 * (player - 1);
     int cumulativePower = 2;
 
-    for (size_t i = 0; i < boardSize; i++) {
+    for (size_t i = 0; i < len; i++) {
         result += cumulativePower * board[i];
         cumulativePower *= 3;
     }
     return result;
 }
 
-/*
-bool State::operator==(const State &s) {
-    if (boardSize == s.boardSize) {
-        for (int i = 0; i < boardSize; i++) {
-            if (board[i] != s.board[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    return false;
-}
-*/
-
-void State::play(int from, int to, char *undoBuffer) {
+void play(uint8_t *board, uint8_t *undoBuffer, int from, int to) {
     int minIdx = std::min<int>(from, to);
     ((int *) undoBuffer)[0] = minIdx;
-    ((char *) undoBuffer)[0 + sizeof(int)] = board[minIdx];
-    ((char *) undoBuffer)[0 + sizeof(int) + 1] = board[minIdx + 1];
+    ((uint8_t *) undoBuffer)[0 + sizeof(int)] = board[minIdx];
+    ((uint8_t *) undoBuffer)[0 + sizeof(int) + 1] = board[minIdx + 1];
 
     board[to] = board[from];
     board[from] = EMPTY;
 }
 
-void State::undo(char *undoBuffer) {
+void undo(uint8_t *board, uint8_t *undoBuffer) {
     int start = ((int *) undoBuffer)[0];
-    board[start] = (char) undoBuffer[0 + sizeof(int)];
-    board[start + 1] = (char) undoBuffer[0 + sizeof(int) + 1];
+    board[start] = (uint8_t) undoBuffer[0 + sizeof(int)];
+    board[start + 1] = (uint8_t) undoBuffer[0 + sizeof(int) + 1];
 }
 
-int *State::getMoves(const int &player, const int &opponent, size_t *moveCount) {
-    return generateMoves(player, opponent, moveCount, 0, 0);
-}
 
-std::ostream &operator<<(std::ostream &os, const State &s) {
-    //os << "[" << s.board << " " << playerNumberToChar(s.player) << "]";
-    os << "[" << s.board << " " << "]";
-    return os;
-}

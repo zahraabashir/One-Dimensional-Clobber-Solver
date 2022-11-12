@@ -11,7 +11,10 @@ FLAGS = -Wall --std=c++17 -g
 .PHONY: default
 
 
-default: miscTest
+default: compTest
+
+compTest: main.o
+
 
 run: TheSolvers
 	-./TheSolvers BWBWBWBWBWBW W 200

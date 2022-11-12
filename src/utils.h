@@ -4,6 +4,7 @@
 
 #include <ostream>
 #include <vector>
+#include <cassert>
 
 #define EMPTY 0
 #define BLACK 1
@@ -15,9 +16,14 @@
 
 //Return number of opposing player (1 --> 2), (2 --> 1)
 inline int opponentNumber(int n) { //Inline means this needs to be in the header
-    if (n == 1 || n == 2) {
-        return (n % 2) + 1;
+    if (n == 1) {
+        return 2;
     }
+    if (n == 2) {
+        return 1;
+    }
+
+    assert(n == 0);
     return n;
 }
 
@@ -41,7 +47,7 @@ std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {
 }
 
 template <class T>
-int sign(T &val) {
+int sign(const T &val) {
     return T(0) > val ? -1 : 1;
 }
 
@@ -63,12 +69,9 @@ struct triple {
     T2 second;
     T3 third;
 
-    triple(T1 first, T2 second, T3 third) {
-        this->first = first;
-        this->second = second;
-        this->third = third;
+    triple(const T1 &_first, const T2 &_second, const T3 &_third): 
+        first(_first), second(_second), third(_third) {
     }
-
 };
 
 template <class T1, class T2, class T3>
@@ -97,19 +100,7 @@ bool operator<(const triple<T1, T2, T3> &t1, const triple<T1, T2, T3> &t2) {
     return false;
 }
 
-size_t gameLength(size_t bufferSize, char *game);
-
-void negateGame(size_t length, char *game);
-
-
-char *generateGame(int length, int game);
-
-char *generateGameFromShape(uint64_t shape, int game);
-
-uint64_t shapeToNumber(const std::vector<int> &svec);
-uint64_t shapeDataToID(const std::vector<std::pair<int, char *>> &shapeData);
-
-std::vector<int> numberToShape(uint64_t snum);
+void negateBoard(uint8_t *board size_t length);
 
 template <class T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
@@ -124,43 +115,3 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
 
     return os;
 }
-
-uint64_t shapeToNumber(const std::vector<int> &shape);
-std::vector<int> numberToShape(uint64_t number);
-
-
-////////////////////////////// Bitvector stuff
-
-struct __BitvectorBracket;
-struct __BitvectorBracketConst;
-
-struct Bitvector {
-    uint64_t data[BIT_VECTOR_SIZE];
-    static const int size = BIT_VECTOR_SIZE * 64;
-
-    Bitvector();
-    void operator=(const Bitvector &v);
-
-    __BitvectorBracket operator[](int i);
-    __BitvectorBracketConst operator[](int i) const;
-};
-
-struct __BitvectorBracket {
-    uint64_t *data;
-    int i;
-
-    __BitvectorBracket(uint64_t *data, int i);
-    void operator=(bool val);
-    operator bool();
-};
-
-struct __BitvectorBracketConst {
-    const uint64_t *data;
-    int i;
-
-    __BitvectorBracketConst(const uint64_t *data, int i);
-    operator bool() const;
-};
-
-
-std::ostream &operator<<(std::ostream &os, const Bitvector &v);

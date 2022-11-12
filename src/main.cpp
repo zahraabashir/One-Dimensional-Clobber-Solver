@@ -1,12 +1,12 @@
 #include <iostream>
 #include "utils.h"
-#include "state.h"
+//#include "state.h"
 #include "solver.h"
 #include "options.h"
 #include <cstring>
 #include <chrono.h>
 
-#include "game.h"
+//#include "game.h"
 
 using namespace std;
 

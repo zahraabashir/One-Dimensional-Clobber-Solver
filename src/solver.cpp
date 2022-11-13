@@ -162,7 +162,6 @@ Solver::~Solver() {
 
 
 int Solver::solveID(uint8_t *board, size_t len, int n) {
-    cout << "Solving" << endl;
     int p = opponentNumber(n);
 
     doABPrune = false;
@@ -454,20 +453,21 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //if solved, save value and return
 
 
-
     vector<int> moveOrder;
 
     entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
-
 
     int bestMoves[3] = {-1, -1, -1};
     bool checkedBestMove = false;
     if (*tt_get_valid(entryPtr)) {
         //bestMove = BESTMOVE(entry);
         uint8_t *bms = tt_get_best_moves(entryPtr);
-        bestMoves[0] = bms[0];
-        bestMoves[1] = bms[1];
-        bestMoves[2] = bms[2];
+        for (int i = 0; i < 3; i++) {
+            bestMoves[i] = bms[i];
+            if (bms[0] == (uint8_t) -1) {
+                bestMoves[i] = -1;
+            }
+        }
     }
 
     for (int i = 0; i < moveCount; i++) {
@@ -518,8 +518,13 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     // (i, score)
     vector<pair<int, int>> moveScores;
 
+
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;
+
+        if (i == -1) {
+            continue;
+        }
 
         //if (checkedBestMove && i == bestMove) {
         //    continue;

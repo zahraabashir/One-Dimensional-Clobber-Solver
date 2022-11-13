@@ -251,8 +251,6 @@ void Database::init() {
 }
 
 Database::~Database() {
-    cout << "Destroying DB" << endl;
-
     if (data != NULL) {
         free(data);
     }

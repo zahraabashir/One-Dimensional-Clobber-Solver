@@ -116,4 +116,4 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
     return os;
 }
 
-void printBoard(uint8_t *board, size_t len);
+void printBoard(uint8_t *board, size_t len, bool newline = false);

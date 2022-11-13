@@ -223,7 +223,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     uint8_t *blockPtr = getBlockPtr(code);
     uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
 
-    uint8_t cachedOutcome = *db_get_outcome(entryPtr);
+    uint8_t cachedOutcome = *tt_get_outcome(entryPtr);
     if (depth > 0 && cachedOutcome != OC_UNKNOWN) {
         delete[] sboard;
         return pair<int, bool>(cachedOutcome, true);
@@ -370,6 +370,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     int *moves = getMoves(sboard, sboardLen, n, &moveCount);
 
     if (moveCount == 0) { //is terminal
+        //cout << "No moves, " << p << " wins" << endl;
         completed += 1;
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
@@ -497,11 +498,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
-    if (bestMoves[0] != -1) {
-        for (int i = 2; i >= 0; i--) {
-            if (bestMoves[i] != -1 && moves[2 * bestMoves[i]] != -1) {
-                moveOrder.push_back(bestMoves[i]);
-            }
+    for (int i = 2; i >= 0; i--) {
+        if (bestMoves[i] != (uint8_t) -1 && moves[2 * bestMoves[i]] != -1) {
+            moveOrder.push_back(bestMoves[i]);
         }
     }
 
@@ -518,6 +517,15 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     // (i, score)
     vector<pair<int, int>> moveScores;
 
+
+    //cout << "|| ";
+    //printBoard(sboard, sboardLen);
+    //cout << " " << playerNumberToChar(n) << " ||" << endl;
+    //for (size_t i = 0; i < moveCount; i++) {
+    //    cout << "(" << moves[2 * i] << " " << moves[2 * i + 1] << ")" << endl;
+    //}
+
+    //cout << "Move order: " << moveOrder << endl;
 
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;
@@ -537,9 +545,13 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
+        //cout << "Trying move " << from << " -> " << to << endl;
+
         play(sboard, undoBuffer, from, to);
         pair<int, bool> result = searchID(sboard, sboardLen, p, n, depth + 1);
         undo(sboard, undoBuffer);
+
+        //cout << "Result of move: " << result.first << " " << result.second << endl;
 
 
         allProven &= result.second;

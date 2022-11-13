@@ -17,7 +17,8 @@ compTest: solver.o
 
 
 run: TheSolvers
-	-./TheSolvers BWBWBWBWBWBW W 200
+	#-./TheSolvers BWBWBWBWBWBW W 200
+	-./TheSolvers BWBWBWB.WBWBWBW W 1
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

@@ -66,7 +66,7 @@ void negateBoard(uint8_t *board, size_t length) {
 void printBoard(uint8_t *board, size_t len, bool newline) {
     cout << "{ ";
     for (size_t i = 0; i < len; i++) {
-        cout << (int) board[i] << " ";
+        cout << playerNumberToChar(board[i]) << " ";
     }
     
     cout << "}";

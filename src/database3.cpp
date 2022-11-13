@@ -211,7 +211,7 @@ void Database::init() {
 
     size += entryCount * entrySize;
 
-    cout << "DB allocating " << size << " bytes" << endl;
+    //cout << "DB allocating " << size << " bytes" << endl;
 
     //Allocate space
     data = (uint8_t *) calloc(size, 1);

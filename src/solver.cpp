@@ -203,7 +203,8 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //if solved, return
     int code = getCode(sboard, sboardLen, n);
     uint8_t *blockPtr = getBlockPtr(code);
-    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
+    bool validEntry;
+    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, &validEntry);
 
     uint8_t cachedOutcome = *db_get_outcome(entryPtr);
     if (depth > 0 && cachedOutcome != OC_UNKNOWN) {
@@ -273,6 +274,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127 * (n == BLACK ? 1 : -1);
             }        
+            delete[] sboard;
             return pair<int, bool>(OC_B, true);
         }
 
@@ -286,6 +288,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 *tt_get_heuristic(entryPtr) = 127 * (n == WHITE ? 1 : -1);
             }        
 
+            delete[] sboard;
             return pair<int, bool>(OC_W, true);
         }
 
@@ -297,6 +300,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127;
             }        
+            delete[] sboard;
             return pair<int, bool>(n, true); //current player wins
         }
 
@@ -327,6 +331,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                         *tt_get_depth(entryPtr) = depth;
                         *tt_get_heuristic(entryPtr) = 127;
                     }        
+                    delete[] sboard;
                     return result;
                 }
 
@@ -336,43 +341,38 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         #endif
     }
 
-    /*
 
     //generate moves
     //check for terminal
     size_t moveCount;
-    int *moves = state->getMoves(p, n, &moveCount);
+    int *moves = getMoves(sboard, sboardLen, n, &moveCount);
 
     if (moveCount == 0) { //is terminal
         completed += 1;
-        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, state->boardSize);
-            memcpy(BOARDPTR(entry), state->board, state->boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = n;
-            BESTMOVE(entry) = 0;
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = -127;
+        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        if (true) {
+            *tt_get_outcome(entryPtr) = p;
+            *tt_get_depth(entryPtr) = depth;
+            *tt_get_heuristic(entryPtr) = -127;
         }
 
-        RESIZESTATEBOARD(state, oldBoardSize);
-        memcpy(state->board, oldBoard, state->boardSize);
-        return pair<int, bool>(n, true);
+        delete[] sboard;
+        return pair<int, bool>(p, true);
     }
+
 
     //Delete dominated moves
     #if defined(SOLVER_DELETE_DOMINATED_MOVES)
-    vector<pair<int, int>> sg = generateSubgames(state);
+    vector<pair<int, int>> sg = generateSubgames(sboard, sboardLen);
 
     for (int i = 0; i < sg.size(); i++) {
         int start = sg[i].first;
         int end = sg[i].second; //index after end
         int len = end - start;
 
-        unsigned char *dbEntry = db->get(len, &state->board[start]);
+        uint8_t *dbEntry = db->get(&sboard[start], len);
 
-        uint64_t dominated = DB_GET_DOMINATED(dbEntry, p);
+        uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
         int moveIndex = 0;
         for (int j = 0; j < moveCount; j++) {
@@ -394,50 +394,50 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
 
 
+
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
 
         size_t pMoveCount;
-        int *pMoves = state->getMoves(n, p, &pMoveCount);
+        int *pMoves = getMoves(sboard, sboardLen, p, &pMoveCount);
 
         if (pMoveCount > 0) {
             delete[] pMoves;
         }
 
-        int h = HEURISTIC(entry);
+        int h = *tt_get_heuristic(entryPtr);
         if (!validEntry) {
-            //h = (int) moveCount - (int) pMoveCount;
             h = -pMoveCount;
         }
 
-        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, state->boardSize);
-            memcpy(BOARDPTR(entry), state->board, state->boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = EMPTY;
-            BESTMOVE(entry) = 0;
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = h;
+        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        if (true) {
+            *tt_get_outcome(entryPtr) = EMPTY;
+            *tt_get_depth(entryPtr) = depth;
+            *tt_get_heuristic(entryPtr) = h;
         }        
 
-        RESIZESTATEBOARD(state, oldBoardSize);
-        memcpy(state->board, oldBoard, state->boardSize);
         delete[] moves;
+        delete[] sboard;
         return pair<int, bool>(h, false);
     }
 
     //visit children, starting with best; find new best and update heuristic
     //if solved, save value and return
 
+
     vector<int> moveOrder;
 
 
-    int bestMove = -1;
+    int bestMoves[3] = {-1, -1, -1};
     bool checkedBestMove = false;
     if (validEntry) {
-        bestMove = BESTMOVE(entry);
+        //bestMove = BESTMOVE(entry);
+        uint8_t *bms = tt_get_best_moves(entryPtr);
+        bestMoves[0] = bms[0];
+        bestMoves[1] = bms[1];
+        bestMoves[2] = bms[2];
     }
 
     for (int i = 0; i < moveCount; i++) {
@@ -445,7 +445,11 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
-        if (i == bestMove || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
+        bool isBest = false;
+
+        isBest = (i == bestMoves[0]) || (i == bestMoves[1]) || (i == bestMoves[2]);
+        
+        if (isBest || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;
         }
         moveOrder.push_back(i);
@@ -463,11 +467,11 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
-    if (bestMove != -1) {
-        if (moves[2 * bestMove] != -1) {
-            moveOrder.push_back(bestMove);
-        } else {
-            bestMove = -1;
+    if (bestMoves[0] != -1) {
+        for (int i = 2; i >= 0; i--) {
+            if (moves[2 * bestMoves[i]] != -1) {
+                moveOrder.push_back(bestMoves[i]);
+            }
         }
     }
 
@@ -475,21 +479,19 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     int bestVal = -127;
 
-    char undoBuffer[sizeof(int) + 2 * sizeof(char)];
+    uint8_t undoBuffer[UNDO_BUFFER_SIZE];
 
     int newBestMove = 0;
 
     bool allProven = true;
 
+    vector<pair<int, int>> moveScores;
+
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;
 
-        if (checkedBestMove && i == bestMove) {
-            continue;
-        }
-        
-        //if (depth == 0) {
-        //    cout << i << " ";
+        //if (checkedBestMove && i == bestMove) {
+        //    continue;
         //}
         
         int from = moves[2 * i];
@@ -499,48 +501,26 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
-        state->play(from, to, undoBuffer);
-
-
-        int beforeSize = state->boardSize;
-
-        #if defined(SOLVER_ALPHA_BETA)
-        Bound cb1, cb2;
-        pair<int, bool> result = searchID(state, n, p, depth + 1, alpha, beta, cb1, cb2);
-        #else
-        pair<int, bool> result = searchID(state, n, p, depth + 1);
-        #endif
-
-        if (beforeSize != state->boardSize) {
-            cout << "Size change" << endl;
-            while (1) { }
-        }
-        if (outOfTime) {
-            //memcpy(state->board, oldBoard, state->boardSize);
-            delete[] moves;
-            return result;
-        }
-    
-        state->undo(undoBuffer);
+        play(sboard, undoBuffer, from, to);
+        pair<int, bool> result = searchID(sboard, sboardLen, p, n, depth + 1);
+        undo(sboard, undoBuffer);
 
         allProven &= result.second;
 
-        if (result.second && result.first == p) {
-            if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                //memcpy(entry, state->board, boardSize);
-                RESIZETTBOARD(entry, state->boardSize);
-                memcpy(BOARDPTR(entry), state->board, state->boardSize);
-                PLAYER(entry) = p;
-                OUTCOME(entry) = p;
-                BESTMOVE(entry) = i;
-                DEPTH(entry) = depth;
-                HEURISTIC(entry) = 127;
+        if (result.second && result.first == n) {
+            //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+            if (true) {
+                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, &validEntry);
+
+                *tt_get_outcome(entryPtr) = n;
+                tt_get_best_moves(entryPtr)[0] = i;
+                *tt_get_depth(entryPtr) = depth;
+                *tt_get_heuristic(entryPtr) = 127;
             }
 
-            RESIZESTATEBOARD(state, oldBoardSize);
-            memcpy(state->board, oldBoard, state->boardSize);
             delete[] moves;
-            return pair<int, bool>(p, true);
+            delete[] sboard;
+            return pair<int, bool>(n, true);
         }
 
         if (!result.second) {
@@ -549,55 +529,44 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 newBestMove = i;
                 bestVal = result.first;
             }
+            moveScores.push_back({i, result.first});
         }
 
-        if (!checkedBestMove) {
-            checkedBestMove = true;
-            i = -1;
-        }
+        //if (!checkedBestMove) {
+        //    checkedBestMove = true;
+        //    i = -1;
+        //}
     }
-
-    //if (depth == 0) {
-    //    cout << endl;
-    //}
 
     delete[] moves;
 
-    if (allProven) {
-        if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            //memcpy(entry, state->board, boardSize);
-            RESIZETTBOARD(entry, state->boardSize);
-            memcpy(BOARDPTR(entry), state->board, state->boardSize);
-            PLAYER(entry) = p;
-            OUTCOME(entry) = n;
-            BESTMOVE(entry) = newBestMove; //these two values don't matter -- node result is known
-            DEPTH(entry) = depth;
-            HEURISTIC(entry) = -127;
 
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, &validEntry);
+
+    if (allProven) {
+        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        if (true) {
+            *tt_get_outcome(entryPtr) = p;
+            *tt_get_depth(entryPtr) = depth;
+            *tt_get_heuristic(entryPtr) = -127;
         }
 
-        RESIZESTATEBOARD(state, oldBoardSize);
-        memcpy(state->board, oldBoard, state->boardSize);
-        return pair<int, bool>(n, true);
+        delete[] sboard;
+        return pair<int, bool>(p, true);
     }
 
 
-    if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        //memcpy(entry, state->board, boardSize);
-        RESIZETTBOARD(entry, state->boardSize);
-        memcpy(BOARDPTR(entry), state->board, state->boardSize);
-        PLAYER(entry) = p;
-        OUTCOME(entry) = EMPTY;
-        BESTMOVE(entry) = newBestMove;
-        DEPTH(entry) = depth;
-        HEURISTIC(entry) = bestVal;
+    //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+    if (true) {
+        *tt_get_outcome(entryPtr) = EMPTY;
+        *tt_get_depth(entryPtr) = depth;
+        *tt_get_heuristic(entryPtr) = bestVal;
+        //BESTMOVE(entry) = newBestMove; //TODO
     }
-    RESIZESTATEBOARD(state, oldBoardSize);
-    memcpy(state->board, oldBoard, state->boardSize);
+    delete[] sboard;
     return pair<int, bool>(bestVal, false);
 }
-*/
-}
+
 
 uint8_t *Solver::getBlockPtr(int code) {
     int idx = code & codeMask;
@@ -617,7 +586,8 @@ uint8_t *Solver::getBlockPtr(int code) {
     return table + (idx * totalBlockSize);
 }
 
-uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player) {
+uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, bool *exists) {
+    *exists = false;
     if (len == 0) {
         return 0;
     }
@@ -632,7 +602,6 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     uint8_t *first = blockPtr + blockHeaderSize;
 
     //Search all for a match
-    bool found = false;
     int idx = BLOCK_SIZE - 1;
     for (; idx >= 0; idx--) {
         uint8_t *entry = first + idx * tableEntrySize;
@@ -657,11 +626,11 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
             }
         }
 
-        found = true;
+        *exists = true;
         break;
     }
 
-    if (!found) {
+    if (!*exists) {
         idx = blockPtr[0];
     }
     //idx now indicates the slot we use
@@ -676,7 +645,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
 
     uint8_t *entry = first + idx * tableEntrySize;
 
-    if (!found) {
+    if (!*exists) {
         uint8_t *elen = tt_get_length(entry);
         uint8_t **eboard = tt_get_board(entry);
         uint8_t *eplayer = tt_get_player(entry);

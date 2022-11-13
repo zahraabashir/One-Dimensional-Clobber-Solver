@@ -13,13 +13,15 @@ extern int node_count;
 extern int best_from;
 extern int best_to;
 
+#define STORED_BEST_MOVES 8
+
 struct TTLayout {
     static constexpr size_t arr[] = {
         sz(uint8_t),        // board length
         sz(uint8_t *),      // board pointer
         sz(uint8_t),        // player
         sz(uint8_t),        // outcome
-        sz(int8_t[3]),     // best moves
+        sz(int8_t[STORED_BEST_MOVES]),     // best moves
         sz(unsigned int),   // depth
         sz(int8_t),         // heuristic
         sz(bool),           // valid

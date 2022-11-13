@@ -469,12 +469,16 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2);
 
-    int bestMoves[3] = {-1, -1, -1};
+    int bestMoves[STORED_BEST_MOVES];
+    for (int i = 0; i < STORED_BEST_MOVES; i++) {
+        bestMoves[i] = -1;
+    }
+
     bool checkedBestMove = false;
     if (*tt_get_valid(entryPtr)) {
         //bestMove = BESTMOVE(entry);
         int8_t *bms = tt_get_best_moves(entryPtr);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < STORED_BEST_MOVES; i++) {
             bestMoves[i] = bms[i];
         }
     }
@@ -486,8 +490,13 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
         bool isBest = false;
 
-        isBest = (i == bestMoves[0]) || (i == bestMoves[1]) || (i == bestMoves[2]);
-        //isBest = false;
+        //isBest = (i == bestMoves[0]) || (i == bestMoves[1]) || (i == bestMoves[2]);
+        for (int j = 0; j < STORED_BEST_MOVES; j++) {
+            if (i == bestMoves[j]) {
+                isBest = true;
+                break;
+            }
+        }
         
         if (isBest || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;
@@ -572,6 +581,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
                 *tt_get_outcome(entryPtr) = n;
                 tt_get_best_moves(entryPtr)[0] = i;
+                for (int j = 1; j < STORED_BEST_MOVES; j++) {
+                    tt_get_best_moves(entryPtr)[j] = 0;
+                }
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127;
                 *tt_get_valid(entryPtr) = true;
@@ -622,7 +634,20 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         *tt_get_depth(entryPtr) = depth;
         *tt_get_heuristic(entryPtr) = bestVal;
         *tt_get_valid(entryPtr) = true;
-        tt_get_best_moves(entryPtr)[0] = newBestMove;
+        //tt_get_best_moves(entryPtr)[0] = newBestMove;
+        sort(moveScores.begin(), moveScores.end(),
+            [](const pair<int, int> m1, const pair<int, int> m2) {
+                return m1.second > m2.second;
+            }
+        );
+        for (int i = 0; i < STORED_BEST_MOVES; i++) {
+            int move = -1;
+            if (i < moveScores.size()) {
+                move = moveScores[i].first;
+            }
+            tt_get_best_moves(entryPtr)[i] = move;
+
+        }
         //BESTMOVE(entry) = newBestMove; //TODO
     }
     delete[] sboard;
@@ -763,9 +788,9 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
 
         *eplayer = player;
         *outcome = OC_UNKNOWN;
-        moves[0] = -1;
-        moves[1] = -1;
-        moves[2] = -1;
+        for (int i = 0; i < STORED_BEST_MOVES; i++) {
+            moves[i] = -1;
+        }
         *depth = 0;
         *heuristic = 0;
         *valid = false;

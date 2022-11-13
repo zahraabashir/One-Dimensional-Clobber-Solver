@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
     }
 
     Database db;
-    db.load();
+    //db.load();
+    db.init();
 
     size_t boardLen = strlen(argv[1]);
     uint8_t board[boardLen];

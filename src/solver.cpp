@@ -10,8 +10,10 @@ using namespace std;
 int node_count = 0; //nodes visited
 int best_from = -1; //root player's move
 int best_to = -1;
+bool _validEntry = false;
 
 uint8_t *tt_get_length(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -19,6 +21,7 @@ uint8_t *tt_get_length(uint8_t *entry) {
 }
 
 uint8_t **tt_get_board(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -26,6 +29,7 @@ uint8_t **tt_get_board(uint8_t *entry) {
 }
 
 uint8_t *tt_get_player(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -34,6 +38,7 @@ uint8_t *tt_get_player(uint8_t *entry) {
 }
 
 uint8_t *tt_get_outcome(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -41,6 +46,7 @@ uint8_t *tt_get_outcome(uint8_t *entry) {
 }
 
 uint8_t *tt_get_best_moves(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -49,6 +55,7 @@ uint8_t *tt_get_best_moves(uint8_t *entry) {
 }
 
 unsigned int *tt_get_depth(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -56,6 +63,7 @@ unsigned int *tt_get_depth(uint8_t *entry) {
 }
 
 int8_t *tt_get_heuristic(uint8_t *entry) {
+    assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
@@ -98,6 +106,7 @@ vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
 
 
 Solver::Solver(size_t boardLen, Database *db) {
+    _validEntry = false;
     this->boardLen = boardLen;
     this->db = db;
     this->rng = new default_random_engine(3.141);
@@ -188,6 +197,7 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 
 
 pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
+    _validEntry = false;
 
     node_count += 1;
 
@@ -587,6 +597,7 @@ uint8_t *Solver::getBlockPtr(int code) {
 }
 
 uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, bool *exists) {
+    _validEntry = true;
     *exists = false;
     if (len == 0) {
         return 0;
@@ -672,6 +683,12 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
         }
 
     }
+
+    //cout << "Buffer ";
+    //for (int i = 0; i < BLOCK_SIZE; i++) {
+    //    cout << (int) blockPtr[i];
+    //}
+    //cout << endl;
 
     return entry;
 }

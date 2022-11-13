@@ -702,16 +702,27 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
 
     }
 
-    if (!exists) { //replace least depth
-        //find replacement
-        unsigned int lowestDepth = (unsigned int) -1;
-        idx = 0;
-        for (int i = 0; i < BLOCK_SIZE; i++) {
-            uint8_t *entry = blockPtr + blockHeaderSize + i * tableEntrySize;
-            unsigned int thisDepth = *tt_get_depth(entry);
-            if (thisDepth < lowestDepth) {
-                lowestDepth = thisDepth;
-                idx = i;
+    if (!exists) {
+        idx = blockPtr[0];
+        uint8_t *entry0 = first + idx * tableEntrySize;
+        if (*tt_get_valid(entry0) && false) {
+            //find best value
+            double bestValue = numeric_limits<double>::infinity();
+            idx = 0;
+
+            for (int i = 0; i < BLOCK_SIZE; i++) {
+                int slot = blockPtr[i];
+                uint8_t *entry = first + slot * tableEntrySize;
+
+                unsigned int depth = *tt_get_depth(entry);
+                int age = BLOCK_SIZE - i;
+
+                double value = ((double) -depth) * ((double) age) / ((double) BLOCK_SIZE);
+
+                if (value < bestValue) {
+                    bestValue = value;
+                    idx = slot;
+                }
             }
         }
     }

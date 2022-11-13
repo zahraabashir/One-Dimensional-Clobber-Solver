@@ -4,7 +4,7 @@
 SHELL := /bin/bash
 
 CC = g++
-FLAGS = -Wall --std=c++17 -O3
+FLAGS = -Wall --std=c++17 -lmd -O3
 
 
 .PHONY: dbtest
@@ -17,15 +17,13 @@ compTest: solver.o
 
 
 run: TheSolvers
-	#-./TheSolvers BWBWBWBWBWBW W 200
-	-./TheSolvers BWBWBWBWBWBWBWB B 1
-	@echo should be W
+	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 1
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test
 	-time ./Test
 
-TheSolvers: main.o database3.o utils.o state.o solver.o bound.o
+TheSolvers: main.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
 DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o

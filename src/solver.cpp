@@ -480,6 +480,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         bool isBest = false;
 
         isBest = (i == bestMoves[0]) || (i == bestMoves[1]) || (i == bestMoves[2]);
+        isBest = false;
         
         if (isBest || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;

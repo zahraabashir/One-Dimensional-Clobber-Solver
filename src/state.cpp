@@ -49,6 +49,7 @@ int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
 
 
 int getCode(uint8_t *board, size_t len, int player) {
+    assert(player == 1 || player == 2);
     int result = 1 * (player - 1);
     int cumulativePower = 2;
 
@@ -60,11 +61,14 @@ int getCode(uint8_t *board, size_t len, int player) {
 }
 
 void play(uint8_t *board, uint8_t *undoBuffer, int from, int to) {
+    assert(board[to] != 0);
+    assert(board[from] != 0);
+    assert(board[from] != board[to]);
+
     int minIdx = std::min<int>(from, to);
     ((int *) undoBuffer)[0] = minIdx;
     ((uint8_t *) undoBuffer)[0 + sizeof(int)] = board[minIdx];
     ((uint8_t *) undoBuffer)[0 + sizeof(int) + 1] = board[minIdx + 1];
-
     board[to] = board[from];
     board[from] = EMPTY;
 }

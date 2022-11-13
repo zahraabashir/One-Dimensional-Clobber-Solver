@@ -22,6 +22,7 @@ struct TTLayout {
         sz(uint8_t[3]),     // best moves
         sz(unsigned int),   // depth
         sz(int8_t),         // heuristic
+        sz(bool),           // valid
     };
 
     static constexpr size_t N = sizeof(arr) / sizeof(size_t);
@@ -46,6 +47,7 @@ enum {
     TT_BEST_MOVES,
     TT_DEPTH,
     TT_HEURISTIC,
+    TT_VALID,
 };
 
 uint8_t *tt_get_length(uint8_t *entry);
@@ -55,6 +57,7 @@ uint8_t *tt_get_outcome(uint8_t *entry);
 uint8_t *tt_get_best_moves(uint8_t *entry);
 unsigned int *tt_get_depth(uint8_t *entry);
 int8_t *tt_get_heuristic(uint8_t *entry);
+bool *tt_get_valid(uint8_t *entry);
 
 class Solver {
   private:
@@ -99,7 +102,7 @@ class Solver {
 
     uint8_t *getBlockPtr(int code);
 
-    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, bool *exists);
+    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player);
 };
 
 

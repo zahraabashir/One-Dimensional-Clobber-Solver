@@ -70,6 +70,15 @@ int8_t *tt_get_heuristic(uint8_t *entry) {
     return (int8_t *) (entry + Offset<TTLayout, TT_HEURISTIC>());
 }
 
+bool *tt_get_valid(uint8_t *entry) {
+    assert(_validEntry);
+    if (entry == 0) {
+        return 0;
+    }
+
+    return (bool *) (entry + Offset<TTLayout, TT_VALID>());
+}
+
 vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
     vector<pair<int, int>> subgames;
 
@@ -96,7 +105,7 @@ vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
         }
     }
 
-    if (start != -1) {
+    if (start != -1 && foundMask == 3) {
         subgames.push_back(pair<int, int>(start, len));
     }
 
@@ -213,8 +222,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //if solved, return
     int code = getCode(sboard, sboardLen, n);
     uint8_t *blockPtr = getBlockPtr(code);
-    bool validEntry;
-    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, &validEntry);
+    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
 
     uint8_t cachedOutcome = *db_get_outcome(entryPtr);
     if (depth > 0 && cachedOutcome != OC_UNKNOWN) {
@@ -254,7 +262,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         lengths.push_back(length);
 
         uint8_t *dbEntry = db->get(&sboard[it->first], length);
-        int outcome = *db_get_outcome(dbEntry);
+        int outcome = dbEntry ? *db_get_outcome(dbEntry) : OC_UNKNOWN;
         outcomes.push_back(outcome);
 
         counts[outcome] += 1;
@@ -283,6 +291,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 *tt_get_outcome(entryPtr) = BLACK;
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127 * (n == BLACK ? 1 : -1);
+                *tt_get_valid(entryPtr) = true;
             }        
             delete[] sboard;
             return pair<int, bool>(OC_B, true);
@@ -296,6 +305,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 *tt_get_outcome(entryPtr) = WHITE;
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127 * (n == WHITE ? 1 : -1);
+                *tt_get_valid(entryPtr) = true;
             }        
 
             delete[] sboard;
@@ -309,6 +319,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 *tt_get_outcome(entryPtr) = n;
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127;
+                *tt_get_valid(entryPtr) = true;
             }        
             delete[] sboard;
             return pair<int, bool>(n, true); //current player wins
@@ -336,10 +347,12 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 if (result.second && result.first == n) {
 
                     //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+                    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
                     if (true) {
                         *tt_get_outcome(entryPtr) = n;
                         *tt_get_depth(entryPtr) = depth;
                         *tt_get_heuristic(entryPtr) = 127;
+                        *tt_get_valid(entryPtr) = true;
                     }        
                     delete[] sboard;
                     return result;
@@ -360,10 +373,12 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     if (moveCount == 0) { //is terminal
         completed += 1;
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
         if (true) {
             *tt_get_outcome(entryPtr) = p;
             *tt_get_depth(entryPtr) = depth;
             *tt_get_heuristic(entryPtr) = -127;
+            *tt_get_valid(entryPtr) = true;
         }
 
         delete[] sboard;
@@ -416,8 +431,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             delete[] pMoves;
         }
 
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
         int h = *tt_get_heuristic(entryPtr);
-        if (!validEntry) {
+        if (!*tt_get_valid(entryPtr)) {
             h = -pMoveCount;
         }
 
@@ -426,6 +442,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             *tt_get_outcome(entryPtr) = EMPTY;
             *tt_get_depth(entryPtr) = depth;
             *tt_get_heuristic(entryPtr) = h;
+            *tt_get_valid(entryPtr) = true;
         }        
 
         delete[] moves;
@@ -437,12 +454,15 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //if solved, save value and return
 
 
+
     vector<int> moveOrder;
+
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
 
 
     int bestMoves[3] = {-1, -1, -1};
     bool checkedBestMove = false;
-    if (validEntry) {
+    if (*tt_get_valid(entryPtr)) {
         //bestMove = BESTMOVE(entry);
         uint8_t *bms = tt_get_best_moves(entryPtr);
         bestMoves[0] = bms[0];
@@ -479,7 +499,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     if (bestMoves[0] != -1) {
         for (int i = 2; i >= 0; i--) {
-            if (moves[2 * bestMoves[i]] != -1) {
+            if (bestMoves[i] != -1 && moves[2 * bestMoves[i]] != -1) {
                 moveOrder.push_back(bestMoves[i]);
             }
         }
@@ -495,6 +515,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     bool allProven = true;
 
+    // (i, score)
     vector<pair<int, int>> moveScores;
 
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
@@ -515,17 +536,19 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         pair<int, bool> result = searchID(sboard, sboardLen, p, n, depth + 1);
         undo(sboard, undoBuffer);
 
+
         allProven &= result.second;
 
         if (result.second && result.first == n) {
             //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             if (true) {
-                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, &validEntry);
+                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
 
                 *tt_get_outcome(entryPtr) = n;
                 tt_get_best_moves(entryPtr)[0] = i;
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127;
+                *tt_get_valid(entryPtr) = true;
             }
 
             delete[] moves;
@@ -551,7 +574,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     delete[] moves;
 
 
-    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, &validEntry);
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
 
     if (allProven) {
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
@@ -559,6 +582,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             *tt_get_outcome(entryPtr) = p;
             *tt_get_depth(entryPtr) = depth;
             *tt_get_heuristic(entryPtr) = -127;
+            *tt_get_valid(entryPtr) = true;
         }
 
         delete[] sboard;
@@ -571,6 +595,8 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         *tt_get_outcome(entryPtr) = EMPTY;
         *tt_get_depth(entryPtr) = depth;
         *tt_get_heuristic(entryPtr) = bestVal;
+        *tt_get_valid(entryPtr) = true;
+        tt_get_best_moves(entryPtr)[0] = newBestMove;
         //BESTMOVE(entry) = newBestMove; //TODO
     }
     delete[] sboard;
@@ -596,9 +622,9 @@ uint8_t *Solver::getBlockPtr(int code) {
     return table + (idx * totalBlockSize);
 }
 
-uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, bool *exists) {
+uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player) {
     _validEntry = true;
-    *exists = false;
+    bool exists = false;
     if (len == 0) {
         return 0;
     }
@@ -637,11 +663,11 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
             }
         }
 
-        *exists = true;
+        exists = true;
         break;
     }
 
-    if (!*exists) {
+    if (!exists) {
         idx = blockPtr[0];
     }
     //idx now indicates the slot we use
@@ -656,7 +682,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
 
     uint8_t *entry = first + idx * tableEntrySize;
 
-    if (!*exists) {
+    if (!exists) {
         uint8_t *elen = tt_get_length(entry);
         uint8_t **eboard = tt_get_board(entry);
         uint8_t *eplayer = tt_get_player(entry);
@@ -664,6 +690,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
         uint8_t *moves = tt_get_best_moves(entry);
         unsigned int *depth = tt_get_depth(entry);
         int8_t *heuristic = tt_get_heuristic(entry);
+        bool *valid = tt_get_valid(entry);
 
         if (*elen != len) {
             if (*eboard != 0) {
@@ -680,6 +707,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
             moves[2] = -1;
             *depth = 0;
             *heuristic = 0;
+            *valid = false;
         }
 
     }

@@ -21,6 +21,7 @@ char opponentChar(char c) {
             break;
     }
 
+    assert(c == '.');
     return '.';
 }
 
@@ -35,6 +36,7 @@ char playerNumberToChar(int n) {
             break;
     }
 
+    assert(n == 0);
     return '.';
 }
 
@@ -66,5 +68,6 @@ void printBoard(uint8_t *board, size_t len) {
     for (size_t i = 0; i < len; i++) {
         cout << (int) board[i] << " ";
     }
-    cout << " }" << endl;
+    
+    cout << "}" << endl;
 }

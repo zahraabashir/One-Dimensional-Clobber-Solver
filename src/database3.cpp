@@ -118,6 +118,7 @@ vector<int> numberToShape(uint64_t number) {
 
     while (number) {
         int chunk = (number & shapeNumberMask()) + 1;
+        assert(chunk > 1);
         shape.push_back(chunk);
 
         number >>= shapeNumberShift();
@@ -359,6 +360,7 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
 
     if (sectionOffset == DB_NOT_FOUND) {
         cerr << "DB NOT FOUND for valid size -- shouldn't happen" << endl;
+        assert(sectionOffset != DB_NOT_FOUND);
         return DB_NOT_FOUND;
     }
 

@@ -716,17 +716,19 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
             }
             *eboard = (uint8_t *) malloc(len);
             *elen = len;
-            memcpy(*eboard, board, len);
 
-            *eplayer = player;
-            *outcome = OC_UNKNOWN;
-            moves[0] = -1;
-            moves[1] = -1;
-            moves[2] = -1;
-            *depth = 0;
-            *heuristic = 0;
-            *valid = false;
         }
+
+        memcpy(*eboard, board, len);
+
+        *eplayer = player;
+        *outcome = OC_UNKNOWN;
+        moves[0] = -1;
+        moves[1] = -1;
+        moves[2] = -1;
+        *depth = 0;
+        *heuristic = 0;
+        *valid = false;
 
     }
 
@@ -736,6 +738,8 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     //}
     //cout << endl;
 
+
+    //cout << "Exists " << exists << endl;
 
     return entry;
 }

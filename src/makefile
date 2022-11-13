@@ -4,7 +4,7 @@
 SHELL := /bin/bash
 
 CC = g++
-FLAGS = -Wall --std=c++17 -g
+FLAGS = -Wall --std=c++17 -O3
 
 
 .PHONY: dbtest

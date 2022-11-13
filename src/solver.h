@@ -7,7 +7,7 @@
 #include "options.h"
 #include "database3.h"
 
-#define BLOCK_SIZE 8
+#define BLOCK_SIZE 4
 
 extern int node_count;
 extern int best_from;
@@ -23,6 +23,7 @@ struct TTLayout {
         sz(unsigned int),   // depth
         sz(int8_t),         // heuristic
         sz(bool),           // valid
+        sz(uint32_t),       // hash
     };
 
     static constexpr size_t N = sizeof(arr) / sizeof(size_t);
@@ -48,6 +49,8 @@ enum {
     TT_DEPTH,
     TT_HEURISTIC,
     TT_VALID,
+    TT_HASH,
+    TT_COST,
 };
 
 uint8_t *tt_get_length(uint8_t *entry);
@@ -58,6 +61,7 @@ int8_t *tt_get_best_moves(uint8_t *entry);
 unsigned int *tt_get_depth(uint8_t *entry);
 int8_t *tt_get_heuristic(uint8_t *entry);
 bool *tt_get_valid(uint8_t *entry);
+uint32_t *tt_get_hash(uint8_t *entry);
 
 class Solver {
   private:
@@ -102,7 +106,7 @@ class Solver {
 
     uint8_t *getBlockPtr(int code);
 
-    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player);
+    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint32_t hash);
 };
 
 

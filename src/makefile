@@ -17,7 +17,8 @@ compTest: solver.o
 
 
 run: TheSolvers
-	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 1
+	@#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 1
+	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 1
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

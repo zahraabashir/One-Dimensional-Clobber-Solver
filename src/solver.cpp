@@ -480,8 +480,10 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         int8_t *bms = tt_get_best_moves(entryPtr);
         for (int i = 0; i < STORED_BEST_MOVES; i++) {
             bestMoves[i] = bms[i];
+            //cout << "Read best move " << (int) bms[i] << endl;
         }
     }
+
 
     for (int i = 0; i < moveCount; i++) {
         if (moves[2 * i] == -1) {
@@ -516,7 +518,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
-    for (int i = 2; i >= 0; i--) {
+    for (int i = STORED_BEST_MOVES - 1; i >= 0; i--) {
         if (bestMoves[i] != -1 && moves[2 * bestMoves[i]] != -1) {
             moveOrder.push_back(bestMoves[i]);
             //cout << "Pushing " << bestMoves[i] << endl;
@@ -541,7 +543,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //cout << " ";
     //cout << "Move order: " << moveOrder << endl;
 
-    //entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
+    //entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2);
     //cout << "Table board: ";
     //printBoard(*tt_get_board(entryPtr), *tt_get_length(entryPtr));
     //cout << endl;
@@ -581,8 +583,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
                 *tt_get_outcome(entryPtr) = n;
                 tt_get_best_moves(entryPtr)[0] = i;
+                //cout << "Storing best move " << i << endl;
                 for (int j = 1; j < STORED_BEST_MOVES; j++) {
-                    tt_get_best_moves(entryPtr)[j] = 0;
+                    tt_get_best_moves(entryPtr)[j] = -1;
                 }
                 *tt_get_depth(entryPtr) = depth;
                 *tt_get_heuristic(entryPtr) = 127;
@@ -645,6 +648,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             if (i < moveScores.size()) {
                 move = moveScores[i].first;
             }
+            //cout << "Batch move " << move << endl;
             tt_get_best_moves(entryPtr)[i] = move;
 
         }

@@ -18,8 +18,8 @@ compTest: solver.o
 
 run: TheSolvers
 	#-./TheSolvers BWBWBWBWBWBW W 200
-	-./TheSolvers BWBWBWB.WBWBWBW W 1
-	@echo should be B
+	-./TheSolvers BWBWBWBWBWBWBWB B 1
+	@echo should be W
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

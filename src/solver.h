@@ -19,7 +19,7 @@ struct TTLayout {
         sz(uint8_t *),      // board pointer
         sz(uint8_t),        // player
         sz(uint8_t),        // outcome
-        sz(uint8_t[3]),     // best moves
+        sz(int8_t[3]),     // best moves
         sz(unsigned int),   // depth
         sz(int8_t),         // heuristic
         sz(bool),           // valid
@@ -54,7 +54,7 @@ uint8_t *tt_get_length(uint8_t *entry);
 uint8_t **tt_get_board(uint8_t *entry);
 uint8_t *tt_get_player(uint8_t *entry);
 uint8_t *tt_get_outcome(uint8_t *entry);
-uint8_t *tt_get_best_moves(uint8_t *entry);
+int8_t *tt_get_best_moves(uint8_t *entry);
 unsigned int *tt_get_depth(uint8_t *entry);
 int8_t *tt_get_heuristic(uint8_t *entry);
 bool *tt_get_valid(uint8_t *entry);

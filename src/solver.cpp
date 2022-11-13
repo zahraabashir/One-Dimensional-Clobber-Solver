@@ -45,13 +45,13 @@ uint8_t *tt_get_outcome(uint8_t *entry) {
     return (uint8_t *) (entry + Offset<TTLayout, TT_OUTCOME>());
 }
 
-uint8_t *tt_get_best_moves(uint8_t *entry) {
+int8_t *tt_get_best_moves(uint8_t *entry) {
     assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
 
-    return (uint8_t *) (entry + Offset<TTLayout, TT_BEST_MOVES>());
+    return (int8_t *) (entry + Offset<TTLayout, TT_BEST_MOVES>());
 }
 
 unsigned int *tt_get_depth(uint8_t *entry) {
@@ -224,13 +224,11 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
 
     uint8_t cachedOutcome = *tt_get_outcome(entryPtr);
-    cachedOutcome = 0;
+    //cachedOutcome = 0;
     if (depth > 0 && cachedOutcome != OC_UNKNOWN) {
         delete[] sboard;
         return pair<int, bool>(cachedOutcome, true);
     }
-
-
 
     //generate subgames, look them up in the database
     vector<pair<int, int>> subgames = generateSubgames(sboard, sboardLen);
@@ -463,12 +461,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     bool checkedBestMove = false;
     if (*tt_get_valid(entryPtr)) {
         //bestMove = BESTMOVE(entry);
-        uint8_t *bms = tt_get_best_moves(entryPtr);
+        int8_t *bms = tt_get_best_moves(entryPtr);
         for (int i = 0; i < 3; i++) {
             bestMoves[i] = bms[i];
-            if (bms[0] == (uint8_t) -1) {
-                bestMoves[i] = -1;
-            }
         }
     }
 
@@ -480,7 +475,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         bool isBest = false;
 
         isBest = (i == bestMoves[0]) || (i == bestMoves[1]) || (i == bestMoves[2]);
-        isBest = false;
+        //isBest = false;
         
         if (isBest || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;
@@ -501,10 +496,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
 
     for (int i = 2; i >= 0; i--) {
-        if (bestMoves[i] != (uint8_t) -1 && moves[2 * bestMoves[i]] != -1) {
-            continue;
+        if (bestMoves[i] != -1 && moves[2 * bestMoves[i]] != -1) {
             moveOrder.push_back(bestMoves[i]);
-            cout << "Pushing " << bestMoves[i] << endl;
+            //cout << "Pushing " << bestMoves[i] << endl;
         }
     }
 
@@ -520,6 +514,16 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     // (i, score)
     vector<pair<int, int>> moveScores;
+
+    
+    //printBoard(sboard, sboardLen);
+    //cout << " ";
+    //cout << "Move order: " << moveOrder << endl;
+
+    //entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n);
+    //cout << "Table board: ";
+    //printBoard(*tt_get_board(entryPtr), *tt_get_length(entryPtr));
+    //cout << endl;
 
 
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
@@ -666,15 +670,19 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
         }
 
         //Check content...
+        exists = true;
         uint8_t *eboard = *tt_get_board(entry);
         for (size_t i = 0; i < len; i++) {
             if (board[i] != eboard[i]) {
-                continue;
+                exists = false;
+                break;
             }
         }
 
-        exists = true;
-        break;
+        if (exists) {
+            break;
+        }
+
     }
 
     if (!exists) {
@@ -697,7 +705,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
         uint8_t **eboard = tt_get_board(entry);
         uint8_t *eplayer = tt_get_player(entry);
         uint8_t *outcome = tt_get_outcome(entry);
-        uint8_t *moves = tt_get_best_moves(entry);
+        int8_t *moves = tt_get_best_moves(entry);
         unsigned int *depth = tt_get_depth(entry);
         int8_t *heuristic = tt_get_heuristic(entry);
         bool *valid = tt_get_valid(entry);
@@ -727,6 +735,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     //    cout << (int) blockPtr[i];
     //}
     //cout << endl;
+
 
     return entry;
 }

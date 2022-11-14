@@ -1,3 +1,5 @@
+#pragma once
+
 #include "options.h"
 #include <cstdio>
 #include <stdint.h>
@@ -122,3 +124,4 @@ class Database {
 
 uint64_t shapeToNumber(const std::vector<int> &shape);
 std::vector<int> numberToShape(uint64_t number);
+std::vector<std::vector<int>> makeShapes();

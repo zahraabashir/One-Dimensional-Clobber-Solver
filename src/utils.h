@@ -117,3 +117,12 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
 }
 
 void printBoard(uint8_t *board, size_t len, bool newline = false);
+
+void makeGame(uint64_t shapeNumber, uint32_t gameNumber, 
+    uint8_t **board, size_t *len);
+
+
+void makeGame(const std::vector<int> &shape, uint32_t gameNumber, 
+    uint8_t **board, size_t *len);
+
+

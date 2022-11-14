@@ -64,13 +64,60 @@ void negateBoard(uint8_t *board, size_t length) {
 
 
 void printBoard(uint8_t *board, size_t len, bool newline) {
-    cout << "{ ";
+    //cout << "\"";
     for (size_t i = 0; i < len; i++) {
         cout << playerNumberToChar(board[i]);
     }
-    
-    cout << "}";
+    //cout << "\"";
+
     if (newline) {
         cout << endl;
     }
 }
+
+
+
+void makeGame(uint64_t shapeNumber, uint32_t gameNumber, 
+        uint8_t **board, size_t *len) {
+    makeGame(numberToShape(shapeNumber), gameNumber, board, len);
+}
+
+
+void makeGame(const vector<int> &shape, uint32_t gameNumber, 
+        uint8_t **board, size_t *len) {
+
+    *len = 0;
+
+
+    if (shape.size() == 0) {
+        *board = new uint8_t[0];
+        return;
+    }
+
+    *len += shape.size() - 1;
+    for (int chunk : shape) {
+        *len += chunk;
+    }
+
+    *board = new uint8_t[*len];
+
+    int shift = 0;
+    int chunkIdx = 0;
+    int chunkOffset = 0;
+
+
+    for (int i = 0; i < *len; i++) {
+        int chunk = shape[chunkIdx];
+
+        if (chunkOffset < chunk) {
+            (*board)[i] = ((gameNumber >> shift) & 1) + 1;
+            shift += 1;
+            chunkOffset += 1;
+        } else {
+            (*board)[i] = 0;
+            chunkOffset = 0;
+            chunkIdx += 1;
+        }
+    }
+}
+

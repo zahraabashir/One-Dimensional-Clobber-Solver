@@ -11,7 +11,7 @@ FLAGS = -Wall --std=c++17 -lmd -O3
 .PHONY: default
 
 
-default: run
+default: db3
 
 compTest: solver.o
 
@@ -34,7 +34,7 @@ DBManage: dbmanage.o database.o utils.o state.o solver.o bound.o
 DBManage2: dbmanage2.o database2.o utils.o state.o solver.o bound.o
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o
+DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
 
@@ -90,6 +90,7 @@ db2: DBManage2
 	-./DBManage2
 
 db3: DBManage3
+	-rm database3.bin
 	touch database3.bin
 	-./DBManage3
 

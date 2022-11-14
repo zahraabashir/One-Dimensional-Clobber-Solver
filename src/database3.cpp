@@ -265,13 +265,13 @@ void Database::save() {
 }
 
 void Database::load() {
-    cout << "DB LOAD" << endl;
+    //cout << "DB LOAD" << endl;
 
     file = fopen("database3.bin", "r+");
 
     fseek(file, 0L, SEEK_END);
     size = ftell(file);
-    cout << "Database loading " << size << " bytes" << endl;
+    //cout << "Database loading " << size << " bytes" << endl;
     fseek(file, 0L, SEEK_SET);
 
     data = (uint8_t *) calloc(size, 1);

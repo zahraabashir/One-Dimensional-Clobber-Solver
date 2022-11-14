@@ -40,15 +40,44 @@ int main() {
         uint32_t maxGame = 1 << gameBits;
 
         for (uint32_t gameNumber = minGame; gameNumber <= maxGame; gameNumber++) {
+            //Get game and print it
             uint8_t *board;
             size_t boardLen;
             makeGame(shapeNumber, gameNumber, &board, &boardLen);
-
             cout << "Shape " << shape << " (" << shapeNumber << ") ";
             printBoard(board, boardLen, true);
+
+            //Get entry
+            uint8_t *entry = db->get(board, boardLen);
+            assert(entry);
+
+            //Set trivial values (shape and number)
+            *db_get_shape(entry) = shapeNumber;
+            *db_get_number(entry) = gameNumber;
+
+            //Compute outcome class
+            int result1 = solver->solveID(board, boardLen, BLACK);
+            int result2 = solver->solveID(board, boardLen, WHITE);
+
+            uint8_t outcomeClass = OC_UNKNOWN;
+
+            if (result1 == result2) {
+                outcomeClass = result1;
+            } else {
+                if (result1 == BLACK) {
+                    outcomeClass = OC_N;
+                } else {
+                    outcomeClass = OC_P;
+                }
+            }
+
+            *db_get_outcome(entry) = outcomeClass;
+            cout << (int) outcomeClass << endl;
+
+
+
+
             delete[] board;
-
-
         }
 
 

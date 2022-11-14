@@ -11,15 +11,38 @@
 using namespace std;
 
 
+bool test() {
+    //return false;
+
+    Database db;
+    db.load();
+
+    uint8_t board[] = {1,1,2};
+    size_t len = sizeof(board);
+    
+    uint8_t *entry = db.get(board, len);
+    assert(entry);
+
+    cout << (int) *db_get_outcome(entry) << endl;
+
+
+    return true;
+}
+
+
 int main(int argc, char **argv) {
+    if (test()) {
+        return 0;
+    }
+
     if (argc < 3) {
         cout << "Usage:\n" << argv[0] << " <board> <toPlay> <time (ignored)>" << endl;
         return 0;
     }
 
     Database db;
-    //db.load();
-    db.init();
+    db.load();
+    //db.init();
 
     size_t boardLen = strlen(argv[1]);
     uint8_t board[boardLen];

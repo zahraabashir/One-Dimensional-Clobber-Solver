@@ -11,15 +11,15 @@ FLAGS = -Wall --std=c++17 -lmd -O3
 .PHONY: default
 
 
-default: db3
+default: run
 
 compTest: solver.o
 
 
 run: TheSolvers
 	@#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 1
-	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 1
-	@#-time ./TheSolvers BW B 1
+	#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 1
+	-time ./TheSolvers BBW W
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

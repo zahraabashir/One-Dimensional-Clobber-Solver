@@ -291,10 +291,21 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
+    //printBoard(sboard, sboardLen);
+    //cout << " " << playerNumberToChar(n) << endl;
+    //cout << "Depth: " << depth << endl;
+    //cout << "Counts: ";
+    //for (int i = 0; i < 5; i++) {
+    //    cout << counts[i] << " ";
+    //}
+    //cout << endl;
+    //cout << "Outcomes: " << outcomes << endl;
+
 
     if (depth > 0) {
         //Only Bs
         if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
+            cout << "Only B" << endl;
 
             //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             if (true) {
@@ -309,6 +320,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
         //Only Ws
         if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
+            cout << "Only W" << endl;
 
             //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             if (true) {
@@ -324,6 +336,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
         //Only one N
         if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
+            cout << "Only one N" << endl;
             //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             if (true) {
                 *tt_get_outcome(entryPtr) = n;

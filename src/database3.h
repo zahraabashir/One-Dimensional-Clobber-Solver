@@ -87,6 +87,7 @@ uint32_t *db_get_number(const uint8_t *entry);
 
 class Database {
   private:
+  public:
     FILE *file; // read/write from here
     uint8_t *data; // load database into this array
     uint64_t *index;

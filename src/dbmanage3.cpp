@@ -37,9 +37,9 @@ int main() {
         }
 
         uint32_t minGame = 0;
-        uint32_t maxGame = 1 << gameBits;
+        uint32_t gameCount = 1 << gameBits;
 
-        for (uint32_t gameNumber = minGame; gameNumber <= maxGame; gameNumber++) {
+        for (uint32_t gameNumber = minGame; gameNumber < gameCount; gameNumber++) {
             //Get game and print it
             uint8_t *board;
             size_t boardLen;
@@ -48,8 +48,11 @@ int main() {
             printBoard(board, boardLen, true);
 
             //Get entry
-            uint8_t *entry = db->get(board, boardLen);
+            uint64_t idx = db->getIdx(board, boardLen);
+            cout << "idx " << idx << endl;
+            uint8_t *entry = db->getFromIdx(idx);
             assert(entry);
+            assert(*db_get_outcome(entry) == 0);
 
             //Set trivial values (shape and number)
             *db_get_shape(entry) = shapeNumber;
@@ -71,8 +74,9 @@ int main() {
                 }
             }
 
+
             *db_get_outcome(entry) = outcomeClass;
-            cout << (int) outcomeClass << endl;
+            cout << (int) outcomeClass << " " << (int) *db_get_outcome(entry) << endl;
 
 
 

@@ -374,15 +374,17 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
         for (int i = 0; i < chunk; i++) {
             assert(*ptr > 0 && *ptr <= 2);
             relativeOffset += cumulativePower * ((*ptr) - 1);
-            cumulativePower <<= 1;
+            cumulativePower *= 2;
+            ptr += 1;
         }
     }
 
-    return sectionOffset + relativeOffset;
+    return sectionOffset + relativeOffset * entrySize;
 }
 
 uint8_t *Database::get(const uint8_t *board, size_t len) {
     uint64_t idx = getIdx(board, len);
+    //cout << "IDX " << idx << endl;
     if (idx == DB_NOT_FOUND) {
         return 0;
     }

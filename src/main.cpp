@@ -12,7 +12,7 @@ using namespace std;
 
 
 bool test() {
-    //return false;
+    return false;
 
     Database db;
     db.load();
@@ -23,7 +23,33 @@ bool test() {
     uint8_t *entry = db.get(board, len);
     assert(entry);
 
+    cout << "Outcome is: ";
     cout << (int) *db_get_outcome(entry) << endl;
+
+
+    cout << "Entry is:" << endl;
+    cout << (uint64_t) *db_get_outcome(entry) << endl;
+    cout << (uint64_t) db_get_dominance(entry)[0] << endl;
+    cout << (uint64_t) db_get_dominance(entry)[1] << endl;
+    cout << (uint64_t) db_get_bounds(entry)[0] << endl;
+    cout << (uint64_t) db_get_bounds(entry)[1] << endl;
+    cout << (uint64_t) *db_get_metric(entry) << endl;
+    cout << (uint64_t) *db_get_link(entry) << endl;
+    cout << (uint64_t) *db_get_shape(entry) << endl;
+    cout << (uint64_t) *db_get_number(entry) << endl;
+        
+
+    cout << endl;
+
+    uint8_t board1[] = {1,1,1,1};
+    uint8_t board2[] = {2,1,1,1};
+    uint8_t *ptr1 = db.get(board1, 4);
+    uint8_t *ptr2 = db.get(board2, 4);
+
+    assert(ptr1);
+    assert(ptr2);
+    cout << "Diff: " << (uint64_t) (ptr2 - ptr1) << endl;
+
 
 
     return true;

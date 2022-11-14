@@ -3,7 +3,7 @@
 finalTests/easy.txt_processed
 #finalTests/tests_small_more_time.txt_processed
 #finalTests/tests_small.txt_processed
-#finalTests/standard.txt_processed
+finalTests/standard.txt_processed
 #finalTests/standard_more_time.txt_processed
 #finalTests/hard.txt_processed
 #finalTests/random.txt_processed

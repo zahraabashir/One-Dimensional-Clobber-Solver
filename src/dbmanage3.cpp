@@ -1,15 +1,111 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cstring>
 
 #include "solver.h"
 #include "database3.h"
 #include "utils.h"
+#include "state.h"
 
 using namespace std;
 
 Database *db;
 Solver *solver;
+
+void computeDominance(uint8_t *g1, size_t g1Size, uint64_t *dominance) {
+    uint64_t domBlack = 0;
+    uint64_t domWhite = 0;
+
+    uint8_t g2[g1Size];
+    size_t g2Size = g1Size;
+    memcpy(g2, g1, g1Size);
+
+    uint8_t undo1[UNDO_BUFFER_SIZE];
+    uint8_t undo2[UNDO_BUFFER_SIZE];
+
+    //Compute dominance for black
+    {
+        size_t moveCount;
+        int *moves = getMoves(g1, g1Size, 1, &moveCount);
+
+        for (size_t i = 0; i < moveCount; i++) {
+            play(g1, undo1, moves[2 * i], moves[2 * i + 1]);
+            for (size_t j = i + 1; j < moveCount; j++) {
+                play(g2, undo2, moves[2 * j], moves[2 * j + 1]);
+                negateBoard(g2, g2Size);
+
+                size_t g3Size;
+                uint8_t *g3 = addGames(g1, g1Size, g2, g2Size, &g3Size); 
+                int bFirst = solver->solveID(g3, g3Size, 1);
+                int wFirst = solver->solveID(g3, g3Size, 2);
+                delete[] g3;
+
+
+                if (bFirst == wFirst) {
+                    if (bFirst == 1) { // I - J is positive for black --> I > J
+                        domBlack |= (((uint64_t) 1) << j);
+                    } else { // I - J is negative for black --> I < J
+                        domBlack |= (((uint64_t) 1) << i);
+                    }
+                }
+
+
+                negateBoard(g2, g2Size);
+                undo(g2, undo2);
+            }
+            undo(g1, undo1);
+        }
+
+        if (moveCount) {
+            delete[] moves;
+        }
+
+    }
+
+    //Compute dominance for white
+    {
+        size_t moveCount;
+        int *moves = getMoves(g1, g1Size, 2, &moveCount);
+
+        for (size_t i = 0; i < moveCount; i++) {
+            play(g1, undo1, moves[2 * i], moves[2 * i + 1]);
+            for (size_t j = i + 1; j < moveCount; j++) {
+                play(g2, undo2, moves[2 * j], moves[2 * j + 1]);
+                negateBoard(g2, g2Size);
+
+                size_t g3Size;
+                uint8_t *g3 = addGames(g1, g1Size, g2, g2Size, &g3Size); 
+                int bFirst = solver->solveID(g3, g3Size, 1);
+                int wFirst = solver->solveID(g3, g3Size, 2);
+                delete[] g3;
+
+                if (bFirst == wFirst) {
+                    if (bFirst == 2) { // I - J is positive for white --> I > J
+                        domWhite |= (((uint64_t) 1) << j);
+                    } else { // I - J is negative for white --> I < J
+                        domWhite |= (((uint64_t) 1) << i);
+                    }
+                }
+
+
+                negateBoard(g2, g2Size);
+                undo(g2, undo2);
+            }
+            undo(g1, undo1);
+        }
+
+        if (moveCount) {
+            delete[] moves;
+        }
+
+    }
+
+    dominance[0] = domBlack;
+    dominance[1] = domWhite;
+
+}
+
 
 /*
 void computeBounds(uint8_t *board, size_t boardLen, uint *bounds) {
@@ -160,7 +256,7 @@ int main() {
 
             //Get entry
             uint64_t idx = db->getIdx(board, boardLen);
-            cout << "idx " << idx << endl;
+            //cout << "idx " << idx << endl;
             uint8_t *entry = db->getFromIdx(idx);
             assert(entry);
             assert(*db_get_outcome(entry) == 0);
@@ -193,6 +289,11 @@ int main() {
 
             //compute dominance
             if (boardLen <= DB_MAX_DOMINANCE_BITS) {
+                uint64_t dominance[2];
+                computeDominance(board, boardLen, dominance);
+
+                db_get_dominance(entry)[0] = dominance[0];
+                db_get_dominance(entry)[1] = dominance[1];
             }
 
 

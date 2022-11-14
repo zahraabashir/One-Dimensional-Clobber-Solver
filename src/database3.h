@@ -36,7 +36,7 @@ struct DBLayout {
     static constexpr size_t arr[] = {
         sz(uint8_t),        // outcome
         sz(uint64_t[2]),    // domBlack/domWhite
-        sz(uint8_t[2]),     // low/high bounds
+        sz(int8_t[2]),     // low/high bounds
         sz(uint64_t),       // simplicity metric
         sz(uint64_t),       //link
         sz(uint64_t),       //shape
@@ -76,7 +76,7 @@ struct Offset<Layout, 0> {
 
 uint8_t *db_get_outcome(const uint8_t *entry);
 uint64_t *db_get_dominance(const uint8_t *entry);
-uint8_t *db_get_bounds(const uint8_t *entry);
+int8_t *db_get_bounds(const uint8_t *entry);
 uint64_t *db_get_metric(const uint8_t *entry);
 uint64_t *db_get_link(const uint8_t *entry);
 uint64_t *db_get_shape(const uint8_t *entry);

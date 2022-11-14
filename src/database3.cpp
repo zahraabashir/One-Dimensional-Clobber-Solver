@@ -21,7 +21,7 @@ uint64_t *db_get_dominance(const uint8_t *entry) {
     return (uint64_t *) (entry + Offset<DBLayout, DB_DOMINANCE>());
 }
 
-uint8_t *db_get_bounds(const uint8_t *entry) {
+int8_t *db_get_bounds(const uint8_t *entry) {
     if (entry == 0) {
         return 0;
     }

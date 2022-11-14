@@ -46,7 +46,7 @@ DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o TheSolvers DBManage dbtest DBManage2 Test
+	-rm *.o TheSolvers DBManage dbtest DBManage2 DBManage3 Test
 
 cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code

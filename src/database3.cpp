@@ -25,7 +25,7 @@ int8_t *db_get_bounds(const uint8_t *entry) {
     if (entry == 0) {
         return 0;
     }
-    return (uint8_t *) (entry + Offset<DBLayout, DB_BOUNDS>());
+    return (int8_t *) (entry + Offset<DBLayout, DB_BOUNDS>());
 }
 
 uint64_t *db_get_metric(const uint8_t *entry) {

@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstring>
+#include <map>
 
 #include "solver.h"
 #include "database3.h"
@@ -107,9 +108,8 @@ void computeDominance(uint8_t *g1, size_t g1Size, uint64_t *dominance) {
 }
 
 
-/*
-void computeBounds(uint8_t *board, size_t boardLen, uint *bounds) {
-    char compare[32];
+void computeBounds(uint8_t *board, size_t boardLen, int8_t *bounds) {
+    uint8_t compare[32];
 
     map<int, int> ltFlags; //-1 false, 0 unknown, 1 true
     map<int, int> gtFlags;
@@ -117,10 +117,9 @@ void computeBounds(uint8_t *board, size_t boardLen, uint *bounds) {
     bool found = false;
 
     for (int i = 0; abs(i) < 31; i = i >= 0 ? -(i + 1) : -i) {
-        //cout << "[" << i << "]" << endl;
 
         memset(compare, 0, 32);
-        char player = i < 0 ? 1 : 2; //we're adding the negative of compare -- flip 1 and 2
+        int player = i < 0 ? 1 : 2; //we're adding the negative of compare -- flip 1 and 2
 
 
         compare[0] = opponentNumber(player);
@@ -129,17 +128,16 @@ void computeBounds(uint8_t *board, size_t boardLen, uint *bounds) {
             compare[j + 1] = player;
         }
 
-        char *g = addGames(strlen(board), board, strlen(compare), compare);
+        //char *g = addGames(strlen(board), board, strlen(compare), compare);
+        size_t gLen;
+        uint8_t *g = addGames(board, boardLen, compare, strlen((char *) compare), &gLen);
 
-        int boardSize = strlen(board) + 1 + strlen(compare);
+        //int boardSize = strlen(board) + 1 + strlen(compare);
+        //int result1 = gameResult(db, g, boardSize, 1);
+        //int result2 = gameResult(db, g, boardSize, 2);
 
-        //for (int j = 0; j < boardSize; j++) {
-        //    cout << playerNumberToChar(g[j]);
-        //}
-        //cout << endl;
-
-        int result1 = gameResult(db, g, boardSize, 1);
-        int result2 = gameResult(db, g, boardSize, 2);
+        int result1 = solver->solveID(g, gLen, 1);
+        int result2 = solver->solveID(g, gLen, 2);
 
         delete[] g;
 
@@ -215,7 +213,6 @@ void computeBounds(uint8_t *board, size_t boardLen, uint *bounds) {
     }
 
 }
-*/
 
 
 int main() {
@@ -297,12 +294,16 @@ int main() {
             }
 
 
-            //compute bounds TODO
-            //int8_t[2] bounds;
-            //computeBounds(board, boardLen, bounds);
-            //db_get_bounds(entry)[0] = bounds[0];
-            //db_get_bounds(entry)[1] = bounds[1];
-
+            
+            //compute bounds
+            if (boardLen <= DB_MAX_BOUND_BITS) {
+                int8_t bounds[2];
+                computeBounds(board, boardLen, bounds);
+                db_get_bounds(entry)[0] = bounds[0];
+                db_get_bounds(entry)[1] = bounds[1];
+                cout << (int) bounds[0] << " <> " << (int) bounds[1] << endl;
+            }
+            
 
 
             //compute metric

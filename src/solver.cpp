@@ -354,7 +354,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
             pair<int, int> &sg = subgames[i];
 
-            if (outcomes[i] == p) {
+            if (outcomes[i] == n) {
                 for (int j = 0; j < lengths[i]; j++) {
                     sboardCopy[sg.first + j] = 0;
                 }

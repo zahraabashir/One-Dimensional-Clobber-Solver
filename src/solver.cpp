@@ -220,6 +220,21 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     node_count += 1;
 
+    if (depth > 0) {
+        uint8_t *ent = db->get(board, boardLen);
+        if (ent) {
+            int outcome = *db_get_outcome(ent);
+
+            if (outcome == 1 || outcome == 2) {
+                return pair<int, bool>(outcome, true);
+            } else if (outcome == OC_P) {
+                return pair<int, bool>(p, true);
+            } else if (outcome == OC_N) {
+                return pair<int, bool>(n, true);
+            }
+        }
+    }
+
     size_t sboardLen = boardLen;
     uint8_t *sboard = new uint8_t[boardLen];
     memcpy(sboard, board, boardLen);

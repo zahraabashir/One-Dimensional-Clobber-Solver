@@ -226,7 +226,18 @@ int main() {
 
     sort(shapeList.begin(), shapeList.end(),
         [](const vector<int> &s1, const vector<int> &s2) {
-            return shapeToNumber(s1) < shapeToNumber(s2);
+            int bits1 = s1.size() - 1;
+            int bits2 = s2.size() - 1;
+
+            for (int chunk : s1) {
+                bits1 += chunk;
+            }
+
+            for (int chunk : s2) {
+                bits2 += chunk;
+            }
+
+            return bits1 < bits2;
         }
     );
 

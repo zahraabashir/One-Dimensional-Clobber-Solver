@@ -93,7 +93,7 @@ db2: DBManage2
 db3: DBManage3
 	-rm database3.bin
 	touch database3.bin
-	-./DBManage3
+	-time ./DBManage3
 
 
 dbtest: database2.o dbtest.o utils.o state.o

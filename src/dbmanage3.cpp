@@ -76,7 +76,7 @@ int main() {
 
 
             *db_get_outcome(entry) = outcomeClass;
-            cout << (int) outcomeClass << " " << (int) *db_get_outcome(entry) << endl;
+            //cout << (int) outcomeClass << " " << (int) *db_get_outcome(entry) << endl;
 
 
 

@@ -115,6 +115,7 @@ class Database {
     void init();
     void save();
     void load();
+    void loadFrom(const char *fileName);
 
     uint64_t getIdx(const uint8_t *board, size_t len);
 

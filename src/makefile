@@ -39,6 +39,11 @@ DBManage2: dbmanage2.o database2.o utils.o state.o solver.o bound.o
 DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
+explore: dbExplore.cpp database3.o utils.o state.o bound.o MurmurHash3.cpp
+	$(CC) $(FLAGS) $^ -o $@
+
+
+
 
 %.o: %.cpp %.h options.h
 	$(CC) $(FLAGS) $< -o $@ -c
@@ -47,7 +52,7 @@ DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o TheSolvers DBManage dbtest DBManage2 DBManage3 Test
+	-rm *.o TheSolvers DBManage dbtest DBManage2 DBManage3 Test explore
 
 cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code

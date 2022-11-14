@@ -215,7 +215,7 @@ void computeBounds(uint8_t *board, size_t boardLen, int8_t *bounds) {
 }
 
 bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t gameNumber) {
-    return false;
+    //return false;
     uint64_t idx = db->getIdx(board, boardLen);
     assert(idx);
     uint8_t *entry = db->getFromIdx(idx);

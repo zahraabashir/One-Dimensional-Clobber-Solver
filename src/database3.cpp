@@ -284,6 +284,27 @@ void Database::load() {
     index = (uint64_t *) (data + headerSize);
 }
 
+void Database::loadFrom(const char *fileName) {
+    //cout << "DB LOAD" << endl;
+
+    file = fopen(fileName, "r+");
+
+    fseek(file, 0L, SEEK_END);
+    size = ftell(file);
+    //cout << "Database loading " << size << " bytes" << endl;
+    fseek(file, 0L, SEEK_SET);
+
+    data = (uint8_t *) calloc(size, 1);
+
+    fread(data, 1, size, file);
+    fclose(file);
+
+    indexEntryCount = ((size_t *) data)[0];
+    entryCount = ((size_t *) data)[1];
+    index = (uint64_t *) (data + headerSize);
+}
+
+
 
 // (chunkSize, start)
 vector<tuple<int, const uint8_t *>> computeShapeData(const uint8_t *board, size_t len) {

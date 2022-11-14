@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
         uint64_t idx = db.getIdx(board, query.size());
         uint8_t *entry = (idx != 0) ? db.getFromIdx(idx) : 0;
 
-        if (idx == 0) {
+        if (!entry) {
             cout << "Not found" << endl;
             continue;
         }

@@ -442,5 +442,8 @@ uint8_t *Database::get(const uint8_t *board, size_t len) {
 }
 
 uint8_t *Database::getFromIdx(uint64_t idx) {
+    if (idx == DB_NOT_FOUND) {
+        return 0;
+    }
     return data + idx;
 }

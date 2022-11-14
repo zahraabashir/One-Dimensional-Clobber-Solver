@@ -19,8 +19,9 @@ compTest: solver.o
 run: TheSolvers
 	@#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 1
 	#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 1
-	-time ./TheSolvers BBBW.BWW B
-	@echo Should be B
+	#-time ./TheSolvers BBBW.BWW B
+	#@echo Should be B
+	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

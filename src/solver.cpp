@@ -757,7 +757,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     if (!exists) {
         idx = blockPtr[0];
         uint8_t *entry0 = first + idx * tableEntrySize;
-        if (*tt_get_valid(entry0) && false) {
+        if (*tt_get_valid(entry0) && true) {
             //find best value
             double bestValue = numeric_limits<double>::infinity();
             idx = 0;
@@ -769,7 +769,10 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
                 unsigned int depth = *tt_get_depth(entry);
                 int age = BLOCK_SIZE - i;
 
-                double value = ((double) -depth) * ((double) age) / ((double) BLOCK_SIZE);
+                //double value = ((double) -depth) - 1.0 * ((double) age) / ((double) BLOCK_SIZE);
+
+                //double value = -depth * ((double) age / (double) BLOCK_SIZE);
+                double value = -(depth * depth) * ((double) age / (double) BLOCK_SIZE);
 
                 if (value < bestValue) {
                     bestValue = value;

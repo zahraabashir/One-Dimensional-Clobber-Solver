@@ -215,7 +215,8 @@ void computeBounds(uint8_t *board, size_t boardLen, int8_t *bounds) {
 }
 
 bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t gameNumber) {
-    //return false;
+    //TODO this creates a different database because bounds might not be stable...
+
     uint64_t idx = db->getIdx(board, boardLen);
     assert(idx);
     uint8_t *entry = db->getFromIdx(idx);
@@ -252,11 +253,13 @@ bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t game
     //bounds
     int8_t low = db_get_bounds(entry2)[0];
     int8_t high = db_get_bounds(entry2)[1];
+    cout << "{B} " << (int) low << " " << (int) high << endl;
     swap(low, high);
     low *= -1;
     high *= -1;
     db_get_bounds(entry)[0] = low;
     db_get_bounds(entry)[1] = high;
+    cout << "{} " << (int) low << " " << (int) high << endl;
 
     //metric
     uint64_t metric = *db_get_metric(entry2);

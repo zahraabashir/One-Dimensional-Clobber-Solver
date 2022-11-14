@@ -1,4 +1,7 @@
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cstring>
 
 #include "database3.h"
 #include "utils.h"
@@ -13,11 +16,84 @@ void printBits(T val) {
     }
 }
 
+bool sameEntry(uint8_t *e1, uint8_t *e2) {
+    return memcmp(e1, e2, DBLayout::size()) == 0;
+}
+
+void diffMode(string &file1, string &file2) {
+    Database db1;
+    db1.loadFrom(file1.c_str());
+
+    Database db2;
+    db2.loadFrom(file2.c_str());
+
+    vector<vector<int>> shapeList = makeShapes();
+
+    sort(shapeList.begin(), shapeList.end(),
+        [](const vector<int> &s1, const vector<int> &s2) {
+            int bits1 = s1.size() - 1;
+            int bits2 = s2.size() - 1;
+
+            for (int chunk : s1) {
+                bits1 += chunk;
+            }
+
+            for (int chunk : s2) {
+                bits2 += chunk;
+            }
+
+            return bits1 < bits2;
+        }
+    );
+
+    //Iterate over all shapes
+    for (const vector<int> &shape : shapeList) {
+        uint64_t shapeNumber = shapeToNumber(shape);
+
+        //iterate over all games
+        int gameBits = 0;
+        for (int chunk : shape) {
+            gameBits += chunk;
+        }
+
+        uint32_t minGame = 0;
+        uint32_t gameCount = 1 << gameBits;
+
+        for (uint32_t gameNumber = minGame; gameNumber < gameCount; gameNumber++) {
+            //Get game and print it
+            uint8_t *board;
+            size_t boardLen;
+            makeGame(shapeNumber, gameNumber, &board, &boardLen);
+            printBoard(board, boardLen, true);
+
+            uint8_t *e1 = db1.get(board, boardLen);
+            uint8_t *e2 = db2.get(board, boardLen);
+
+
+            if (!sameEntry(e1, e2)) {
+                cout << "This entry doesn't match" << endl;
+            }
+
+            delete[] board;
+        }
+    }
+
+    cout << "Done!" << endl;
+
+}
+
 int main(int argc, char **argv) {
     string fileName = "database3.bin";
 
-    if (argc >= 2) {
+    if (argc == 2) {
         fileName = string(argv[1]);
+    }
+
+    if (argc == 3) {
+        string file1(argv[1]);
+        string file2(argv[2]);
+        diffMode(file1, file2);
+        return 0;
     }
 
     cout << "Loading from " << fileName << endl;

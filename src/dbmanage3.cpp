@@ -154,10 +154,18 @@ void computeBounds(uint8_t *board, size_t boardLen, int8_t *bounds) {
 
 
         // C >= G --> 0 >= G - C --> G - C <= 0
+        #if defined(STRICT_BOUNDS)
+        gtFlags[i] = (outcomeClass == OC_W) ? 1 : -1;
+        #else
         gtFlags[i] = (outcomeClass == OC_W || outcomeClass == OC_P) ? 1 : -1;
+        #endif
 
         // C <= G --> 0 <= G - C --> G - C >= 0
+        #if defined(STRICT_BOUNDS)
+        ltFlags[i] = (outcomeClass == OC_B) ? 1 : -1;
+        #else
         ltFlags[i] = (outcomeClass == OC_B || outcomeClass == OC_P) ? 1 : -1;
+        #endif
  
 
         //Now check if we can determine the bound from this
@@ -216,6 +224,7 @@ void computeBounds(uint8_t *board, size_t boardLen, int8_t *bounds) {
 
 bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t gameNumber) {
     //TODO this creates a different database because bounds might not be stable...
+    return false;
 
     uint64_t idx = db->getIdx(board, boardLen);
     assert(idx);

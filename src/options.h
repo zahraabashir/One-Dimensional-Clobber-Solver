@@ -25,6 +25,8 @@
 // changing this requires rebuilding the database
 #define SUBGAME_COMPLEXITY_METRIC 0
 
+#define STRICT_BOUNDS
+
 
 
 // Max bits of index into the database (database will generate all connected games from sizes 1 to this size, inclusive)

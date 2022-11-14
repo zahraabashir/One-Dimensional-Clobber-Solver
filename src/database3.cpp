@@ -314,6 +314,34 @@ vector<tuple<int, const uint8_t *>> computeShapeData(const uint8_t *board, size_
     return shape;
 }
 
+vector<int> getShape(const uint8_t *board, size_t len) {
+    vector<int> shape;
+
+    int chunk = 0;
+
+    for (size_t i = 0; i < len; i++) {
+        if (board[i] != 0) {
+            if (chunk == 0) { //new chunk
+                //ptr = board + i;
+            }
+
+            chunk += 1;
+        } else {
+            if (chunk >= 1) { //complete chunk
+                shape.push_back(chunk);
+            }
+            chunk = 0;
+        }
+    }
+
+    if (chunk >= 1) {
+        shape.push_back(chunk);
+    }
+
+    return shape;
+}
+
+
 
 uint64_t Database::getIdx(const uint8_t *board, size_t len) {
     if (len > DB_MAX_BITS) {

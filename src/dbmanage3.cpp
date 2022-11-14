@@ -214,6 +214,84 @@ void computeBounds(uint8_t *board, size_t boardLen, int8_t *bounds) {
 
 }
 
+bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t gameNumber) {
+    return false;
+    uint64_t idx = db->getIdx(board, boardLen);
+    assert(idx);
+    uint8_t *entry = db->getFromIdx(idx);
+    assert(entry);
+
+
+    //Negated game
+    negateBoard(board, boardLen);
+    uint64_t idx2 = db->getIdx(board, boardLen);
+    assert(idx);
+    uint8_t *entry2 = db->getFromIdx(idx2);
+    assert(entry2);
+    negateBoard(board, boardLen);
+
+    if (*db_get_outcome(entry2) == 0) {
+        return false;
+    }
+
+    //outcome
+    uint8_t outcome = *db_get_outcome(entry2);
+    if (outcome == OC_B) {
+        outcome = OC_W;
+    } else if (outcome == OC_W) {
+        outcome = OC_B;
+    }
+    *db_get_outcome(entry) = outcome;
+
+    //dominance
+    uint64_t domBlack = db_get_dominance(entry2)[0];
+    uint64_t domWhite = db_get_dominance(entry2)[1];
+    db_get_dominance(entry)[0] = domWhite;
+    db_get_dominance(entry)[1] = domBlack;
+
+    //bounds
+    int8_t low = db_get_bounds(entry2)[0];
+    int8_t high = db_get_bounds(entry2)[1];
+    swap(low, high);
+    low *= -1;
+    high *= -1;
+    db_get_bounds(entry)[0] = low;
+    db_get_bounds(entry)[1] = high;
+
+    //metric
+    uint64_t metric = *db_get_metric(entry2);
+    *db_get_metric(entry) = metric;
+
+    //link
+    uint64_t link = *db_get_link(entry2);
+
+    uint8_t *linkedEntry = db->getFromIdx(link);
+    assert(linkedEntry);
+
+    uint64_t linkedShape = *db_get_shape(linkedEntry);
+    uint32_t linkedGameNumber = *db_get_number(linkedEntry);
+
+    size_t linkedGameLen;
+    uint8_t *linkedGame;
+    makeGame(linkedShape, linkedGameNumber, &linkedGame, &linkedGameLen);
+    negateBoard(linkedGame, linkedGameLen);
+
+    uint64_t newLink = db->getIdx(linkedGame, linkedGameLen);
+    assert(newLink);
+
+    *db_get_link(entry) = newLink;
+
+    delete[] linkedGame;
+
+    //shape
+    *db_get_shape(entry) = shapeNumber;
+
+    //number
+    *db_get_number(entry) = gameNumber;
+
+    return true;
+}
+
 
 int main() {
     //Initialize: DB, solver, shapes
@@ -262,8 +340,14 @@ int main() {
             cout << "Shape " << shape << " (" << shapeNumber << ") ";
             printBoard(board, boardLen, true);
 
+            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
+                delete[] board;
+                continue;
+            }
+
             //Get entry
             uint64_t idx = db->getIdx(board, boardLen);
+            assert(idx); 
             //cout << "idx " << idx << endl;
             uint8_t *entry = db->getFromIdx(idx);
             assert(entry);
@@ -303,8 +387,6 @@ int main() {
                 db_get_dominance(entry)[0] = dominance[0];
                 db_get_dominance(entry)[1] = dominance[1];
             }
-
-
             
             //compute bounds
             if (boardLen <= DB_MAX_BOUND_BITS) {
@@ -318,6 +400,22 @@ int main() {
 
 
             //compute metric
+            size_t bMoveCount;
+            size_t wMoveCount;
+            int *bMoves = getMoves(board, boardLen, 1, &bMoveCount);
+            int *wMoves = getMoves(board, boardLen, 2, &wMoveCount);
+
+            if (bMoveCount) {
+                delete[] bMoves;
+            }
+
+            if (wMoveCount) {
+                delete[] wMoves;
+            }
+
+            *db_get_metric(entry) = bMoveCount + wMoveCount;
+
+
             //add to map
 
 

@@ -11,6 +11,117 @@ using namespace std;
 Database *db;
 Solver *solver;
 
+/*
+void computeBounds(uint8_t *board, size_t boardLen, uint *bounds) {
+    char compare[32];
+
+    map<int, int> ltFlags; //-1 false, 0 unknown, 1 true
+    map<int, int> gtFlags;
+
+    bool found = false;
+
+    for (int i = 0; abs(i) < 31; i = i >= 0 ? -(i + 1) : -i) {
+        //cout << "[" << i << "]" << endl;
+
+        memset(compare, 0, 32);
+        char player = i < 0 ? 1 : 2; //we're adding the negative of compare -- flip 1 and 2
+
+
+        compare[0] = opponentNumber(player);
+
+        for (int j = 0; j < abs(i); j++) {
+            compare[j + 1] = player;
+        }
+
+        char *g = addGames(strlen(board), board, strlen(compare), compare);
+
+        int boardSize = strlen(board) + 1 + strlen(compare);
+
+        //for (int j = 0; j < boardSize; j++) {
+        //    cout << playerNumberToChar(g[j]);
+        //}
+        //cout << endl;
+
+        int result1 = gameResult(db, g, boardSize, 1);
+        int result2 = gameResult(db, g, boardSize, 2);
+
+        delete[] g;
+
+        int outcomeClass;
+        if (result1 == result2) {
+            outcomeClass = result1;
+        } else {
+            if (result1 == 1) {
+                outcomeClass = OC_N;
+            } else {
+                outcomeClass = OC_P;
+            }
+        }
+
+
+        // C >= G --> 0 >= G - C --> G - C <= 0
+        gtFlags[i] = (outcomeClass == OC_W || outcomeClass == OC_P) ? 1 : -1;
+
+        // C <= G --> 0 <= G - C --> G - C >= 0
+        ltFlags[i] = (outcomeClass == OC_B || outcomeClass == OC_P) ? 1 : -1;
+ 
+
+        //Now check if we can determine the bound from this
+        int low, high;
+        bool foundLow = false;
+        bool foundHigh = false;
+
+        for (int j = -31; j < 31; j++) {
+            if (ltFlags[j] == 1 && ltFlags[j + 1] == -1) {
+                low = j;
+                foundLow = true;
+                break;
+            }
+            
+        }
+
+        for (int j = 31; j > -31; j--) {
+            if (gtFlags[j] == 1 && gtFlags[j - 1] == -1) {
+                high = j;
+                foundHigh = true;
+                break;
+            }
+        }
+
+        if (foundLow && foundHigh) {
+            bounds[0] = low;
+            bounds[1] = high;
+            found = true;
+            break;
+        }
+
+    }
+
+    if (!found || bounds[0] > bounds[1]) {
+        cout << "Bounds not found..." << endl;
+        cout << "{" << (int) bounds[0] << " " << (int) bounds[1] << "}" << endl;
+
+
+        cout << "LT" << endl;
+        for (int i = -32; i < 32; i++) {
+            cout << "(" << i << " " << ltFlags[i] << ") ";
+        }
+        cout << endl;
+
+        cout << "GT" << endl;
+        for (int i = -32; i < 32; i++) {
+            cout << "(" << i << " " << gtFlags[i] << ") ";
+        }
+        cout << endl;
+
+        while (1) {
+        }
+    }
+
+}
+*/
+
+
 int main() {
     //Initialize: DB, solver, shapes
     db = new Database();
@@ -54,7 +165,8 @@ int main() {
             assert(entry);
             assert(*db_get_outcome(entry) == 0);
 
-            //Set trivial values (shape and number)
+            //Set trivial values (self link, shape, number)
+            *db_get_link(entry) = idx;
             *db_get_shape(entry) = shapeNumber;
             *db_get_number(entry) = gameNumber;
 
@@ -79,6 +191,23 @@ int main() {
             //cout << (int) outcomeClass << " " << (int) *db_get_outcome(entry) << endl;
 
 
+            //compute dominance
+            if (boardLen <= DB_MAX_DOMINANCE_BITS) {
+            }
+
+
+            //compute bounds TODO
+            //int8_t[2] bounds;
+            //computeBounds(board, boardLen, bounds);
+            //db_get_bounds(entry)[0] = bounds[0];
+            //db_get_bounds(entry)[1] = bounds[1];
+
+
+
+            //compute metric
+            //add to map
+
+
 
 
             delete[] board;
@@ -86,6 +215,8 @@ int main() {
 
 
     }
+
+    //do second pass to find links
 
 
     db->save();

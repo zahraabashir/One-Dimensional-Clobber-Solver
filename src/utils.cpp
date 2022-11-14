@@ -120,4 +120,32 @@ void makeGame(const vector<int> &shape, uint32_t gameNumber,
         }
     }
 }
+uint8_t *addGames(uint8_t *g1, size_t g1Size,
+    uint8_t *g2, size_t g2Size, size_t *newSize) {
 
+
+    bool hasSpace = false;
+    if (g1Size != 0 && g2Size != 0) {
+        hasSpace = true;
+    }
+
+    *newSize = g1Size + g2Size + hasSpace;
+
+    uint8_t *result = new uint8_t[*newSize];
+
+    for (size_t i = 0; i < *newSize; i++) {
+        if (i < g1Size) {
+            result[i] = g1[i];
+            continue;
+        }
+
+        if (i == g1Size && hasSpace) {
+            result[i] = 0;
+            continue;
+        }
+
+        result[i] = g2[i - g1Size - hasSpace];
+    }
+
+    return result;
+}

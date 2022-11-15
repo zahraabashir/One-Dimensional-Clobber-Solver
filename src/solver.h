@@ -7,13 +7,13 @@
 #include "options.h"
 #include "database3.h"
 
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 1
 
 extern int node_count;
 extern int best_from;
 extern int best_to;
 
-#define STORED_BEST_MOVES 3
+#define STORED_BEST_MOVES 1
 
 struct TTLayout {
     static constexpr size_t arr[] = {

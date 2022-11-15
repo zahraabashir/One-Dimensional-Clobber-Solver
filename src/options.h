@@ -30,7 +30,7 @@
 
 
 // Max bits of index into the database (database will generate all connected games from sizes 1 to this size, inclusive)
-#define DB_MAX_BITS 12
+#define DB_MAX_BITS 16
 
 // connected games from 1 to this number will have dominance information
 #define DB_MAX_DOMINANCE_BITS 12
@@ -39,6 +39,9 @@
 #define DB_MAX_BOUND_BITS 16
 
 // games are only substituted if they are in the database, and have both dominance and bound information (so the minimum of these will determine what games can be substituted)
+
+
+#define DB_MAX_SUB_BITS min(DB_MAX_DOMINANCE_BITS, DB_MAX_BOUND_BITS)
 
 
 #define BIT_VECTOR_SIZE 2

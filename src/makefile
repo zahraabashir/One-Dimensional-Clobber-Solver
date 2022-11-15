@@ -4,7 +4,7 @@
 SHELL := /bin/bash
 
 CC = g++
-FLAGS = -Wall --std=c++17 -lmd -O3
+FLAGS = -Wall --std=c++17 -lmd -O3 -DNDEBUG
 
 
 .PHONY: dbtest
@@ -17,11 +17,8 @@ compTest: solver.o
 
 
 run: TheSolvers
-	@#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBW B 1
-	#-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B 1
-	#-time ./TheSolvers BBBW.BWW B
-	#@echo Should be B
-	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBW B
+	./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+	@echo Try to beat 47399 nodes 
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

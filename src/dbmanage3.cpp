@@ -318,34 +318,7 @@ void addToReplacementMap(int low, int high, int outcome, uint64_t link) {
     vec->push_back(link);
 }
 
-
-int main() {
-    //Initialize: DB, solver, shapes
-    db = new Database();
-    db->init();
-
-    solver = new Solver(DB_MAX_BITS, db);
-
-    vector<vector<int>> shapeList = makeShapes();
-
-    sort(shapeList.begin(), shapeList.end(),
-        [](const vector<int> &s1, const vector<int> &s2) {
-            int bits1 = s1.size() - 1;
-            int bits2 = s2.size() - 1;
-
-            for (int chunk : s1) {
-                bits1 += chunk;
-            }
-
-            for (int chunk : s2) {
-                bits2 += chunk;
-            }
-
-            return bits1 < bits2;
-        }
-    );
-
-
+void doPass(const vector<vector<int>> &shapeList, int pass) {
     //Iterate over all shapes
     for (const vector<int> &shape : shapeList) {
         uint64_t shapeNumber = shapeToNumber(shape);
@@ -358,6 +331,20 @@ int main() {
 
         uint32_t minGame = 0;
         uint32_t gameCount = 1 << gameBits;
+
+
+        size_t _inducedSize = 0;
+        _inducedSize += shape.size() - 1;
+        for (int chunk : shape) {
+            _inducedSize += chunk;
+        }
+
+        if ((_inducedSize <= DB_MAX_SUB_BITS) && (pass == 1)) {
+            continue;
+        }
+        if ((_inducedSize > DB_MAX_SUB_BITS) && (pass == 0)) {
+            continue;
+        }
 
         for (uint32_t gameNumber = minGame; gameNumber < gameCount; gameNumber++) {
             //Get game and print it
@@ -387,7 +374,6 @@ int main() {
                 delete[] board;
                 continue;
             }
-
 
 
             //Set trivial values (self link, shape, number)
@@ -434,8 +420,6 @@ int main() {
                 cout << (int) bounds[0] << " <> " << (int) bounds[1] << endl;
             }
             
-
-
             //compute metric
             size_t bMoveCount;
             size_t wMoveCount;
@@ -454,7 +438,7 @@ int main() {
 
 
             //add to map
-            if (boardLen <= DB_MAX_BOUND_BITS) {
+            if (boardLen <= DB_MAX_SUB_BITS) {
                 addToReplacementMap(bounds[0], bounds[1], outcomeClass, idx);
             }
 
@@ -464,6 +448,37 @@ int main() {
 
 
     }
+}
+
+
+int main() {
+    //Initialize: DB, solver, shapes
+    db = new Database();
+    db->init();
+
+    solver = new Solver(DB_MAX_BITS, db);
+
+    vector<vector<int>> shapeList = makeShapes();
+
+    sort(shapeList.begin(), shapeList.end(),
+        [](const vector<int> &s1, const vector<int> &s2) {
+            int bits1 = s1.size() - 1;
+            int bits2 = s2.size() - 1;
+
+            for (int chunk : s1) {
+                bits1 += chunk;
+            }
+
+            for (int chunk : s2) {
+                bits2 += chunk;
+            }
+
+            return bits1 < bits2;
+        }
+    );
+
+
+    doPass(shapeList, 0);
 
     //do second pass to find links
     for (const vector<int> &shape : shapeList) {
@@ -487,7 +502,7 @@ int main() {
             cout << "Shape (pass 2) " << shape << " (" << shapeNumber << ") ";
             printBoard(board, boardLen, true);
 
-            if (boardLen > DB_MAX_BOUND_BITS) {
+            if (boardLen > DB_MAX_SUB_BITS) {
                 continue;
             }
 
@@ -557,6 +572,9 @@ int main() {
             delete[] board;
         }
     }
+
+
+    doPass(shapeList, 1);
 
 
 

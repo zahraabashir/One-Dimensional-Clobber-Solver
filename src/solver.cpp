@@ -360,6 +360,20 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     node_count += 1;
 
+    size_t sboardLen = boardLen;
+    uint8_t *sboard = new uint8_t[boardLen];
+    memcpy(sboard, board, boardLen);
+
+    if (depth > 0) {
+        simplify(&sboard, &sboardLen);
+    }
+
+    if (sboardLen == 0) {
+        delete[] sboard;
+        return pair<int, bool>(p, true);
+    }
+
+
     if (depth > 0) {
         uint8_t *ent = db->get(board, boardLen);
         if (ent) {
@@ -375,18 +389,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
-    size_t sboardLen = boardLen;
-    uint8_t *sboard = new uint8_t[boardLen];
-    memcpy(sboard, board, boardLen);
-
-    if (depth > 0) {
-        simplify(&sboard, &sboardLen);
-    }
-
-    if (sboardLen == 0) {
-        delete[] sboard;
-        return pair<int, bool>(p, true);
-    }
 
     //lookup entry
     //if solved, return

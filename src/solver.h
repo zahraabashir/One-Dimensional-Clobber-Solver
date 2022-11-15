@@ -109,6 +109,9 @@ class Solver {
     uint8_t *getBlockPtr(int code);
 
     uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint32_t hash);
+
+
+    void simplify(uint8_t **board, size_t *boardLen);
 };
 
 

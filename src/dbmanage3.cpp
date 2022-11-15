@@ -504,10 +504,10 @@ int main() {
 
             //TODO enable mirroring later
 
-            //if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-            //    delete[] board;
-            //    continue;
-            //}
+            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
+                delete[] board;
+                continue;
+            }
 
 
             //Find game in the replacement map and search all possible replacements

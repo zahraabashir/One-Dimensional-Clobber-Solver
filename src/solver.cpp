@@ -213,6 +213,75 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
     }
 }
 
+//void Solver::simplify(State *state, int depth) {
+void Solver::simplify(uint8_t **board, size_t *boardLen) {
+    //Get all subgames
+    vector<pair<int, int>> _subgames = generateSubgames(*board, *boardLen);
+    vector<pair<int, int>> subgames;
+    for (const pair<int, int> &sg : _subgames) {
+        subgames.push_back({sg.first, sg.second - sg.first});
+    }
+
+
+    vector<pair<uint8_t *, size_t>> replacements;
+    // Look up subgames and add their inflated linked games to a vector
+    for (size_t i = 0; i < subgames.size(); i++) {
+        const pair<int, int> &sg = subgames[i];
+        size_t sgOffset = sg.first;
+        size_t sgLen = sg.second;
+
+
+        uint8_t *entry = db->get(*board + sgOffset, sgLen); 
+        if (entry == 0) {
+            uint8_t *gameChunk = new uint8_t[sgLen];
+            memcpy(gameChunk, *board + sgOffset, sgLen);
+            replacements.push_back({gameChunk, sgLen});
+            continue;
+        }
+
+        //skip P positions
+        if (*db_get_outcome(entry) == OC_P) {
+            continue;
+        }
+
+        //inflate game
+        uint64_t linkedShapeNumber = *db_get_shape(entry);
+        uint32_t linkedGameNumber = *db_get_number(entry);
+        uint8_t *linkedGame;
+        size_t linkedGameLen;
+        makeGame(linkedShapeNumber, linkedGameNumber, &linkedGame, &linkedGameLen);
+
+        replacements.push_back({linkedGame, linkedGameLen});
+    }
+
+    //Ignore chunks that are negatives of each other
+    
+
+    //Combine chunks to get result
+    delete[] *board;
+
+    *boardLen = max(((int) replacements.size()) - 1, 0);
+    for (const pair<uint8_t *, size_t> &r : replacements) {
+        *boardLen += r.second;
+    }
+
+    *board = new uint8_t[*boardLen];
+
+    size_t offset = 0;
+    memset(*board, 0, *boardLen);
+    for (const pair<uint8_t *, size_t> &r : replacements) {
+        memcpy(*board + offset, r.first, r.second);
+        offset += r.second + 1;
+    }
+
+    //Clean up
+    for (pair<uint8_t *, size_t> &r : replacements) {
+        delete[] r.first;
+    }
+
+}
+
+
 
 
 pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
@@ -240,7 +309,12 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     memcpy(sboard, board, boardLen);
 
     if (depth > 0) {
-        //simplify(&sboard, &sboardLen);
+        simplify(&sboard, &sboardLen);
+    }
+
+    if (sboardLen == 0) {
+        delete[] sboard;
+        return pair<int, bool>(p, true);
     }
 
     //lookup entry

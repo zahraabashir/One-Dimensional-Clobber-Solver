@@ -215,6 +215,10 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 
 //void Solver::simplify(State *state, int depth) {
 void Solver::simplify(uint8_t **board, size_t *boardLen) {
+    //return;
+    //cout << "+++" << endl;
+    //printBoard(*board, *boardLen, true);
+
     //Get all subgames
     vector<pair<int, int>> _subgames = generateSubgames(*board, *boardLen);
     vector<pair<int, int>> subgames;
@@ -232,7 +236,7 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
 
         uint8_t *entry = db->get(*board + sgOffset, sgLen); 
-        if (entry == 0) {
+        if (entry == 0 || *db_get_outcome(entry) == 0) {
             uint8_t *gameChunk = new uint8_t[sgLen];
             memcpy(gameChunk, *board + sgOffset, sgLen);
             replacements.push_back({gameChunk, sgLen});
@@ -267,6 +271,12 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
     *board = new uint8_t[*boardLen];
 
+    sort(replacements.begin(), replacements.end(),
+        [](const pair<uint8_t *, size_t> &r1, const pair<uint8_t *, size_t> &r2) {
+            return r1.second > r2.second;
+        }
+    );
+
     size_t offset = 0;
     memset(*board, 0, *boardLen);
     for (const pair<uint8_t *, size_t> &r : replacements) {
@@ -278,6 +288,9 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
     for (pair<uint8_t *, size_t> &r : replacements) {
         delete[] r.first;
     }
+
+    //printBoard(*board, *boardLen, true);
+    //cout << "---" << endl << endl;
 
 }
 

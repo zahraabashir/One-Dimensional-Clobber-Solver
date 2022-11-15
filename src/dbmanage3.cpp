@@ -276,23 +276,27 @@ bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t game
     //link
     uint64_t link = *db_get_link(entry2);
 
-    uint8_t *linkedEntry = db->getFromIdx(link);
-    assert(linkedEntry);
+    if (link == idx2) {
+        *db_get_link(entry) = idx;
+    } else {
+        uint8_t *linkedEntry = db->getFromIdx(link);
+        assert(linkedEntry);
 
-    uint64_t linkedShape = *db_get_shape(linkedEntry);
-    uint32_t linkedGameNumber = *db_get_number(linkedEntry);
+        uint64_t linkedShape = *db_get_shape(linkedEntry);
+        uint32_t linkedGameNumber = *db_get_number(linkedEntry);
 
-    size_t linkedGameLen;
-    uint8_t *linkedGame;
-    makeGame(linkedShape, linkedGameNumber, &linkedGame, &linkedGameLen);
-    negateBoard(linkedGame, linkedGameLen);
+        size_t linkedGameLen;
+        uint8_t *linkedGame;
+        makeGame(linkedShape, linkedGameNumber, &linkedGame, &linkedGameLen);
+        negateBoard(linkedGame, linkedGameLen);
 
-    uint64_t newLink = db->getIdx(linkedGame, linkedGameLen);
-    assert(newLink);
+        uint64_t newLink = db->getIdx(linkedGame, linkedGameLen);
+        assert(newLink);
 
-    *db_get_link(entry) = newLink;
+        *db_get_link(entry) = newLink;
 
-    delete[] linkedGame;
+        delete[] linkedGame;
+    }
 
     //shape
     *db_get_shape(entry) = shapeNumber;
@@ -497,11 +501,13 @@ int main() {
             assert(entry);
             assert(*db_get_outcome(entry) != 0);
 
-            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-                delete[] board;
-                continue;
-            }
 
+            //TODO enable mirroring later
+
+            //if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
+            //    delete[] board;
+            //    continue;
+            //}
 
 
             //Find game in the replacement map and search all possible replacements

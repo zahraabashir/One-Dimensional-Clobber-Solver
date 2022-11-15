@@ -7,7 +7,7 @@
 #include "options.h"
 #include "database3.h"
 
-#define BLOCK_SIZE 1
+#define BLOCK_SIZE 3
 
 extern int node_count;
 extern int best_from;

@@ -259,6 +259,64 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
     }
 
     //Ignore chunks that are negatives of each other
+    for (size_t I = 0; I < replacements.size(); I++) {
+        for (size_t J = I + 1; J < replacements.size(); J++) {
+            auto &r1 = replacements[I];
+            auto &r2 = replacements[J];
+            if (r1.second != r2.second) {
+                continue;
+            }
+            if (r1.first == 0 || r2.first == 0) {
+                continue;
+            }
+
+            size_t len = r1.second;
+            uint8_t *b1 = r1.first;
+            uint8_t *b2 = r2.first;
+
+            int failState = 0;
+            for (int i = 0; i < len; i++) {
+                if ((b1[i] + b2[i]) != 3) {
+                    failState += 1;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < len; i++) {
+                if ((b1[i] + b2[len - 1 - i]) != 3) {
+                    failState += 2;
+                    break;
+                }
+            }
+
+            if (failState != 3) {
+                delete[] b1;
+                delete[] b2;
+                r1.first = 0;
+                r2.first = 0;
+            }
+
+        }
+    }
+
+    //Filter out 0s
+    {
+
+        vector<pair<uint8_t *, size_t>> replacements2;
+        for (auto x : replacements) {
+            replacements2.push_back(x);
+        }
+
+        replacements.clear();
+
+        for (auto x : replacements2) {
+            if (x.first != 0) {
+                replacements.push_back(x);
+            }
+        }
+        
+        
+    }
     
 
     //Combine chunks to get result

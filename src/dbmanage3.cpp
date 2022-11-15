@@ -13,6 +13,7 @@ using namespace std;
 
 Database *db;
 Solver *solver;
+map<triple<int, int, int>, vector<uint64_t> *> replacementMap;
 
 void computeDominance(uint8_t *g1, size_t g1Size, uint64_t *dominance) {
     uint64_t domBlack = 0;
@@ -302,6 +303,17 @@ bool mirror(uint8_t *board, size_t boardLen, uint64_t shapeNumber, uint32_t game
     return true;
 }
 
+void addToReplacementMap(int low, int high, int outcome, uint64_t link) {
+    triple<int, int, int> mapTriple(low, high, outcome);
+
+    vector<uint64_t> *vec = replacementMap[mapTriple];
+    if (!vec) {
+        vec = new vector<uint64_t>();
+        replacementMap[mapTriple] = vec;
+    }
+    vec->push_back(link);
+}
+
 
 int main() {
     //Initialize: DB, solver, shapes
@@ -329,6 +341,7 @@ int main() {
         }
     );
 
+
     //Iterate over all shapes
     for (const vector<int> &shape : shapeList) {
         uint64_t shapeNumber = shapeToNumber(shape);
@@ -350,10 +363,6 @@ int main() {
             cout << "Shape " << shape << " (" << shapeNumber << ") ";
             printBoard(board, boardLen, true);
 
-            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-                delete[] board;
-                continue;
-            }
 
             //Get entry
             uint64_t idx = db->getIdx(board, boardLen);
@@ -362,6 +371,20 @@ int main() {
             uint8_t *entry = db->getFromIdx(idx);
             assert(entry);
             assert(*db_get_outcome(entry) == 0);
+
+            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
+                if (boardLen <= DB_MAX_BOUND_BITS) {
+                    int low = db_get_bounds(entry)[0];
+                    int high = db_get_bounds(entry)[1];
+                    int outcome = *db_get_outcome(entry);
+                    addToReplacementMap(low, high, outcome, idx);
+                }
+
+                delete[] board;
+                continue;
+            }
+
+
 
             //Set trivial values (self link, shape, number)
             *db_get_link(entry) = idx;
@@ -399,8 +422,8 @@ int main() {
             }
             
             //compute bounds
+            int8_t bounds[2];
             if (boardLen <= DB_MAX_BOUND_BITS) {
-                int8_t bounds[2];
                 computeBounds(board, boardLen, bounds);
                 db_get_bounds(entry)[0] = bounds[0];
                 db_get_bounds(entry)[1] = bounds[1];
@@ -427,8 +450,9 @@ int main() {
 
 
             //add to map
-
-
+            if (boardLen <= DB_MAX_BOUND_BITS) {
+                addToReplacementMap(bounds[0], bounds[1], outcomeClass, idx);
+            }
 
 
             delete[] board;

@@ -331,7 +331,18 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
     sort(replacements.begin(), replacements.end(),
         [](const pair<uint8_t *, size_t> &r1, const pair<uint8_t *, size_t> &r2) {
-            return r1.second > r2.second;
+            for (size_t i = 0; i < min(r1.second, r2.second); i++) {
+                if (r1.first[i] == r2.first[i]) {
+                    continue;
+                }
+
+                if (r1.first[i] < r2.first[i]) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return r1.second < r2.second;
         }
     );
 
@@ -356,6 +367,10 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
 
 pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
+    //cout << endl;
+    //printBoard(board, boardLen, false);
+    //cout << " " << playerNumberToChar(n) << " " << depth << endl;
+
     _validEntry = false;
 
     node_count += 1;
@@ -367,17 +382,26 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     if (depth > 0) {
         simplify(&sboard, &sboardLen);
     }
+    //printBoard(sboard, sboardLen, false);
+    //cout << " " << playerNumberToChar(n) << " " << depth << endl;
 
     if (sboardLen == 0) {
+        completed += 1;
         delete[] sboard;
         return pair<int, bool>(p, true);
     }
 
 
     if (depth > 0) {
-        uint8_t *ent = db->get(board, boardLen);
+        uint8_t *ent = db->get(sboard, sboardLen);
         if (ent) {
             int outcome = *db_get_outcome(ent);
+
+            if (outcome) {
+                delete[] sboard;
+            }
+
+            completed += 1;
 
             if (outcome == 1 || outcome == 2) {
                 return pair<int, bool>(outcome, true);
@@ -400,6 +424,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     uint8_t cachedOutcome = *tt_get_outcome(entryPtr);
     //cachedOutcome = 0;
     if (depth > 0 && cachedOutcome != OC_UNKNOWN) {
+        completed += 1;
         delete[] sboard;
         return pair<int, bool>(cachedOutcome, true);
     }
@@ -654,15 +679,18 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
     }
 
+    if (depth == 0 && bestMoves[0] == -1) {
+        bestMoves[0] = 0;
+    }
+
 
     for (int i = 0; i < moveCount; i++) {
         if (moves[2 * i] == -1) {
             continue;
         }
 
-        bool isBest = false;
 
-        //isBest = (i == bestMoves[0]) || (i == bestMoves[1]) || (i == bestMoves[2]);
+        bool isBest = false;
         for (int j = 0; j < STORED_BEST_MOVES; j++) {
             if (i == bestMoves[j]) {
                 isBest = true;
@@ -683,9 +711,30 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
+        bool isBest = false;
+        for (int j = 0; j < STORED_BEST_MOVES; j++) {
+            if (i == bestMoves[j]) {
+                isBest = true;
+                break;
+            }
+        }
+
+        if (isBest) {
+            continue;
+        }
+
+
         if ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) {
             moveOrder.push_back(i);
         }
+    }
+
+    if (depth == 0) {
+        sort(moveOrder.begin(), moveOrder.end(), 
+            [](int a, int b) {
+                return a > b;
+            }
+        );
     }
 
     for (int i = STORED_BEST_MOVES - 1; i >= 0; i--) {
@@ -694,7 +743,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             //cout << "Pushing " << bestMoves[i] << endl;
         }
     }
-
 
 
     int bestVal = -127;
@@ -719,12 +767,16 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //cout << endl;
 
 
+    //cout << "MOVE ORDER: " << moveOrder << endl;
+    uint64_t checkedBestMask = 0;
+
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;
 
         if (i == -1) {
             continue;
         }
+
 
         //if (checkedBestMove && i == bestMove) {
         //    continue;

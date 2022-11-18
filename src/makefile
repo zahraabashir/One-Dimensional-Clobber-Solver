@@ -20,6 +20,7 @@ run: TheSolvers
 	@#./TheSolvers BWBWBWBWBWBWBWBWBW B 100
 	@#@echo Try to beat 47399 nodes 
 	./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
+	@#./TheSolvers BWBWBWBWBWBW B 100
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test

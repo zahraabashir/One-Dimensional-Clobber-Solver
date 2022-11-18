@@ -158,7 +158,7 @@ Solver::Solver(size_t boardLen, Database *db) {
     tableSize = blockCount * totalBlockSize;
 
     DBOUT(
-        cout << "Block count " << blockCount << endl;
+        cout << "Table count " << blockCount << endl;
     );
 
 

@@ -368,7 +368,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
                     int low = db_get_bounds(entry)[0];
                     int high = db_get_bounds(entry)[1];
                     int outcome = *db_get_outcome(entry);
-                    addToReplacementMap(low, high, outcome, idx);
+                    //addToReplacementMap(low, high, outcome, idx);
                 }
 
                 delete[] board;
@@ -438,7 +438,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
 
 
             //add to map
-            if (boardLen <= DB_MAX_SUB_BITS) { //&& shape.size() == 1) {
+            if (boardLen <= DB_MAX_SUB_BITS && shape.size() == 1) { //&& shape.size() == 1) {
                 addToReplacementMap(bounds[0], bounds[1], outcomeClass, idx);
             }
 
@@ -523,16 +523,19 @@ int main() {
 
             //TODO enable mirroring later
 
-            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-                delete[] board;
-                continue;
-            }
+//            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
+//                delete[] board;
+//                continue;
+//            }
 
 
             //Find game in the replacement map and search all possible replacements
             triple<int, int, int> mapTriple(db_get_bounds(entry)[0], db_get_bounds(entry)[1], *db_get_outcome(entry));
             vector<uint64_t> *vec = replacementMap[mapTriple];
             assert(vec);
+            if (!vec) {
+                continue;
+            }
 
 
             uint64_t bestMetric = *db_get_metric(entry);

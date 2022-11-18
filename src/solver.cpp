@@ -1054,6 +1054,9 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     }
 
     if (!exists) {
+        if (mode == 0) {
+            return 0;
+        }
         idx = blockPtr[0];
         uint8_t *entry0 = first + idx * tableEntrySize;
         if (*tt_get_valid(entry0) && true) {
@@ -1094,9 +1097,6 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     uint8_t *entry = first + idx * tableEntrySize;
 
     if (!exists) {
-        if (mode == 0) {
-            return 0;
-        }
         uint8_t *elen = tt_get_length(entry);
         uint8_t **eboard = tt_get_board(entry);
         uint8_t *eplayer = tt_get_player(entry);

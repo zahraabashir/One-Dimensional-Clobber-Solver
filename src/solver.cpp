@@ -219,9 +219,6 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 
 //void Solver::simplify(State *state, int depth) {
 void Solver::simplify(uint8_t **board, size_t *boardLen) {
-    //return;
-    //cout << "+++" << endl;
-    //printBoard(*board, *boardLen, true);
 
     //Get all subgames
     vector<pair<int, int>> _subgames = generateSubgames(*board, *boardLen);
@@ -232,6 +229,7 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
 
     vector<pair<uint8_t *, size_t>> replacements;
+    vector<pair<int, int>> remainders;
     // Look up subgames and add their inflated linked games to a vector
     for (size_t i = 0; i < subgames.size(); i++) {
         const pair<int, int> &sg = subgames[i];
@@ -255,6 +253,12 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
         //inflate linked subgame
         uint64_t link = *db_get_link(entry);
         uint8_t *linkedEntry = db->getFromIdx(link);
+
+        if (linkedEntry == entry) {
+            remainders.push_back(sg);
+            continue;
+        }
+
         assert(linkedEntry);
         uint64_t linkedShapeNumber = *db_get_shape(linkedEntry);
         uint32_t linkedGameNumber = *db_get_number(linkedEntry);
@@ -263,6 +267,77 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
         makeGame(linkedShapeNumber, linkedGameNumber, &linkedGame, &linkedGameLen);
 
         replacements.push_back({linkedGame, linkedGameLen});
+    }
+
+
+    //Merge remainders
+    uint64_t mergeMask = 0;
+
+    for (int i = 0; i < remainders.size(); i++) {
+        for (int j = i + 1; j < remainders.size(); j++) {
+            if ((mergeMask >> i) & 1) {
+                continue;
+            }
+            if ((mergeMask >> j) & 1) {
+                continue;
+            }
+
+            pair<int, int> &sg1 = remainders[i];
+            pair<int, int> &sg2 = remainders[j];
+            int g1Offset = sg1.first;
+            int g2Offset = sg2.first;
+            int g1Len = sg1.second;
+            int g2Len = sg2.second;
+
+            //Try to combine these two games
+            if (g1Len + g2Len + 1 > DB_MAX_BITS) {
+                continue;
+            }
+
+            size_t g3Len;
+            uint8_t *g3 = addGames(*board + g1Offset, g1Len, *board + g2Offset, g2Len, &g3Len);
+
+            uint8_t *entry = db->get(g3, g3Len);
+            delete[] g3;
+
+            if (entry == 0 || *db_get_outcome(entry) == 0) {
+                continue;
+            }
+
+            //Inflate linked game and push it
+            uint64_t link = *db_get_link(entry);
+            if (entry == db->getFromIdx(link)) {
+                continue;
+            }
+            uint8_t *newEntry = db->getFromIdx(link);
+            if (newEntry == 0 || *db_get_outcome(newEntry) == 0) {
+                continue;
+            }
+            uint64_t newShape = *db_get_shape(newEntry);
+            uint32_t newNumber = *db_get_number(newEntry);
+            size_t newLen;
+            uint8_t *newBoard;
+            makeGame(newShape, newNumber, &newBoard, &newLen);
+
+            replacements.push_back({newBoard, newLen});
+
+            mergeMask |= ((uint64_t) 1) << i;
+            mergeMask |= ((uint64_t) 1) << j;
+        }
+    }
+
+    //Push non-merged remainders
+    for (size_t i = 0; i < remainders.size(); i++) {
+        if ((mergeMask >> i) & 1) {
+            continue;
+        }
+        pair<int, int> &sg = remainders[i];
+
+        size_t newLen = sg.second;
+        uint8_t *newBoard = new uint8_t[newLen];
+        memcpy(newBoard, *board + sg.first, newLen);
+
+        replacements.push_back({newBoard, newLen});
     }
 
     //Ignore chunks that are negatives of each other
@@ -500,6 +575,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
     int bestMove = 0;
     bool checkedBestMove = false;
     if (validEntry) {
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
         bestMove = tt_get_best_moves(entryPtr)[0];
     }
 
@@ -892,6 +968,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     bool checkedBestMove = false;
 
     if (validEntry) {
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
         bestMove = tt_get_best_moves(entryPtr)[0];
     }
 

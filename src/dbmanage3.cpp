@@ -364,7 +364,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
             assert(*db_get_outcome(entry) == 0);
 
             if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-                if (boardLen <= DB_MAX_BOUND_BITS) {
+                if (boardLen <= DB_MAX_BOUND_BITS && shape.size() == 1) {
                     int low = db_get_bounds(entry)[0];
                     int high = db_get_bounds(entry)[1];
                     int outcome = *db_get_outcome(entry);
@@ -438,7 +438,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
 
 
             //add to map
-            if (boardLen <= DB_MAX_SUB_BITS) {
+            if (boardLen <= DB_MAX_SUB_BITS && shape.size() == 1) {
                 addToReplacementMap(bounds[0], bounds[1], outcomeClass, idx);
             }
 
@@ -482,6 +482,10 @@ int main() {
 
     //do second pass to find links
     for (const vector<int> &shape : shapeList) {
+        if (shape.size() != 1) {
+            continue;
+        }
+
         uint64_t shapeNumber = shapeToNumber(shape);
 
         //iterate over all games

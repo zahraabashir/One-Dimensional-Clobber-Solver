@@ -49,13 +49,13 @@ int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
 
 #include "MurmurHash3.h"
 int getCode(uint8_t *board, size_t len, int player) {
-    ///*
+    /*
     uint32_t val;
     MurmurHash3_x86_32(board, len, player + 84654894654, &val);
     return val;
-    //*/
+    */
 
-    /*
+    ///*
     assert(player == 1 || player == 2);
     int result = 1 * (player - 1);
     int cumulativePower = 2;
@@ -65,7 +65,7 @@ int getCode(uint8_t *board, size_t len, int player) {
         cumulativePower *= 3;
     }
     return result;
-    */
+    //*/
 }
 
 uint32_t getHash2(uint8_t *board, size_t len, int player) {

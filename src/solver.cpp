@@ -157,6 +157,8 @@ Solver::Solver(size_t boardLen, Database *db) {
     totalBlockSize = (BLOCK_SIZE * tableEntrySize) + blockHeaderSize;
     tableSize = blockCount * totalBlockSize;
 
+    cout << "Block count " << blockCount << endl;
+
 
 
     //cout << "Entry size: " << tableEntrySize << endl;
@@ -606,9 +608,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     bool validEntry = entryPtr != 0;
 
-    //cachedOutcome = 0;
     if (validEntry && *tt_get_outcome(entryPtr) != 0) {
-        completed += 1;
         delete[] sboard;
         return pair<int, bool>(*tt_get_outcome(entryPtr), true);
     }
@@ -937,6 +937,10 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             }
         }
 
+        if (!checkedBestMove) {
+            checkedBestMove = true;
+            i = -1;
+        }
     }
 
     delete[] moves;
@@ -1090,6 +1094,9 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     uint8_t *entry = first + idx * tableEntrySize;
 
     if (!exists) {
+        if (mode == 0) {
+            return 0;
+        }
         uint8_t *elen = tt_get_length(entry);
         uint8_t **eboard = tt_get_board(entry);
         uint8_t *eplayer = tt_get_player(entry);

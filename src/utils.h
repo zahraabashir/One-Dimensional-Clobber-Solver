@@ -14,7 +14,7 @@
 #define B 1
 #define W 2
 
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 
 #ifdef DEBUG_PRINT
 #define DBOUT( x ) x

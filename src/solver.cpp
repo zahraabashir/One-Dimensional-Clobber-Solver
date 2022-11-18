@@ -157,7 +157,9 @@ Solver::Solver(size_t boardLen, Database *db) {
     totalBlockSize = (BLOCK_SIZE * tableEntrySize) + blockHeaderSize;
     tableSize = blockCount * totalBlockSize;
 
-    cout << "Block count " << blockCount << endl;
+    DBOUT(
+        cout << "Block count " << blockCount << endl;
+    );
 
 
 
@@ -250,9 +252,12 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             continue;
         }
 
-        //inflate game
-        uint64_t linkedShapeNumber = *db_get_shape(entry);
-        uint32_t linkedGameNumber = *db_get_number(entry);
+        //inflate linked subgame
+        uint64_t link = *db_get_link(entry);
+        uint8_t *linkedEntry = db->getFromIdx(link);
+        assert(linkedEntry);
+        uint64_t linkedShapeNumber = *db_get_shape(linkedEntry);
+        uint32_t linkedGameNumber = *db_get_number(linkedEntry);
         uint8_t *linkedGame;
         size_t linkedGameLen;
         makeGame(linkedShapeNumber, linkedGameNumber, &linkedGame, &linkedGameLen);
@@ -376,6 +381,13 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
     _validEntry = false;
     node_count += 1;
+
+    DBOUT(
+        cout << endl;
+        printBoard(board, boardLen, false);
+        cout << " " << playerNumberToChar(n) << " " << depth << endl;
+
+    );
 
     size_t sboardLen = boardLen;
     uint8_t *sboard = new uint8_t[boardLen];
@@ -589,6 +601,14 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
     _validEntry = false;
 
+    DBOUT(
+        cout << endl;
+        printBoard(board, boardLen, false);
+        cout << " " << playerNumberToChar(n) << " " << depth << endl;
+
+    );
+
+
     node_count += 1;
 
     size_t sboardLen = boardLen;
@@ -596,6 +616,14 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     memcpy(sboard, board, boardLen);
 
     simplify(&sboard, &sboardLen);
+
+    DBOUT(
+        cout << "SIMPLIFY:" << endl;
+        printBoard(sboard, sboardLen, false);
+        cout << " " << playerNumberToChar(n) << " " << depth << endl;
+
+    );
+
 
 
 

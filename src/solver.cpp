@@ -111,6 +111,10 @@ BasicSolver::BasicSolver(int rootPlayer, int boardSize, Database *db) {
 
     entryCount = ((size_t) 1) << bits;
 
+    DBOUT(
+        cout << "Table count: " << entryCount << endl;
+    );
+
     //cout << "Entry size: " << tableEntrySize << endl;
     //cout << "Size: " << (double) tableSize / (1000.0 * 1000.0) << endl;
     //cout << "Board size: " << boardSize << endl;   
@@ -235,6 +239,15 @@ pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth,
 pair<int, bool> BasicSolver::rootSearchID(State *state, int p, int n, int depth) {
 #endif
     node_count += 1;
+
+    DBOUT(
+        cout << endl;
+        for (int i = 0; i < state->boardSize; i++) {
+            cout << playerNumberToChar(state->board[i]);
+        }
+        cout << " " << playerNumberToChar(p) << " " << depth << endl;
+    );
+
     updateTime();
     if (outOfTime) {
         return pair<int, bool>(0, false);
@@ -965,6 +978,17 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth, Bou
 pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
 #endif
     node_count += 1;
+
+    DBOUT(
+        cout << endl;
+        for (int i = 0; i < state->boardSize; i++) {
+            cout << playerNumberToChar(state->board[i]);
+        }
+        cout << " " << playerNumberToChar(p) << " " << depth << endl;
+    );
+
+
+
     updateTime();
     if (outOfTime) {
         return pair<int, bool>(0, false);
@@ -974,6 +998,15 @@ pair<int, bool> BasicSolver::searchID(State *state, int p, int n, int depth) {
     uint8_t oldBoardSize = state->boardSize;
     memcpy(oldBoard, state->board, state->boardSize);
     simplify(state, depth);
+
+    DBOUT(
+        cout << "SIMPLIFY:" << endl;
+        for (int i = 0; i < state->boardSize; i++) {
+            cout << playerNumberToChar(state->board[i]);
+        }
+        cout << " " << playerNumberToChar(p) << " " << depth << endl;
+    );
+
 
 //    int boundWin = checkBounds(state);
 //

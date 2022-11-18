@@ -1,17 +1,17 @@
 # This is a comment
 
 finalTests/easy.txt_processed
-finalTests/tests_small_more_time.txt_processed
-finalTests/tests_small.txt_processed
+#finalTests/tests_small_more_time.txt_processed
+#finalTests/tests_small.txt_processed
 finalTests/standard.txt_processed
-finalTests/standard_more_time.txt_processed
-finalTests/hard.txt_processed
-finalTests/random.txt_processed
-finalTests/special.txt_processed
-finalTests/added_random.txt_processed
-finalTests/random_more_time.txt_processed
-finalTests/added_hard.txt_processed
-finalTests/random_hard.txt_processed
+#finalTests/standard_more_time.txt_processed
+#finalTests/hard.txt_processed
+#finalTests/random.txt_processed
+#finalTests/special.txt_processed
+#finalTests/added_random.txt_processed
+#finalTests/random_more_time.txt_processed
+#finalTests/added_hard.txt_processed
+#finalTests/random_hard.txt_processed
 
 # these are to verify the hypotheses, you can uncomment them to see the results
 # finalTests/(BBW)^n-17.txt

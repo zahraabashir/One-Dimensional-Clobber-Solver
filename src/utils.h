@@ -10,6 +10,15 @@
 #define B 1
 #define W 2
 
+
+//#define DEBUG_PRINT
+
+#ifdef DEBUG_PRINT
+#define DBOUT( x ) x
+#else
+#define DBOUT( x )
+#endif
+
 //Return number of opposing player (1 --> 2), (2 --> 1)
 inline int opponentNumber(int n) { //Inline means this needs to be in the header
     if (n == 1 || n == 2) {

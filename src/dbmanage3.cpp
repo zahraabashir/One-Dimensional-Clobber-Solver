@@ -421,20 +421,76 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
             }
             
             //compute metric
-            size_t bMoveCount;
-            size_t wMoveCount;
-            int *bMoves = getMoves(board, boardLen, 1, &bMoveCount);
-            int *wMoves = getMoves(board, boardLen, 2, &wMoveCount);
 
-            if (bMoveCount) {
-                delete[] bMoves;
+            if (boardLen <= DB_MAX_DOMINANCE_BITS) {
+                size_t bMoveCount;
+                size_t wMoveCount;
+                int *bMoves = getMoves(board, boardLen, 1, &bMoveCount);
+                int *wMoves = getMoves(board, boardLen, 2, &wMoveCount);
+
+                uint64_t domBlack = db_get_dominance(entry)[0];
+                uint64_t domWhite = db_get_dominance(entry)[1];
+
+                int domCountB = sumBits(domBlack);
+                int domCountW = sumBits(domWhite);
+
+                uint64_t baseMetric = bMoveCount + wMoveCount - domCountB - domCountW;
+
+                uint8_t undoBuffer[UNDO_BUFFER_SIZE];
+                uint64_t metricSum = 0;
+                size_t moveCounts[] = {bMoveCount, wMoveCount};
+                int *moveArrs[] = {bMoves, wMoves};
+                uint64_t doms[] = {domBlack, domWhite};
+
+                //play moves
+                for (int i = 0; i < 2; i++) {
+                    size_t moveCount = moveCounts[i];
+                    int *moves = moveArrs[i];
+                    uint64_t dom = doms[i];
+
+                    for (size_t i = 0; i < moveCount; i++) {
+                        int from = moves[2 * i];
+                        int to = moves[2 * i + 1];
+
+                        if ((dom >> i) & 1) {
+                            continue;
+                        }
+
+                        play(board, undoBuffer, from, to);
+                        uint8_t *nextEntry = db->get(board, boardLen);
+
+                        if (nextEntry) {
+                            if (*db_get_outcome(nextEntry) == 0) {
+                                cout << "Failed to make metric (haven't processed children yet)..." << endl;
+                                while (1) {}
+                            }
+
+                            uint64_t childMetric = *db_get_metric(nextEntry);
+                            if (metricSum + childMetric < metricSum) {
+                                cout << "Metric overflow" << endl;
+                                while (1) {}
+                                metricSum = ((uint64_t) -1);
+                            } else {
+                                metricSum += childMetric;
+                            }
+                        }
+
+                        undo(board, undoBuffer);
+                    }
+                }
+
+
+                if (bMoveCount) {
+                    delete[] bMoves;
+                }
+
+                if (wMoveCount) {
+                    delete[] wMoves;
+                }
+
+                uint64_t metric = baseMetric + metricSum;
+                *db_get_metric(entry) = metric;
             }
-
-            if (wMoveCount) {
-                delete[] wMoves;
-            }
-
-            *db_get_metric(entry) = bMoveCount + wMoveCount;
 
 
             //add to map
@@ -471,6 +527,11 @@ int main() {
 
             for (int chunk : s2) {
                 bits2 += chunk;
+            }
+
+
+            if (bits1 == bits2) {
+                return s1.size() > s2.size();
             }
 
             return bits1 < bits2;

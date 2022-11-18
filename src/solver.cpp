@@ -290,7 +290,7 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             int g2Len = sg2.second;
 
             //Try to combine these two games
-            if (g1Len + g2Len + 1 > DB_MAX_BITS) {
+            if (g1Len + g2Len + 1 > DB_MAX_SUB_BITS) {
                 continue;
             }
 
@@ -320,6 +320,8 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             makeGame(newShape, newNumber, &newBoard, &newLen);
 
             replacements.push_back({newBoard, newLen});
+
+            //cout << "Beneficial merge" << endl;
 
             mergeMask |= ((uint64_t) 1) << i;
             mergeMask |= ((uint64_t) 1) << j;

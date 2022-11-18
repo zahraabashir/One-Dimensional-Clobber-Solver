@@ -543,9 +543,9 @@ int main() {
 
     //do second pass to find links
     for (const vector<int> &shape : shapeList) {
-        if (shape.size() != 1) {
-            continue;
-        }
+        //if (shape.size() != 1) {
+        //    continue;
+        //}
 
         uint64_t shapeNumber = shapeToNumber(shape);
 

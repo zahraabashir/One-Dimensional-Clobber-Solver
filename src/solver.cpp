@@ -994,6 +994,10 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
+        if (i == bestMove) {
+            continue;
+        }
+
         if ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) {
             moveOrder.push_back(i);
         }

@@ -576,8 +576,9 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     int bestMove = 0;
     bool checkedBestMove = false;
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
+    validEntry = entryPtr != 0;
     if (validEntry) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
         bestMove = tt_get_best_moves(entryPtr)[0];
     }
 
@@ -969,8 +970,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     int bestMove = -1;
     bool checkedBestMove = false;
 
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
+    validEntry = entryPtr != 0;
     if (validEntry) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
         bestMove = tt_get_best_moves(entryPtr)[0];
     }
 

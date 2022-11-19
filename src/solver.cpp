@@ -188,12 +188,18 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
         //collisions = 0;
         completed = 0;
 
-        //used to be 100
-        maxCompleted += 50;
+        //maxCompleted was incremented by 100
+        //maxDepth check was 150
 
-        //used to be 150
+        #if defined ALTERNATE_ID_SCALING
+        maxCompleted *= 2;
+        if (maxDepth >= 12) {
+        #else
+        maxCompleted += 50;
         if (maxDepth >= 30) {
+        #endif
             limitCompletions = false;
+            maxDepth = 999999999999999;
         }
 
         if (maxDepth >= 18) { //was 10

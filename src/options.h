@@ -31,6 +31,9 @@
 //#define SEARCH_VERSION 2
 
 
+#define ALTERNATE_ID_SCALING
+
+
 // Max bits of index into the database (database will generate all connected games from sizes 1 to this size, inclusive)
 #define DB_MAX_BITS 16
 

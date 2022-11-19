@@ -677,6 +677,9 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
     return pair<int, bool>(bestVal, false);
 }
 
+#if SEARCH_VERSION == 2
+#include "search2.cpp"
+#else
 pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
     _validEntry = false;
 
@@ -1105,6 +1108,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     delete[] sboard;
     return pair<int, bool>(bestVal, false);
 }
+#endif
 
 
 

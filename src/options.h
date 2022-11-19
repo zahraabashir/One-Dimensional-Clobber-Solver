@@ -27,6 +27,8 @@
 
 //#define STRICT_BOUNDS
 
+//Failed experiment using N positions for move ordering
+//#define SEARCH_VERSION 2
 
 
 // Max bits of index into the database (database will generate all connected games from sizes 1 to this size, inclusive)

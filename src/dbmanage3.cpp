@@ -318,7 +318,7 @@ void addToReplacementMap(int low, int high, int outcome, uint64_t link) {
     vec->push_back(link);
 }
 
-void doPass(const vector<vector<int>> &shapeList, int pass) {
+void doPass(const vector<vector<int>> &shapeList, int pass, int batchLen) {
     //Iterate over all shapes
     for (const vector<int> &shape : shapeList) {
         uint64_t shapeNumber = shapeToNumber(shape);
@@ -339,10 +339,10 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
             _inducedSize += chunk;
         }
 
-        if ((_inducedSize <= DB_MAX_SUB_BITS) && (pass == 1)) {
+        if ((_inducedSize != batchLen) && (pass == 1)) {
             continue;
         }
-        if ((_inducedSize > DB_MAX_SUB_BITS) && (pass == 0)) {
+        if ((_inducedSize > RMAP_SIZE) && (pass == 0)) {
             continue;
         }
 
@@ -364,7 +364,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
             assert(*db_get_outcome(entry) == 0);
 
             if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-                if (boardLen <= DB_MAX_BOUND_BITS) { //&& shape.size() == 1) {
+                if (boardLen <= RMAP_SIZE && pass == 0) { //&& shape.size() == 1) {
                     int low = db_get_bounds(entry)[0];
                     int high = db_get_bounds(entry)[1];
                     int outcome = *db_get_outcome(entry);
@@ -494,7 +494,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
 
 
             //add to map
-            if (boardLen <= DB_MAX_BOUND_BITS) { //&& shape.size() == 1) {
+            if (boardLen <= RMAP_SIZE && pass == 0) { //&& shape.size() == 1) {
                 addToReplacementMap(bounds[0], bounds[1], outcomeClass, idx);
             }
 
@@ -504,6 +504,125 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
 
 
     }
+}
+
+void makeLinks(const vector<vector<int>> &shapeList, int batchLen) {
+    //do second pass to find links
+    for (const vector<int> &shape : shapeList) {
+        //if (shape.size() != 1) {
+        //    continue;
+        //}
+
+
+        size_t _inducedSize = 0;
+        _inducedSize += shape.size() - 1;
+        for (int chunk : shape) {
+            _inducedSize += chunk;
+        }
+
+        if (_inducedSize != batchLen) {
+            continue;
+        }
+
+        uint64_t shapeNumber = shapeToNumber(shape);
+
+        //iterate over all games
+        int gameBits = 0;
+        for (int chunk : shape) {
+            gameBits += chunk;
+        }
+
+        uint32_t minGame = 0;
+        uint32_t gameCount = 1 << gameBits;
+
+        for (uint32_t gameNumber = minGame; gameNumber < gameCount; gameNumber++) {
+            //Get game and print it
+            uint8_t *board;
+            size_t boardLen;
+
+            makeGame(shapeNumber, gameNumber, &board, &boardLen);
+            cout << "Shape (pass 2) " << shape << " (" << shapeNumber << ") ";
+            printBoard(board, boardLen, true);
+
+            if (boardLen > DB_MAX_SUB_BITS) {
+                continue;
+                delete[] board;
+            }
+
+
+
+            //Get entry
+            uint64_t idx = db->getIdx(board, boardLen);
+            assert(idx); 
+            //cout << "idx " << idx << endl;
+            uint8_t *entry = db->getFromIdx(idx);
+            assert(entry);
+            assert(*db_get_outcome(entry) != 0);
+
+
+            //TODO enable mirroring later
+
+//            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
+//                delete[] board;
+//                continue;
+//            }
+
+
+            //Find game in the replacement map and search all possible replacements
+            triple<int, int, int> mapTriple(db_get_bounds(entry)[0], db_get_bounds(entry)[1], *db_get_outcome(entry));
+            vector<uint64_t> *vec = replacementMap[mapTriple];
+            if (!vec) {
+                continue;
+            }
+
+
+            uint64_t bestMetric = *db_get_metric(entry);
+            uint64_t bestLink = *db_get_link(entry);
+            for (size_t i = 0; i < vec->size(); i++) {
+                uint64_t idx = (*vec)[i];
+                uint8_t *entry2 = db->getFromIdx(idx);
+                assert(entry);
+                uint64_t metric = *db_get_metric(entry2);
+                if (metric >= bestMetric) {
+                    continue;
+                }
+
+                //Check equality of games
+                uint64_t gameShape = *db_get_shape(entry2);
+                uint32_t gameNumber = *db_get_number(entry2);
+                size_t gameLen;
+                uint8_t *game;
+                makeGame(gameShape, gameNumber, &game, &gameLen);
+                negateBoard(game, gameLen);
+
+                //if (gameLen > boardLen) {
+                //    delete[] game;
+                //    continue;
+                //}
+
+                size_t sumSize;
+                uint8_t *gameSum = addGames(board, boardLen, game, gameLen, &sumSize);
+
+                int outcome1 = solver->solveID(gameSum, sumSize, 1);
+                int outcome2 = solver->solveID(gameSum, sumSize, 2);
+
+                if (outcome1 == 2 && outcome2 == 1) {
+                    bestMetric = metric;
+                    bestLink = idx;
+                }
+
+                delete[] gameSum;
+                delete[] game;
+            }
+            if (bestLink != *db_get_link(entry)) {
+                cout << "Found better: " << bestLink << " (" << *db_get_metric(entry) << " -> " << bestMetric << ")" << endl;
+            }
+            *db_get_link(entry) = bestLink;
+
+            delete[] board;
+        }
+    }
+
 }
 
 
@@ -539,110 +658,17 @@ int main() {
     );
 
 
-    doPass(shapeList, 0);
+    doPass(shapeList, 0, 0);
 
-    //do second pass to find links
-    for (const vector<int> &shape : shapeList) {
-        //if (shape.size() != 1) {
-        //    continue;
-        //}
-
-        uint64_t shapeNumber = shapeToNumber(shape);
-
-        //iterate over all games
-        int gameBits = 0;
-        for (int chunk : shape) {
-            gameBits += chunk;
+    for (int i = 2; i <= 16; i++) {
+        if (i > RMAP_SIZE) {
+            doPass(shapeList, 1, i);
         }
 
-        uint32_t minGame = 0;
-        uint32_t gameCount = 1 << gameBits;
-
-        for (uint32_t gameNumber = minGame; gameNumber < gameCount; gameNumber++) {
-            //Get game and print it
-            uint8_t *board;
-            size_t boardLen;
-
-            makeGame(shapeNumber, gameNumber, &board, &boardLen);
-            cout << "Shape (pass 2) " << shape << " (" << shapeNumber << ") ";
-            printBoard(board, boardLen, true);
-
-            if (boardLen > DB_MAX_SUB_BITS) {
-                continue;
-            }
-
-
-
-            //Get entry
-            uint64_t idx = db->getIdx(board, boardLen);
-            assert(idx); 
-            //cout << "idx " << idx << endl;
-            uint8_t *entry = db->getFromIdx(idx);
-            assert(entry);
-            assert(*db_get_outcome(entry) != 0);
-
-
-            //TODO enable mirroring later
-
-//            if (gameNumber * 2 > gameCount && mirror(board, boardLen, shapeNumber, gameNumber)) {
-//                delete[] board;
-//                continue;
-//            }
-
-
-            //Find game in the replacement map and search all possible replacements
-            triple<int, int, int> mapTriple(db_get_bounds(entry)[0], db_get_bounds(entry)[1], *db_get_outcome(entry));
-            vector<uint64_t> *vec = replacementMap[mapTriple];
-            assert(vec);
-            if (!vec) {
-                continue;
-            }
-
-
-            uint64_t bestMetric = *db_get_metric(entry);
-            uint64_t bestLink = *db_get_link(entry);
-            for (size_t i = 0; i < vec->size(); i++) {
-                uint64_t idx = (*vec)[i];
-                uint8_t *entry2 = db->getFromIdx(idx);
-                assert(entry);
-                uint64_t metric = *db_get_metric(entry2);
-                if (metric >= bestMetric) {
-                    continue;
-                }
-
-                //Check equality of games
-                uint64_t gameShape = *db_get_shape(entry2);
-                uint32_t gameNumber = *db_get_number(entry2);
-                size_t gameLen;
-                uint8_t *game;
-                makeGame(gameShape, gameNumber, &game, &gameLen);
-                negateBoard(game, gameLen);
-
-                size_t sumSize;
-                uint8_t *gameSum = addGames(board, boardLen, game, gameLen, &sumSize);
-
-                int outcome1 = solver->solveID(gameSum, sumSize, 1);
-                int outcome2 = solver->solveID(gameSum, sumSize, 2);
-
-                if (outcome1 == 2 && outcome2 == 1) {
-                    bestMetric = metric;
-                    bestLink = idx;
-                }
-
-                delete[] gameSum;
-                delete[] game;
-            }
-            if (bestLink != *db_get_link(entry)) {
-                cout << "Found better: " << bestLink << " (" << *db_get_metric(entry) << " -> " << bestMetric << ")" << endl;
-            }
-            *db_get_link(entry) = bestLink;
-
-            delete[] board;
+        if (i <= DB_MAX_SUB_BITS) {
+            makeLinks(shapeList, i);
         }
     }
-
-
-    doPass(shapeList, 1);
 
 
 

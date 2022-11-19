@@ -494,7 +494,7 @@ void doPass(const vector<vector<int>> &shapeList, int pass) {
 
 
             //add to map
-            if (boardLen <= DB_MAX_SUB_BITS) { //&& shape.size() == 1) {
+            if (boardLen <= DB_MAX_BOUND_BITS) { //&& shape.size() == 1) {
                 addToReplacementMap(bounds[0], bounds[1], outcomeClass, idx);
             }
 

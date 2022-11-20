@@ -513,6 +513,10 @@ void makeLinks(const vector<vector<int>> &shapeList, int batchLen) {
         //    continue;
         //}
 
+        if (shape.size() > 2) {
+            continue;
+        }
+
 
         size_t _inducedSize = 0;
         _inducedSize += shape.size() - 1;
@@ -545,8 +549,8 @@ void makeLinks(const vector<vector<int>> &shapeList, int batchLen) {
             printBoard(board, boardLen, true);
 
             if (boardLen > DB_MAX_SUB_BITS) {
-                continue;
                 delete[] board;
+                continue;
             }
 
 
@@ -570,8 +574,18 @@ void makeLinks(const vector<vector<int>> &shapeList, int batchLen) {
 
             //Find game in the replacement map and search all possible replacements
             triple<int, int, int> mapTriple(db_get_bounds(entry)[0], db_get_bounds(entry)[1], *db_get_outcome(entry));
-            vector<uint64_t> *vec = replacementMap[mapTriple];
+
+            auto vecIt = replacementMap.find(mapTriple);
+            if (vecIt == replacementMap.end()) {
+                delete[] board;
+                continue;
+            }
+            vector<uint64_t> *vec = vecIt->second;            
+
+
+            //vector<uint64_t> *vec = replacementMap[mapTriple];
             if (!vec) {
+                delete[] board;
                 continue;
             }
 
@@ -660,7 +674,7 @@ int main() {
 
     doPass(shapeList, 0, 0);
 
-    for (int i = 2; i <= 16; i++) {
+    for (int i = 2; i <= DB_MAX_BITS; i++) {
         if (i > RMAP_SIZE) {
             doPass(shapeList, 1, i);
         }

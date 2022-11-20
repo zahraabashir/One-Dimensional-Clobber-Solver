@@ -719,12 +719,15 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             uint8_t outcome = *db_get_outcome(dbEntry);
 
             if (outcome == OC_B || outcome == OC_W) {
+                delete[] sboard;
                 return pair<int, bool>(outcome, true);
             }
             if (outcome == OC_N) {
+                delete[] sboard;
                 return pair<int, bool>(n, true);
             }
             if (outcome == OC_P) {
+                delete[] sboard;
                 return pair<int, bool>(p, true);
             }
 

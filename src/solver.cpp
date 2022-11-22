@@ -1046,7 +1046,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //if solved, save value and return
 
 
-    vector<int> moveOrder;
 
     int bestMove = -1;
     bool checkedBestMove = false;
@@ -1057,6 +1056,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         bestMove = tt_get_best_moves(entryPtr)[0];
     }
 
+
+    //opposing position, not best
+    vector<int> moves1;
     for (int i = 0; i < moveCount; i++) {
         if (moves[2 * i] == -1) {
             continue;
@@ -1065,11 +1067,13 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         if (i == bestMove || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
             continue;
         }
-        moveOrder.push_back(i);
+        moves1.push_back(i);
     }
 
-    shuffle(moveOrder.begin(), moveOrder.end(), *rng);
+    shuffle(moves1.begin(), moves1.end(), *rng);
 
+    //remaining moves, not best
+    vector<int> moves2;
     for (int i = 0; i < moveCount; i++) {
         if (moves[2 * i] == -1) {
             continue;
@@ -1080,7 +1084,19 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
 
         if ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) {
-            moveOrder.push_back(i);
+            moves2.push_back(i);
+        }
+    }
+    shuffle(moves2.begin(), moves2.end(), *rng);
+
+
+    vector<int> moveOrder;
+
+    vector<int> *_moveOrders[] = {&moves1, &moves2};
+    for (int i = 0; i < sizeof(_moveOrders) / sizeof(_moveOrders[0]); i++) {
+        vector<int> *_moveOrder = _moveOrders[i];
+        for (int m : *_moveOrder) {
+            moveOrder.push_back(m);
         }
     }
 

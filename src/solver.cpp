@@ -272,7 +272,16 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
         size_t linkedGameLen;
         makeGame(linkedShapeNumber, linkedGameNumber, &linkedGame, &linkedGameLen);
 
-        replacements.push_back({linkedGame, linkedGameLen});
+        vector<pair<int, int>> subChunks = generateSubgames(linkedGame, linkedGameLen);
+        for (const pair<int, int> &chunk : subChunks) {
+            size_t l = chunk.second - chunk.first;
+            uint8_t *b = new uint8_t[l];
+            memcpy(b, linkedGame + chunk.first, l);
+            replacements.push_back({b, l});
+        }
+        delete[] linkedGame;
+
+        //replacements.push_back({linkedGame, linkedGameLen});
     }
 
 
@@ -325,7 +334,19 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             uint8_t *newBoard;
             makeGame(newShape, newNumber, &newBoard, &newLen);
 
-            replacements.push_back({newBoard, newLen});
+            vector<pair<int, int>> subChunks = generateSubgames(newBoard, newLen);
+            for (const pair<int, int> &chunk : subChunks) {
+                size_t l = chunk.second - chunk.first;
+                uint8_t *b = new uint8_t[l];
+                memcpy(b, newBoard + chunk.first, l);
+                replacements.push_back({b, l});
+            }
+            delete[] newBoard;
+
+
+
+
+            //replacements.push_back({newBoard, newLen});
 
             //cout << "Beneficial merge" << endl;
 
@@ -419,6 +440,29 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
     *board = new uint8_t[*boardLen];
 
+    #if defined SIMPLIFY_ALTERNATE_SORT
+    sort(replacements.begin(), replacements.end(),
+        [](const pair<uint8_t *, size_t> &r1, const pair<uint8_t *, size_t> &r2) {
+            if (r1.second == r2.second) {
+                for (size_t i = 0; i < r1.second; i++) {
+                    if (r1.first[i] == r2.first[i]) {
+                        continue;
+                    }
+
+                    if (r1.first[i] < r2.first[i]) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+
+            }
+            return r1.second > r2.second;
+        }
+    );
+
+    #else
     sort(replacements.begin(), replacements.end(),
         [](const pair<uint8_t *, size_t> &r1, const pair<uint8_t *, size_t> &r2) {
             for (size_t i = 0; i < min(r1.second, r2.second); i++) {
@@ -435,6 +479,7 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             return r1.second < r2.second;
         }
     );
+    #endif
 
     size_t offset = 0;
     memset(*board, 0, *boardLen);

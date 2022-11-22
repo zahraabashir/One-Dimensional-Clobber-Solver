@@ -904,8 +904,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     #if defined STATIC_EXTRA
     // one N, all others positive for n
-    int opposingCount = n == 1 ? counts[OC_W] : counts[OC_B];
-    if (counts[OC_N] == 1 && opposingCount == 0) {
+    int _selfBit = n == 1 ? (1 << OC_B) : (1 << OC_W);
+    int _ocm = outcomeMask & ~((1 << OC_N) | _selfBit);
+    if (counts[OC_N] == 1 && _ocm == 0) {
         completed += STATIC_MC_DELTA;
         if (true) {
             entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);

@@ -801,9 +801,11 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
 
 
+
     //Only Bs
     if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        completed += STATIC_MC_DELTA;
         if (true) {
             entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
             *tt_get_valid(entryPtr) = true;
@@ -819,6 +821,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //Only Ws
     if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        completed += STATIC_MC_DELTA;
         if (true) {
             entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
             *tt_get_valid(entryPtr) = true;
@@ -835,6 +838,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //Only one N
     if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
+        completed += STATIC_MC_DELTA;
         if (true) {
             entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
             *tt_get_valid(entryPtr) = true;
@@ -846,6 +850,26 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         delete[] sboard;
         return pair<int, bool>(n, true); //current player wins
     }
+
+    
+
+    #if defined STATIC_EXTRA
+    // one N, all others positive for n
+    int opposingCount = n == 1 ? counts[OC_W] : counts[OC_B];
+    if (counts[OC_N] == 1 && opposingCount == 0) {
+        completed += STATIC_MC_DELTA;
+        if (true) {
+            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+            *tt_get_valid(entryPtr) = true;
+            *tt_get_outcome(entryPtr) = n;
+            tt_get_best_moves(entryPtr)[0] = 0;
+            *tt_get_depth(entryPtr) = depth;
+            *tt_get_heuristic(entryPtr) = 127;
+        }        
+        delete[] sboard;
+        return pair<int, bool>(n, true); //current player wins
+    }
+    #endif
 
 
     //Use differences

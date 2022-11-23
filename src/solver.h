@@ -9,7 +9,7 @@
 
 #define BLOCK_SIZE 4
 
-extern int node_count;
+extern uint64_t node_count;
 extern int best_from;
 extern int best_to;
 

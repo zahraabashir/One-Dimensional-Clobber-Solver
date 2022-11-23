@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int node_count = 0; //nodes visited
+uint64_t node_count = 0; //nodes visited
 int best_from = -1; //root player's move
 int best_to = -1;
 bool _validEntry = false;
@@ -827,7 +827,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
 
     //this is OK because 64 is the maximum board size
-    uint64_t opposingPositionMask = 0;
+    //uint64_t opposingPositionMask = 0;
+
+    vector<pair<int, int>> opposingVector;
 
     for (auto it = subgames.begin(); it != subgames.end(); it++) {
         int length = it->second - it->first;
@@ -841,17 +843,19 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         outcomeMask |= (1 << outcome);
 
         if ((outcome == OC_B && n == WHITE) || (outcome == OC_W && n == BLACK)) {
-            uint64_t mask = 1;
+            //uint64_t mask = 1;
 
-            for (int i = 1; i < length; i++) {
-                mask <<= 1;
-                mask |= 1;
-            }
+            //for (int i = 1; i < length; i++) {
+            //    mask <<= 1;
+            //    mask |= 1;
+            //}
 
-            mask <<= it->first;
-            if (it->first < 64) {
-                opposingPositionMask |= mask;
-            }
+            //mask <<= it->first;
+            //if (it->first < 64) {
+            //    opposingPositionMask |= mask;
+            //}
+
+            opposingVector.push_back({it->first, it->first + length - 1});
         }
     }
 
@@ -1079,8 +1083,22 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
-        int shiftAmt = moves[2 * i];
-        bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
+        //int shiftAmt = moves[2 * i];
+        //bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
+
+        //cond iff this move belongs to opposing subgame
+        bool cond = false;
+        int m = moves[2 * i];
+        for (const pair<int, int> &opp : opposingVector) {
+            if (m < opp.first) {
+                break;
+            }
+            if (m >= opp.first && m <= opp.second) {
+                cond = true;
+                break;
+            }
+        }
+
 
         if (i == bestMove || cond) {
             continue;
@@ -1101,8 +1119,22 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
-        int shiftAmt = moves[2 * i];
-        bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
+        //int shiftAmt = moves[2 * i];
+        //bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
+
+        bool cond = false;
+        int m = moves[2 * i];
+        for (const pair<int, int> &opp : opposingVector) {
+            if (m < opp.first) {
+                break;
+            }
+            if (m >= opp.first && m <= opp.second) {
+                cond = true;
+                break;
+            }
+        }
+
+
 
 
         if (cond) {

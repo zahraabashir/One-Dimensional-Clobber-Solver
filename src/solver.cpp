@@ -569,6 +569,10 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
         uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
+        if (dominated == 0) {
+            continue;
+        }
+
         int moveIndex = 0;
         for (int j = 0; j < moveCount; j++) {
             int from = moves[2 * j];
@@ -845,7 +849,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             }
 
             mask <<= it->first;
-            opposingPositionMask |= mask;
+            if (it->first < 64) {
+                opposingPositionMask |= mask;
+            }
         }
     }
 
@@ -995,6 +1001,10 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
         uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
+        if (dominated == 0) {
+            continue;
+        }
+
         int moveIndex = 0;
         for (int j = 0; j < moveCount; j++) {
             int from = moves[2 * j];
@@ -1062,14 +1072,17 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
 
 
-    //opposing position, not best
+    //???
     vector<int> moves1;
     for (int i = 0; i < moveCount; i++) {
         if (moves[2 * i] == -1) {
             continue;
         }
-        
-        if (i == bestMove || ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0) {
+
+        int shiftAmt = moves[2 * i];
+        bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
+
+        if (i == bestMove || cond) {
             continue;
         }
         moves1.push_back(i);
@@ -1088,7 +1101,11 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
         }
 
-        if ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) {
+        int shiftAmt = moves[2 * i];
+        bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
+
+
+        if (cond) {
             moves2.push_back(i);
         }
     }

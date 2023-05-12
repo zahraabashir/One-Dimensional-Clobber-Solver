@@ -5,6 +5,7 @@
 #include <ostream>
 #include <vector>
 #include <cassert>
+#include <cstdint>
 
 #define EMPTY 0
 #define BLACK 1

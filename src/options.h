@@ -47,15 +47,16 @@
 
 // games are only substituted if they are in the database, and have both dominance and bound information (so the minimum of these will determine what games can be substituted)
 
-
+//games can be substituted with other games that are up to/including this length
 #define RMAP_SIZE 12
 
 // CAN CHANGE TO 16 WITH db3-r12-16s.bin
 #define DB_MAX_SUB_BITS 12
 
-
+//unused
 #define BIT_VECTOR_SIZE 2
 
+//weird specific macros that shouldn't change
 #define STATIC_MC_DELTA 1
 #define STATIC_EXTRA
 #define SIMPLIFY_ALTERNATE_SORT

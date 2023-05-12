@@ -3,5 +3,6 @@
 src/TheSolvers
 src/DBManage
 src/DBManage2
+src/DBManage3
 src/dbtest
 **/clobber

@@ -5,9 +5,9 @@
 #include <map>
 
 #include "solver.h"
-#include "database3.h"
 #include "utils.h"
 #include "state.h"
+#include "dbutils.h"
 
 using namespace std;
 
@@ -575,6 +575,17 @@ void makeLinks(const vector<vector<int>> &shapeList, int batchLen) {
             //Find game in the replacement map and search all possible replacements
             triple<int, int, int> mapTriple(db_get_bounds(entry)[0], db_get_bounds(entry)[1], *db_get_outcome(entry));
 
+            #if defined(DB_SORT)
+            uint64_t simplestIdx = simplifyIdx(mapTriple, idx);
+            if (simplestIdx != idx) {
+                cout << "FOUND BETTER" << endl;
+            }
+            *db_get_link(entry) = simplestIdx;
+            delete[] board;
+            continue;
+            #endif
+
+
             auto vecIt = replacementMap.find(mapTriple);
             if (vecIt == replacementMap.end()) {
                 delete[] board;
@@ -673,6 +684,15 @@ int main() {
 
 
     doPass(shapeList, 0, 0);
+
+    #if defined(DB_SORT)
+    cout << "SORTING" << endl;
+    makeSortedMap();
+    cout << "VERIFYING ORDERING" << endl;
+    checkSorting();
+    cout << "DONE" << endl;
+    #endif
+
 
     for (int i = 2; i <= DB_MAX_BITS; i++) {
         if (i > RMAP_SIZE) {

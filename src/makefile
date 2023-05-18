@@ -29,7 +29,7 @@ miscTest: database3.o test.o utils.o
 TheSolvers: main.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
+DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp dbutils.o
 	$(CC) $(FLAGS) $^ -o $@
 
 explore: dbExplore.cpp database3.o utils.o state.o bound.o MurmurHash3.cpp

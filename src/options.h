@@ -27,6 +27,8 @@
 
 #define DB_MAX_SUB_BITS std::min({DB_MAX_BITS, DB_MAX_DOMINANCE_BITS, DB_MAX_BOUND_BITS})
 
+// optimize rmap lookups by sorting the rmap
+#define DB_SORT
 
 
 /////////////              Weird/unused stuff below (probably shouldn't change)

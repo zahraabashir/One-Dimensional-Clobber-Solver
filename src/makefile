@@ -60,6 +60,9 @@ corr: TheSolvers referenceSolver
 fcorr: TheSolvers
 	python3 instructorSolution/runTests.py --fast
 
+pcorr: TheSolvers
+	python3 instructorSolution/runTestsPersistent.py --fast
+
 report: TheSolvers referenceSolver
 	python3 instructorSolution/runTests.py -nc > correctnessReport.txt
 

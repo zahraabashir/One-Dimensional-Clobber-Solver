@@ -6,3 +6,5 @@ src/DBManage2
 src/DBManage3
 src/dbtest
 **/clobber
+src/compile_commands.json
+src/.cache

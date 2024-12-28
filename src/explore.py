@@ -202,13 +202,14 @@ with open("inpipe", "r") as inpipe:
             _to = move[1]
             child = children[i]
             outcome = outcomes[i]
+            moveSubtitle = "Losing move" if outcome else "Winning move"
 
             displayColor = red
             if not outcome:
                 displayColor = green
             color(displayColor)
 
-            print(move)
+            print(f"{move} {moveSubtitle}")
             color(white)
             for j in range(len(board)):
                 if j == _from:

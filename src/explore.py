@@ -5,6 +5,7 @@ import select
 import sys
 
 printOnlyWinning = False
+showProgress = False
 
 helpMessage = """\
 Usage: python3 explore.py [flags]
@@ -15,6 +16,8 @@ Flags:
     --only-wins: Omit losing moves from output
 
     --no-color: Don't use color escape codes
+
+    --show-progress: Show progress bars for solving input cases
 
 Example lines with explanations:
     ; This is a comment
@@ -47,6 +50,10 @@ for arg in (sys.argv[1 : ] if len(sys.argv) > 1 else []):
         white = ""
         lblue = ""
         pink = ""
+        continue
+
+    if arg == "--show-progress":
+        showProgress = True
         continue
 
     print(helpMessage)
@@ -203,7 +210,22 @@ with open("inpipe", "r") as inpipe:
 
         moves = getMoves(board, player)
         children = [playMove(board, m) for m in moves]
-        outcomes = [solve(c, opponent) for c in children]
+
+        outcomes = []
+
+        if showProgress:
+            print("|" + "." * len(moves) + "|")
+            print(" ", end="", flush=True)
+
+        for c in children:
+            outcomes.append(solve(c, opponent))
+            if showProgress:
+                print("*", end="", flush=True)
+
+        if showProgress:
+            print("|")
+
+        print("")
 
         assert len(outcomes) == len(moves)
         assert len(outcomes) == len(children)

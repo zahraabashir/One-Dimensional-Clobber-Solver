@@ -114,22 +114,11 @@ def playMove(board, m):
     return child
 
 
-def printBitList(bits):
-    for b in bits:
-        if b:
-            color(green)
-            print(1, end="")
-        else:
-            color(red)
-            print(0, end="")
-    color(white)
-
-
 def solve(board, player):
     assert isLegalBoard(board)
     assert player in ["B", "W"]
 
-    # TODO assert no error
+    # TODO assert no error, better parsing
     proc.stdin.write(f"{board} {player}\n")
     proc.stdin.flush()
     result = proc.stdout.readline().rstrip()
@@ -171,7 +160,6 @@ with open("inpipe", "r") as inpipe:
 
         if ";" in line:
             assert line.index(";") == 0
-            line = ""
             continue
 
         line = line.split()

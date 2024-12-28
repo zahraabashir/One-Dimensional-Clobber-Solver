@@ -1,5 +1,5 @@
 
-#./clobber BWBWBWBWBWBWBWBWBWBW W 100
+#./clobber BWBWBWBWBWBWBWBWBWBW W
 
 SHELL := /bin/bash
 
@@ -17,10 +17,10 @@ compTest: solver.o
 
 
 run: TheSolvers
-	@#./TheSolvers BWBWBWBWBWBWBWBWBW B 100
+	@#./TheSolvers BWBWBWBWBWBWBWBWBW B
 	@#@echo Try to beat 47399 nodes 
-	./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B 100
-	@#./TheSolvers BWBWBWBWBWBW B 100
+	./TheSolvers BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBW B
+	@#./TheSolvers BWBWBWBWBWBW B
 
 miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test
@@ -82,4 +82,4 @@ referenceSolver:
 	make -C instructorSolution/sample_c++/code
 
 hardtest: TheSolvers
-	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W 500
+	-time ./TheSolvers BWBWBWBWBWBWBWBWBWBWB.WBWBWBWBWBWBWBWBWB W

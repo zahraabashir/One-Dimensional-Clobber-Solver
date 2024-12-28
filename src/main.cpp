@@ -56,7 +56,13 @@ bool test() {
 }
 
 void printUsage(const char *execName) {
-    cout << "Usage:\n" << execName << " [--persist] <board> <toPlay> <time (ignored)>" << endl;
+    cout << "Usage:" << endl;
+    cout << execName << " <board> <toPlay>" << endl;
+    cout << "or:" << endl;
+    cout << execName << " --persist" << endl;
+    cout << endl;
+    cout << "Legal board characters: 'B', 'W', '.'" << endl;
+    cout << "Legal players: 'B', 'W'" << endl; 
 }
 
 void persistMain() {
@@ -147,13 +153,13 @@ void persistMain() {
 
 
 int main(int argc, char **argv) {
-    if (test()) {
-        return 0;
-    }
+    //if (test()) {
+    //    return 0;
+    //}
 
     if (argc < 2) {
         printUsage(argv[0]);
-        return 0;
+        return -1;
     }
 
     bool persist = strcmp(argv[1], "--persist") == 0;
@@ -162,10 +168,41 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    if (argc < 3) {
+    if (argc != 3) {
         printUsage(argv[0]);
-        return 0;
+        return -1;
     }
+
+    // Validate input
+    {
+        bool isValid = true;
+
+        size_t arg1Len = strlen(argv[1]);
+        for (size_t i = 0; i < arg1Len; i++) {
+            const char &c = argv[1][i];
+
+            if (c != 'B' && c != 'W' && c != '.') {
+                isValid = false;
+                break;
+            }
+        }
+
+        size_t arg2Len = strlen(argv[2]);
+        if (arg2Len != 1) {
+            isValid = false;
+        }
+
+        const char &arg2Char = argv[2][0];
+        if (arg2Char != 'B' && arg2Char != 'W') {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            printUsage(argv[0]);
+            return -1;
+        }
+    }
+
 
 
     Database db;

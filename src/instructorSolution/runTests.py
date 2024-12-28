@@ -69,7 +69,7 @@ def runTest(inputLine, outputLine):
     board, toPlay, timeLimit = inputLine.split()
     expectedWinner, expectedMove = outputLine.split()[1 : 3]
 
-    command = "./TheSolvers %s %s %s" % (board, toPlay, "100") 
+    command = "./TheSolvers %s %s" % (board, toPlay)
 
     start = time.clock_gettime(time.CLOCK_MONOTONIC)
     result = subprocess.run(command, capture_output = True, shell = True)

@@ -122,6 +122,10 @@ def solve(board, player):
     proc.stdin.write(f"{board} {player}\n")
     proc.stdin.flush()
     result = proc.stdout.readline().rstrip()
+    exitCode = proc.poll()
+    if exitCode is not None:
+        print(f"Solver subprocess closed with exit code {exitCode} -- this is probably an error. Stopping...")
+        exit(-1)
     return result[0] == player
 
 
@@ -153,13 +157,11 @@ with open("inpipe", "r") as inpipe:
             pipeReady = False
             continue
 
-        if "clear" in line:
-            assert line.index("clear") == 0
+        if line.find("clear") == 0:
             clearScreen()
             continue
 
-        if ";" in line:
-            assert line.index(";") == 0
+        if line.find(";") == 0:
             continue
 
         line = line.split()

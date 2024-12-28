@@ -1,7 +1,7 @@
 ; This is a comment. Comments have a semicolon as their first character, and are ignored
-; Comments take up a whole line (i.e. can't come at the end of a line)
+; Comments take up a whole line (i.e. ';' is the first non-whitespace character in the line)
 BWBW B
 clear
-; The Output resulting from the above commands should be hidden, as "clear" should delete your terminal window's output history
+; The Output resulting from the above commands should be hidden, as "clear" should delete your terminal window's output history. You should only see output for the next two cases
 BWBWBWBW.BW B
 BWBWBWBW.BW W

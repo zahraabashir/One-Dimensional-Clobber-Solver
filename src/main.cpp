@@ -76,7 +76,8 @@ void persistMain() {
 
         if (cin.fail()) {
             if (!cin.eof()) {
-                cout << "Some input error happened reading board" << endl;
+                cerr << "Some input error happened reading board" << endl;
+                exit(-1);
             }
             return;
         }
@@ -84,24 +85,22 @@ void persistMain() {
         cin >> toPlayStr;
 
         if (cin.fail()) {
-            if (!cin.eof()) {
-                cout << "Some input error happened reading player" << endl;
-            }
-            return;
+            cerr << "Some input error happened reading player" << endl;
+            exit(-1);
         }
 
         // Validate input
         for (int i = 0; i < boardStr.size(); i++) {
             const char &c = boardStr[i];
             if (c != '.' && c != 'B' && c != 'W') {
-                cout << "Invalid board character. Use 'B', 'W', and '.'" << endl;
-                return;
+                cerr << "Invalid board character. Use 'B', 'W', and '.'" << endl;
+                exit(-1);
             }
         }
 
         if (toPlayStr.size() != 1 || (toPlayStr[0] != 'B' && toPlayStr[0] != 'W')) {
-            cout << "Bad player character. Use 'B' or 'W'" << endl;
-            return;
+            cerr << "Bad player character. Use 'B' or 'W'" << endl;
+            exit(-1);
         }
 
         size_t boardLen = strlen(boardStr.c_str());
@@ -111,14 +110,14 @@ void persistMain() {
 
         // sanity checks
         if (boardLen != boardStr.size()) { // string size() excludes null
-            cout << "Wrong board size" << endl;
-            return;
+            cerr << "Wrong board size" << endl;
+            exit(-1);
         }
 
         for (size_t i = 0; i < boardLen; i++) {
             if (board[i] != boardStr[i]) {
-                cout << "Bad board copy" << endl;
-                return;
+                cerr << "Bad board copy" << endl;
+                exit(-1);
             }
         }
 

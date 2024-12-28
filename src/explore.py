@@ -4,11 +4,17 @@ import atexit
 import select
 import sys
 
-if len(sys.argv) > 1:
-    print("""\
-Usage: python3 explore.py
+printOnlyWinning = False
+
+helpMessage = """\
+Usage: python3 explore.py [flags]
 
 Run the program, then write lines to named pipe \"inpipe\" to interact with this program.
+
+Flags:
+    --only-wins: Omit losing moves from output
+
+    --no-color: Don't use color escape codes
 
 Example lines with explanations:
     ; This is a comment
@@ -18,10 +24,9 @@ Example lines with explanations:
         Find moves for board "BWBWBW.BW" for player B
 
     clear
-        Clear the screen (this should delete previous output from your terminal so that you can't see it when scrolling up)
-    
-    """)
-    exit(0)
+        Clear the screen (this should delete previous output from your terminal so that you can't see it when scrolling up)"""
+
+
 
 
 green = "\033[0;32m"
@@ -29,6 +34,23 @@ red = "\033[1;31m"
 white = "\033[0;0m"
 lblue = "\033[1;96m"
 pink = "\033[1;95m"
+
+
+for arg in (sys.argv[1 : ] if len(sys.argv) > 1 else []):
+    if arg == "--only-wins":
+        printOnlyWinning = True
+        continue
+
+    if arg == "--no-color":
+        green = ""
+        red = ""
+        white = ""
+        lblue = ""
+        pink = ""
+        continue
+
+    print(helpMessage)
+    exit(-1)
 
 
 def color(c):
@@ -203,6 +225,9 @@ with open("inpipe", "r") as inpipe:
             child = children[i]
             outcome = outcomes[i]
             moveSubtitle = "Losing move" if outcome else "Winning move"
+
+            if outcome and printOnlyWinning:
+                continue
 
             displayColor = red
             if not outcome:

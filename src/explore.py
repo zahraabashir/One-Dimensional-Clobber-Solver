@@ -215,7 +215,7 @@ with open("inpipe", "r") as inpipe:
 
         if showProgress:
             print("|" + "." * len(moves) + "|")
-            print(" ", end="", flush=True)
+            print("|", end="", flush=True)
 
         for c in children:
             outcomes.append(solve(c, opponent))

@@ -27,13 +27,13 @@ miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test
 	-time ./Test
 
-TheSolvers: main.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
+TheSolvers: main.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o MurmurHash3.cpp
+DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
-explore: dbExplore.cpp database3.o utils.o state.o bound.o MurmurHash3.cpp
+explore: dbExplore.cpp database3.o utils.o state.o bound.o zobrist.o MurmurHash3.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
 

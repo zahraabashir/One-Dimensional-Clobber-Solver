@@ -1,6 +1,7 @@
 #include "state.h"
 
 #include "utils.h"
+#include "zobrist.h"
 #include <iostream>
 #include <cstring>
 #include <algorithm>
@@ -47,12 +48,14 @@ int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
 }
 
 
-#include "MurmurHash3.h"
-int getCode(uint8_t *board, size_t len, int player) {
+//#include "MurmurHash3.h"
+uint64_t getCode(uint8_t *board, size_t len, int player) {
     ///*
-    uint32_t val;
-    MurmurHash3_x86_32(board, len, player + 84654894654, &val);
-    return val;
+
+    return getZobristHash(player, board, len);
+    //uint32_t val;
+    //MurmurHash3_x86_32(board, len, player + 84654894654, &val);
+    //return val;
     //*/
 
     /*
@@ -68,11 +71,12 @@ int getCode(uint8_t *board, size_t len, int player) {
     */
 }
 
-uint32_t getHash2(uint8_t *board, size_t len, int player) {
-    uint32_t val;
-    MurmurHash3_x86_32(board, len, player + 654651298435, &val);
-    return val;
-}
+//uint32_t getHash2(uint8_t *board, size_t len, int player) {
+//    return getZobristHash(player, board, len);
+//    //uint32_t val;
+//    //MurmurHash3_x86_32(board, len, player + 654651298435, &val);
+//    //return val;
+//}
 
 
 

@@ -61,7 +61,7 @@ inline RandomTable::RandomTable()
 inline uint64_t RandomTable::get(uint8_t val, size_t pos)
 {
     assert(0 <= val && val <= 2);
-    _growTable(pos);
+    _growTable(pos + 1);
 
     const size_t idx = pos * 3 + val;
     assert(idx < _numbers.size());
@@ -76,6 +76,8 @@ void RandomTable::_growTable(size_t target)
 
     while (_currentSize < target) {
         _currentSize++;
+        _numbers.push_back(_generator.getRandomNumber());
+        _numbers.push_back(_generator.getRandomNumber());
         _numbers.push_back(_generator.getRandomNumber());
     }
 

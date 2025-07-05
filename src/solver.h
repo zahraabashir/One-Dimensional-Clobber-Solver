@@ -17,15 +17,15 @@ extern int best_to;
 
 struct TTLayout {
     static constexpr size_t arr[] = {
-        sz(uint8_t),        // board length
-        sz(uint8_t *),      // board pointer
+        //sz(uint8_t),        // board length
+        //sz(uint8_t *),      // board pointer
         sz(uint8_t),        // player
         sz(uint8_t),        // outcome
         sz(int8_t[STORED_BEST_MOVES]),     // best moves
         sz(unsigned int),   // depth
         sz(int8_t),         // heuristic
         sz(bool),           // valid
-        sz(uint32_t),       // hash
+        sz(uint64_t),       // hash
     };
 
     static constexpr size_t N = sizeof(arr) / sizeof(size_t);
@@ -43,9 +43,9 @@ struct TTLayout {
 };
 
 enum {
-    TT_LENGTH = 0,
-    TT_BOARD,
-    TT_PLAYER,
+    //TT_LENGTH = 0,
+    //TT_BOARD,
+    TT_PLAYER = 0,
     TT_OUTCOME,
     TT_BEST_MOVES,
     TT_DEPTH,
@@ -55,15 +55,15 @@ enum {
     TT_COST,
 };
 
-uint8_t *tt_get_length(uint8_t *entry);
-uint8_t **tt_get_board(uint8_t *entry);
+//uint8_t *tt_get_length(uint8_t *entry);
+//uint8_t **tt_get_board(uint8_t *entry);
 uint8_t *tt_get_player(uint8_t *entry);
 uint8_t *tt_get_outcome(uint8_t *entry);
 int8_t *tt_get_best_moves(uint8_t *entry);
 unsigned int *tt_get_depth(uint8_t *entry);
 int8_t *tt_get_heuristic(uint8_t *entry);
 bool *tt_get_valid(uint8_t *entry);
-uint32_t *tt_get_hash(uint8_t *entry);
+uint64_t *tt_get_hash(uint8_t *entry);
 
 class Solver {
   private:
@@ -110,9 +110,9 @@ class Solver {
         int n, int p, int depth);
 
 
-    uint8_t *getBlockPtr(int code);
+    uint8_t *getBlockPtr(uint64_t code);
 
-    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint32_t hash, int mode);
+    uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint64_t hash, int mode);
 
 
     void simplify(uint8_t **board, size_t *boardLen);

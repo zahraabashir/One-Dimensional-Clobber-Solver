@@ -13,6 +13,7 @@ int best_from = -1; //root player's move
 int best_to = -1;
 bool _validEntry = false;
 
+/*
 uint8_t *tt_get_length(uint8_t *entry) {
     assert(_validEntry);
     if (entry == 0) {
@@ -28,6 +29,7 @@ uint8_t **tt_get_board(uint8_t *entry) {
     }
     return (uint8_t **) (entry + Offset<TTLayout, TT_BOARD>());
 }
+*/
 
 uint8_t *tt_get_player(uint8_t *entry) {
     assert(_validEntry);
@@ -81,12 +83,12 @@ bool *tt_get_valid(uint8_t *entry) {
 }
 
 
-uint32_t *tt_get_hash(uint8_t *entry) {
+uint64_t *tt_get_hash(uint8_t *entry) {
     assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
-    return (uint32_t *) (entry + Offset<TTLayout, TT_HASH>());
+    return (uint64_t *) (entry + Offset<TTLayout, TT_HASH>());
 }
 
 
@@ -144,7 +146,7 @@ Solver::Solver(size_t boardLen, Database *db) {
     }
 
     // EXPERIMENTAL
-    codeBits = 26;
+    codeBits = 27;
 
     codeLength = codeBits;
 
@@ -277,35 +279,6 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
         remainders.push_back(sg);
         continue;
 
-        // EXPERIMENTAL: comment out
-        /*
-        //inflate linked subgame
-        uint64_t link = *db_get_link(entry);
-        uint8_t *linkedEntry = db->getFromIdx(link);
-
-        if (linkedEntry == entry) {
-            remainders.push_back(sg);
-            continue;
-        }
-
-        assert(linkedEntry);
-        uint64_t linkedShapeNumber = *db_get_shape(linkedEntry);
-        uint32_t linkedGameNumber = *db_get_number(linkedEntry);
-        uint8_t *linkedGame;
-        size_t linkedGameLen;
-        makeGame(linkedShapeNumber, linkedGameNumber, &linkedGame, &linkedGameLen);
-
-        vector<pair<int, int>> subChunks = generateSubgames(linkedGame, linkedGameLen);
-        for (const pair<int, int> &chunk : subChunks) {
-            size_t l = chunk.second - chunk.first;
-            uint8_t *b = new uint8_t[l];
-            memcpy(b, linkedGame + chunk.first, l);
-            replacements.push_back({b, l});
-        }
-        delete[] linkedGame;
-        */
-
-        //replacements.push_back({linkedGame, linkedGameLen});
     }
 
 
@@ -541,23 +514,6 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
         }
     }
 
-
-    /*
-    //Push non-merged remainders
-    for (size_t i = 0; i < remainders.size(); i++) {
-        if ((mergeMask >> i) & 1) {
-            continue;
-        }
-        pair<int, int> &sg = remainders[i];
-
-        size_t newLen = sg.second;
-        uint8_t *newBoard = new uint8_t[newLen];
-        memcpy(newBoard, *board + sg.first, newLen);
-
-        replacements.push_back({newBoard, newLen});
-    }
-    */
-
     //Ignore chunks that are negatives of each other
     for (size_t I = 0; I < replacements.size(); I++) {
         for (size_t J = I + 1; J < replacements.size(); J++) {
@@ -733,10 +689,10 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     //lookup entry
     //if solved, return
-    int code = getCode(sboard, sboardLen, n);
-    uint32_t hash2 = getHash2(sboard, sboardLen, n);
-    uint8_t *blockPtr = getBlockPtr(code);
-    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
+    uint64_t hash = getCode(sboard, sboardLen, n);
+    //uint32_t hash2 = getHash2(sboard, sboardLen, n);
+    uint8_t *blockPtr = getBlockPtr(hash);
+    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
 
     bool validEntry = entryPtr != 0;
 
@@ -752,7 +708,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     if (moveCount == 0) { //is terminal
         completed += 1;
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         if (true) {
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = p;
@@ -815,7 +771,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
             delete[] pMoves;
         }
 
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
 
         int h = *tt_get_heuristic(entryPtr);
         if (!validEntry) {
@@ -841,7 +797,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     int bestMove = 0;
     bool checkedBestMove = false;
-    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
     validEntry = entryPtr != 0;
     if (validEntry) {
         bestMove = tt_get_best_moves(entryPtr)[0];
@@ -881,7 +837,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
         if (result.second && result.first == n) {
             //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             if (true) {
-                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
                 *tt_get_valid(entryPtr) = true;
                 *tt_get_outcome(entryPtr) = n;
                 tt_get_best_moves(entryPtr)[0] = i;
@@ -915,7 +871,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
 
     if (allProven) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         if (true) {
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = p;
@@ -931,7 +887,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
 
     if (true) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         *tt_get_valid(entryPtr) = true;
         *tt_get_outcome(entryPtr) = EMPTY;
         tt_get_best_moves(entryPtr)[0] = newBestMove;
@@ -998,14 +954,12 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
 
 
-
-
     //lookup entry
     //if solved, return
-    int code = getCode(sboard, sboardLen, n);
-    uint32_t hash2 = getHash2(sboard, sboardLen, n);
-    uint8_t *blockPtr = getBlockPtr(code);
-    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
+    uint64_t hash = getCode(sboard, sboardLen, n);
+    //uint32_t hash2 = getHash2(sboard, sboardLen, n);
+    uint8_t *blockPtr = getBlockPtr(hash);
+    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
 
     bool validEntry = entryPtr != 0;
 
@@ -1076,7 +1030,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         completed += STATIC_MC_DELTA;
         if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = BLACK;
             tt_get_best_moves(entryPtr)[0] = 0;
@@ -1092,7 +1046,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         completed += STATIC_MC_DELTA;
         if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = WHITE;
             tt_get_best_moves(entryPtr)[0] = 0;
@@ -1109,7 +1063,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
         completed += STATIC_MC_DELTA;
         if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = n;
             tt_get_best_moves(entryPtr)[0] = 0;
@@ -1129,7 +1083,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     if (counts[OC_N] == 1 && _ocm == 0) {
         completed += STATIC_MC_DELTA;
         if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = n;
             tt_get_best_moves(entryPtr)[0] = 0;
@@ -1163,7 +1117,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             if (result.second && result.first == n) {
 
                 //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
                 if (true) {
                     *tt_get_valid(entryPtr) = true;
                     *tt_get_outcome(entryPtr) = n;
@@ -1188,7 +1142,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     if (moveCount == 0) { //is terminal
         completed += 1;
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         if (true) {
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = p;
@@ -1251,7 +1205,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             delete[] pMoves;
         }
 
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         int h = *tt_get_heuristic(entryPtr);
         if (!validEntry) {
             h = -pMoveCount;
@@ -1279,7 +1233,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     int bestMove = -1;
     bool checkedBestMove = false;
 
-    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 0);
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
     validEntry = entryPtr != 0;
     if (validEntry) {
         bestMove = tt_get_best_moves(entryPtr)[0];
@@ -1409,7 +1363,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         if (result.second && result.first == n) {
             //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
             if (true) {
-                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
                 *tt_get_valid(entryPtr) = true;
                 *tt_get_outcome(entryPtr) = n;
                 tt_get_best_moves(entryPtr)[0] = i;
@@ -1441,7 +1395,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
 
     if (allProven) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         if (true) {
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = p;
@@ -1456,7 +1410,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
 
     if (true) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash2, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         *tt_get_valid(entryPtr) = true;
         *tt_get_outcome(entryPtr) = EMPTY;
         tt_get_best_moves(entryPtr)[0] = newBestMove;
@@ -1470,8 +1424,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
 
 
-uint8_t *Solver::getBlockPtr(int code) {
-    int idx = code & codeMask;
+uint8_t *Solver::getBlockPtr(uint64_t code) {
+    uint64_t idx = code & codeMask;
+    /*
     for (int i = 1; ; i++) {
         int shift = i * codeLength;
 
@@ -1484,6 +1439,7 @@ uint8_t *Solver::getBlockPtr(int code) {
         code += add;
     }
     code &= codeMask;
+    */
 
     return table + (idx * totalBlockSize);
 }
@@ -1493,7 +1449,7 @@ uint8_t *Solver::getBlockPtr(int code) {
     1 -- allocate
     2 -- read + run policy
 */
-uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint32_t hash, int mode) {
+uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint64_t hash, int mode) {
     _validEntry = true;
     bool exists = false;
     if (len == 0) {
@@ -1520,26 +1476,28 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
         }
 
         //Check size
-        uint8_t esize = *tt_get_length(entry);
-        if ((size_t) esize != len) {
-            continue;
-        }
+        //uint8_t esize = *tt_get_length(entry);
+        //if ((size_t) esize != len) {
+        //    continue;
+        //}
 
         //Check player
         uint8_t eplayer = *tt_get_player(entry);
-        if ((int) eplayer != player) {
-            continue;
-        }
+        assert((int) eplayer == player);
+        //if ((int) eplayer != player) {
+        //    continue;
+        //}
 
         //Check content...
-        exists = true;
-        uint8_t *eboard = *tt_get_board(entry);
-        for (size_t i = 0; i < len; i++) {
-            if (board[i] != eboard[i]) {
-                exists = false;
-                break;
-            }
-        }
+        exists = true; // TODO
+        //exists = true;
+        //uint8_t *eboard = *tt_get_board(entry);
+        //for (size_t i = 0; i < len; i++) {
+        //    if (board[i] != eboard[i]) {
+        //        exists = false;
+        //        break;
+        //    }
+        //}
 
         if (exists) {
             break;
@@ -1591,26 +1549,26 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
     uint8_t *entry = first + idx * tableEntrySize;
 
     if (!exists) {
-        uint8_t *elen = tt_get_length(entry);
-        uint8_t **eboard = tt_get_board(entry);
+        //uint8_t *elen = tt_get_length(entry);
+        //uint8_t **eboard = tt_get_board(entry);
         uint8_t *eplayer = tt_get_player(entry);
         uint8_t *outcome = tt_get_outcome(entry);
         int8_t *moves = tt_get_best_moves(entry);
         unsigned int *depth = tt_get_depth(entry);
         int8_t *heuristic = tt_get_heuristic(entry);
         bool *valid = tt_get_valid(entry);
-        uint32_t *ehash = tt_get_hash(entry);
+        uint64_t *ehash = tt_get_hash(entry);
 
-        if (*elen != len) {
-            if (*eboard != 0) {
-                free(*eboard);
-            }
-            *eboard = (uint8_t *) malloc(len);
-            *elen = len;
+        //if (*elen != len) {
+        //    if (*eboard != 0) {
+        //        free(*eboard);
+        //    }
+        //    *eboard = (uint8_t *) malloc(len);
+        //    *elen = len;
 
-        }
+        //}
 
-        memcpy(*eboard, board, len);
+        //memcpy(*eboard, board, len);
 
         *eplayer = player;
         *outcome = OC_UNKNOWN;

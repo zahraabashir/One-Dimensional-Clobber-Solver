@@ -1,4 +1,5 @@
 #include "solver.h"
+#include "database3.h"
 #include "options.h"
 #include "utils.h"
 #include "state.h"
@@ -7,6 +8,62 @@
 #include <algorithm>
 
 using namespace std;
+
+struct AnnotatedMove {
+    int from;
+    int to;
+    int oc;
+    int idx;
+    int localIdx;
+    int subgameIdx;
+    bool isMiddle;
+    bool isBest;
+};
+
+class MoveScorer {
+public:
+    MoveScorer(int player): player(player) {
+    }
+
+    /*
+       - Best
+       - U + middle
+
+       - U
+       - N
+
+       - Self
+       - Opponent
+    */
+    int moveScore(const AnnotatedMove &m) const {
+        if (m.isBest)
+            return 0;
+
+        if (m.isMiddle)
+            return 1;
+
+        if (m.oc == OC_UNKNOWN)
+            return 2;
+
+        if (m.oc == OC_N)
+            return 3;
+
+        int oppClass = player == 1 ? OC_B : OC_W;
+
+        return oppClass == m.oc ? 5 : 4;
+    }
+
+    bool operator()(const AnnotatedMove &m1, const AnnotatedMove &m2) const {
+        return moveScore(m1) < moveScore(m2);
+    }
+
+    int player;
+};
+
+
+void sortMoves(vector<AnnotatedMove> &moves, int player) {
+    std::sort(moves.begin(), moves.end(), MoveScorer(player));
+}
 
 uint64_t node_count = 0; //nodes visited
 int best_from = -1; //root player's move
@@ -993,7 +1050,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //this is OK because 64 is the maximum board size
     //uint64_t opposingPositionMask = 0;
 
-    vector<pair<int, int>> opposingVector;
+    //vector<pair<int, int>> opposingVector;
 
     for (auto it = subgames.begin(); it != subgames.end(); it++) {
         int length = it->second - it->first;
@@ -1019,7 +1076,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             //    opposingPositionMask |= mask;
             //}
 
-            opposingVector.push_back({it->first, it->first + length - 1});
+            //opposingVector.push_back({it->first, it->first + length - 1});
         }
     }
 
@@ -1191,9 +1248,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
     #endif
 
-
-
-
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
@@ -1240,93 +1294,70 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
 
 
-    //???
-    vector<int> moves1;
-    for (int i = 0; i < moveCount; i++) {
-        if (moves[2 * i] == -1) {
-            continue;
-        }
-
-        //int shiftAmt = moves[2 * i];
-        //bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
-
-        //cond iff this move belongs to opposing subgame
-        bool cond = false;
-        int m = moves[2 * i];
-        for (const pair<int, int> &opp : opposingVector) {
-            if (m < opp.first) {
-                break;
-            }
-            if (m >= opp.first && m <= opp.second) {
-                cond = true;
-                break;
-            }
-        }
-
-
-        if (i == bestMove || cond) {
-            continue;
-        }
-        moves1.push_back(i);
-    }
-
-    shuffle(moves1.begin(), moves1.end(), *rng);
-
-    //remaining moves, not best
-    vector<int> moves2;
-    for (int i = 0; i < moveCount; i++) {
-        if (moves[2 * i] == -1) {
-            continue;
-        }
-
-        if (i == bestMove) {
-            continue;
-        }
-
-        //int shiftAmt = moves[2 * i];
-        //bool cond = shiftAmt < 64 ? ((((uint64_t) 1) << moves[2 * i]) & opposingPositionMask) != 0 : false;
-
-        bool cond = false;
-        int m = moves[2 * i];
-        for (const pair<int, int> &opp : opposingVector) {
-            if (m < opp.first) {
-                break;
-            }
-            if (m >= opp.first && m <= opp.second) {
-                cond = true;
-                break;
-            }
-        }
-
-
-
-
-        if (cond) {
-            moves2.push_back(i);
-        }
-    }
-    shuffle(moves2.begin(), moves2.end(), *rng);
-
-
     vector<int> moveOrder;
 
-    vector<int> *_moveOrders[] = {&moves1, &moves2};
-    for (int i = 0; i < sizeof(_moveOrders) / sizeof(_moveOrders[0]); i++) {
-        vector<int> *_moveOrder = _moveOrders[i];
-        for (int m : *_moveOrder) {
-            moveOrder.push_back(m);
+    vector<int> subgameMoveCounts;
+    subgameMoveCounts.resize(subgames.size(), 0);
+
+    // TODO
+    assert(subgames.size() == outcomes.size());
+
+    vector<AnnotatedMove> annotatedMoves;
+
+    for (int i = 0; i < moveCount; i++) {
+        const int from = moves[2 * i];
+        const int to = moves[2 * i + 1];
+
+        if (from == -1)
+            continue;
+
+        int subgameIdx = -1;
+        for (int i = 0; i < subgames.size(); i++) {
+            const pair<int, int> &sg = subgames[i];
+            if (sg.first <= from && from < sg.second) {
+                assert(sg.first <= to && to < sg.second);
+
+                subgameIdx = i;
+                break;
+            }
         }
+        assert(subgameIdx >= 0);
+
+        const int oc = outcomes[subgameIdx];
+
+        int &localIdx = subgameMoveCounts[subgameIdx];
+
+        annotatedMoves.push_back({});
+        AnnotatedMove &m = annotatedMoves.back();
+        m.from = from;
+        m.to = to;
+        m.oc = oc;
+        m.isMiddle = false;
+        m.idx = i;
+        m.localIdx = localIdx;
+        m.subgameIdx = subgameIdx;
+        m.isBest = (i == bestMove);
+
+        localIdx++;
     }
 
-    if (bestMove != -1) {
-        if (moves[2 * bestMove] != -1) {
-            moveOrder.push_back(bestMove);
-        } else {
-            bestMove = -1;
-        }   
-    }   
-    
+    for (AnnotatedMove &m : annotatedMoves) {
+        if (m.oc != OC_UNKNOWN)
+            continue;
 
+        const int count = subgameMoveCounts[m.subgameIdx];
+        const int local = m.localIdx;
+
+        const int mid = count / 2;
+
+        if (abs(mid - local) <= 1)
+            m.isMiddle = true;
+    }
+
+    sortMoves(annotatedMoves, n);
+    assert(moveOrder.empty());
+    for (const AnnotatedMove &m : annotatedMoves)
+        moveOrder.push_back(m.idx);
 
     int bestVal = -127;
 
@@ -1339,10 +1370,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;
-
-        if (checkedBestMove && i == bestMove) {
-            continue;
-        }
 
         int from = moves[2 * i];
         int to = moves[2 * i + 1];

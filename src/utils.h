@@ -138,4 +138,3 @@ void makeGame(const std::vector<int> &shape, uint32_t gameNumber,
 uint8_t *addGames(uint8_t *g1, size_t g1Size,
     uint8_t *g2, size_t g2Size, size_t *newSize);
 
-

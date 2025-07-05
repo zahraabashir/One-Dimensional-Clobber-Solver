@@ -17,7 +17,7 @@
 
 // connected games from 1 to this number will have bound information
 // CAN CHANGE TO 16 WITH db3-r12-16s.bin
-#define DB_MAX_BOUND_BITS 12
+#define DB_MAX_BOUND_BITS 16
 
 
 // games are only substituted if they are in the database, and have both dominance and bound information (so the minimum of these will determine what games can be substituted)

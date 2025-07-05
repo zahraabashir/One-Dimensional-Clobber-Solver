@@ -1,4 +1,5 @@
 #include "solver.h"
+#include "options.h"
 #include "utils.h"
 #include "state.h"
 #include <cstring>
@@ -142,6 +143,9 @@ Solver::Solver(size_t boardLen, Database *db) {
         i >>= 1;
     }
 
+    // EXPERIMENTAL
+    codeBits = 26;
+
     codeLength = codeBits;
 
 
@@ -161,6 +165,7 @@ Solver::Solver(size_t boardLen, Database *db) {
         cout << "Table count " << blockCount << endl;
     );
 
+    //cout << "SIZE " << tableSize << endl;
 
 
     //cout << "Entry size: " << tableEntrySize << endl;
@@ -227,24 +232,36 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
     //Get all subgames
-    vector<pair<int, int>> _subgames = generateSubgames(*board, *boardLen);
-    vector<pair<int, int>> subgames;
-    for (const pair<int, int> &sg : _subgames) {
-        subgames.push_back({sg.first, sg.second - sg.first});
-    }
+    vector<pair<int, int>> subgames = generateSubgames(*board, *boardLen);
+    for (pair<int, int> &sg : subgames) {
+        const int newFirst = sg.first;
+        const int newSecond = sg.second - sg.first;
 
+        sg.first = newFirst;
+        sg.second = newSecond;
+    }
 
     vector<pair<uint8_t *, size_t>> replacements;
     vector<pair<int, int>> remainders;
-    // Look up subgames and add their inflated linked games to a vector
+
+    // Filter games which don't have replacements
     for (size_t i = 0; i < subgames.size(); i++) {
         const pair<int, int> &sg = subgames[i];
-        size_t sgOffset = sg.first;
-        size_t sgLen = sg.second;
+        const int &sgOffset = sg.first;
+        const int &sgLen = sg.second;
 
+        uint8_t *entry = 0;
 
-        uint8_t *entry = db->get(*board + sgOffset, sgLen); 
-        if (entry == 0 || *db_get_outcome(entry) == 0) {
+        bool hasEntry = sgLen <= DB_MAX_BITS;
+
+        if (hasEntry) {
+            entry = db->get(*board + sgOffset, sgLen);
+
+            if (entry == 0 || *db_get_outcome(entry) == 0)
+                hasEntry = false;
+        }
+
+        if (!hasEntry) {
             uint8_t *gameChunk = new uint8_t[sgLen];
             memcpy(gameChunk, *board + sgOffset, sgLen);
             replacements.push_back({gameChunk, sgLen});
@@ -256,6 +273,12 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             continue;
         }
 
+        // EXPERIMENTAL
+        remainders.push_back(sg);
+        continue;
+
+        // EXPERIMENTAL: comment out
+        /*
         //inflate linked subgame
         uint64_t link = *db_get_link(entry);
         uint8_t *linkedEntry = db->getFromIdx(link);
@@ -280,54 +303,68 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
             replacements.push_back({b, l});
         }
         delete[] linkedGame;
+        */
 
         //replacements.push_back({linkedGame, linkedGameLen});
     }
 
 
     //Merge remainders
-    uint64_t mergeMask = 0;
+    bool mergeBools[remainders.size()];
+    for (size_t i = 0; i < remainders.size(); i++)
+        mergeBools[i] = false;
 
-    for (int i = 0; i < remainders.size(); i++) {
-        for (int j = i + 1; j < remainders.size(); j++) {
-            if ((mergeMask >> i) & 1) {
-                continue;
-            }
-            if ((mergeMask >> j) & 1) {
-                continue;
-            }
+    // Sliding window
+#define OPT_SLIDING_WINDOW
+#ifdef OPT_SLIDING_WINDOW
+    auto sortFn = [](const pair<int, int> &sg1, const pair<int, int> &sg2) -> bool {
+        return sg1.second < sg2.second;
+    };
 
-            pair<int, int> &sg1 = remainders[i];
-            pair<int, int> &sg2 = remainders[j];
-            int g1Offset = sg1.first;
-            int g2Offset = sg2.first;
-            int g1Len = sg1.second;
-            int g2Len = sg2.second;
+    std::sort(remainders.begin(), remainders.end(), sortFn);
 
-            //Try to combine these two games
-            if (g1Len + g2Len + 1 > DB_MAX_SUB_BITS) {
-                continue;
-            }
+    vector<int> window;
+    int windowSize = 0;
 
-            size_t g3Len;
-            uint8_t *g3 = addGames(*board + g1Offset, g1Len, *board + g2Offset, g2Len, &g3Len);
+    auto tryReplaceStep = [&]() -> bool {
+        assert(windowSize <= DB_MAX_BITS);
 
-            uint8_t *entry = db->get(g3, g3Len);
-            delete[] g3;
+        const size_t nSubgames = window.size();
 
-            if (entry == 0 || *db_get_outcome(entry) == 0) {
-                continue;
-            }
+        if (nSubgames < 3)
+            return false;
 
-            //Inflate linked game and push it
+        uint8_t combined[windowSize];
+        for (int i = 0; i < windowSize; i++)
+            combined[i] = 0;
+
+        int cumulative = 0;
+        for (size_t i = 0; i < nSubgames; i++) {
+            const int subgameIdx = window[i];
+            const pair<int, int> &sg = remainders[subgameIdx];
+            const int &sgOffset = sg.first;
+            const int &sgLen = sg.second;
+
+            assert(!mergeBools[subgameIdx]);
+
+            memcpy(combined + cumulative, *board + sgOffset, sgLen);
+            cumulative += 1 + sgLen;
+        }
+        assert(cumulative == windowSize + 1);
+
+        uint8_t *entry = db->get(combined, windowSize);
+        if (entry == 0 || *db_get_outcome(entry) == 0)
+            return false;
+
+        const bool isP = *db_get_outcome(entry) == OC_P;
+
+        if (!isP) {
             uint64_t link = *db_get_link(entry);
-            if (entry == db->getFromIdx(link)) {
-                continue;
-            }
             uint8_t *newEntry = db->getFromIdx(link);
-            if (newEntry == 0 || *db_get_outcome(newEntry) == 0) {
-                continue;
-            }
+
+            if (entry == newEntry)
+                return false;
+
             uint64_t newShape = *db_get_shape(newEntry);
             uint32_t newNumber = *db_get_number(newEntry);
             size_t newLen;
@@ -342,19 +379,170 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
                 replacements.push_back({b, l});
             }
             delete[] newBoard;
+        }
 
+        for (int i = 0; i < nSubgames; i++)
+            mergeBools[window[i]] = true;
 
+        window.clear();
+        windowSize = 0;
+        return true;
+    };
 
+    auto tryReplace = [&]() -> void {
+        if (window.size() < 3)
+            return;
+
+        vector<int> reversed;
+        for (auto it = window.rbegin(); it != window.rend(); it++)
+            reversed.push_back(*it);
+
+        window = std::move(reversed);
+
+        while (window.size() >= 3 && !tryReplaceStep()) {
+            windowSize -= (1 + remainders[window.back()].second);
+            window.pop_back();
+        }
+
+        window.clear();
+        windowSize = 0;
+    };
+
+    for (int i = 0; i < remainders.size(); i++) {
+        if (mergeBools[i])
+            continue;
+
+        const pair<int, int> &sg = remainders[i];
+        const int &sgOffset = sg.first;
+        const int &sgLen = sg.second;
+
+        const int contribution = sgLen + (window.size() > 0);
+
+        if (contribution + windowSize <= DB_MAX_BITS) {
+            window.push_back(i);
+            windowSize += contribution;
+        } else {
+            tryReplace();
+            window.clear();
+
+            window.push_back(i);
+            windowSize = sgLen;
+        }
+    }
+    tryReplace();
+#endif
+
+    // Pairs
+    for (int i = 0; i < remainders.size(); i++) {
+        for (int j = i + 1; j < remainders.size(); j++) {
+            if (mergeBools[i] || mergeBools[j])
+                continue;
+
+            pair<int, int> &sg1 = remainders[i];
+            pair<int, int> &sg2 = remainders[j];
+            int g1Offset = sg1.first;
+            int g2Offset = sg2.first;
+            int g1Len = sg1.second;
+            int g2Len = sg2.second;
+
+            //Try to combine these two games
+            if (g1Len + g2Len + 1 > DB_MAX_BITS) {
+                continue;
+            }
+
+            size_t g3Len;
+            uint8_t *g3 = addGames(*board + g1Offset, g1Len, *board + g2Offset, g2Len, &g3Len);
+
+            uint8_t *entry = db->get(g3, g3Len);
+            delete[] g3;
+
+            if (entry == 0 || *db_get_outcome(entry) == 0) {
+                continue;
+            }
+
+            const bool isP = *db_get_outcome(entry) == OC_P;
+
+            if (!isP) {
+                //Inflate linked game and push it
+                uint64_t link = *db_get_link(entry);
+                if (entry == db->getFromIdx(link)) {
+                    continue;
+                }
+                uint8_t *newEntry = db->getFromIdx(link);
+                if (newEntry == 0 || *db_get_outcome(newEntry) == 0) {
+                    continue;
+                }
+                uint64_t newShape = *db_get_shape(newEntry);
+                uint32_t newNumber = *db_get_number(newEntry);
+                size_t newLen;
+                uint8_t *newBoard;
+                makeGame(newShape, newNumber, &newBoard, &newLen);
+
+                vector<pair<int, int>> subChunks = generateSubgames(newBoard, newLen);
+                for (const pair<int, int> &chunk : subChunks) {
+                    size_t l = chunk.second - chunk.first;
+                    uint8_t *b = new uint8_t[l];
+                    memcpy(b, newBoard + chunk.first, l);
+                    replacements.push_back({b, l});
+                }
+                delete[] newBoard;
+            }
 
             //replacements.push_back({newBoard, newLen});
 
             //cout << "Beneficial merge" << endl;
 
-            mergeMask |= ((uint64_t) 1) << i;
-            mergeMask |= ((uint64_t) 1) << j;
+            mergeBools[i] = true;
+            mergeBools[j] = true;
         }
     }
 
+    // Singles
+    for (size_t i = 0; i < remainders.size(); i++) {
+        if (mergeBools[i])
+            continue;
+
+        mergeBools[i] = true;
+
+        pair<int, int> &sg = remainders[i];
+        const int &offset = sg.first;
+        const int &len = sg.second;
+
+        uint8_t *entry = db->get(*board + offset, len);
+        if (entry == 0 || *db_get_outcome(entry) == 0) {
+            size_t newLen = sg.second;
+            uint8_t *newBoard = new uint8_t[newLen];
+            memcpy(newBoard, *board + sg.first, newLen);
+
+            replacements.push_back({newBoard, newLen});
+            continue;
+        }
+
+        const bool isP = *db_get_outcome(entry) == OC_P;
+
+        if (!isP) {
+            uint64_t link = *db_get_link(entry);
+            uint8_t *newEntry = db->getFromIdx(link);
+            assert(newEntry);
+            uint64_t newShape = *db_get_shape(newEntry);
+            uint32_t newNumber = *db_get_number(newEntry);
+            size_t newLen;
+            uint8_t *newBoard;
+            makeGame(newShape, newNumber, &newBoard, &newLen);
+
+            vector<pair<int, int>> subChunks = generateSubgames(newBoard, newLen);
+            for (const pair<int, int> &chunk : subChunks) {
+                size_t l = chunk.second - chunk.first;
+                uint8_t *b = new uint8_t[l];
+                memcpy(b, newBoard + chunk.first, l);
+                replacements.push_back({b, l});
+            }
+            delete[] newBoard;
+        }
+    }
+
+
+    /*
     //Push non-merged remainders
     for (size_t i = 0; i < remainders.size(); i++) {
         if ((mergeMask >> i) & 1) {
@@ -368,6 +556,7 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
         replacements.push_back({newBoard, newLen});
     }
+    */
 
     //Ignore chunks that are negatives of each other
     for (size_t I = 0; I < replacements.size(); I++) {
@@ -405,6 +594,8 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
                 delete[] b2;
                 r1.first = 0;
                 r2.first = 0;
+                r1.second = 0;
+                r2.second = 0;
             }
 
         }
@@ -412,23 +603,43 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
     //Filter out 0s
     {
-
         vector<pair<uint8_t *, size_t>> replacements2;
-        for (auto x : replacements) {
-            replacements2.push_back(x);
-        }
+        replacements2.reserve(replacements.size());
 
-        replacements.clear();
+        for (const pair<uint8_t *, size_t> &chunk : replacements)
+            if (chunk.first != 0)
+                replacements2.emplace_back(chunk);
 
-        for (auto x : replacements2) {
-            if (x.first != 0) {
-                replacements.push_back(x);
-            }
-        }
-        
-        
+        replacements = std::move(replacements2);
     }
     
+    auto doMirror = [](const pair<uint8_t *, size_t> &chunk) -> bool {
+        assert(chunk.first != 0 && chunk.second > 0);
+
+        for (size_t i = 0; i < chunk.second; i++) {
+            const uint8_t &c1 = chunk.first[i];
+            const uint8_t &c2 = chunk.first[chunk.second - 1 - i];
+
+            if (c1 == c2)
+                continue;
+
+            return c2 < c1;
+        }
+
+        return false;
+    };
+
+    // Possibly reverse chunks
+    for (pair<uint8_t *, size_t> &chunk : replacements) {
+        if (doMirror(chunk)) {
+            uint8_t arr[chunk.second];
+
+            for (size_t i = 0; i < chunk.second; i++)
+                arr[i] = chunk.first[chunk.second - 1 - i];
+
+            memcpy(chunk.first, arr, chunk.second);
+        }
+    }
 
     //Combine chunks to get result
     delete[] *board;
@@ -439,28 +650,27 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
     }
 
     *board = new uint8_t[*boardLen];
+    for (size_t i = 0; i < *boardLen; i++)
+        (*board)[i] = 0;
 
     #if defined SIMPLIFY_ALTERNATE_SORT
-    sort(replacements.begin(), replacements.end(),
-        [](const pair<uint8_t *, size_t> &r1, const pair<uint8_t *, size_t> &r2) {
-            if (r1.second == r2.second) {
-                for (size_t i = 0; i < r1.second; i++) {
-                    if (r1.first[i] == r2.first[i]) {
-                        continue;
-                    }
-
-                    if (r1.first[i] < r2.first[i]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-
-
-            }
+    auto sortBoards = [](const pair<uint8_t *, size_t> &r1, const pair<uint8_t *, size_t> &r2) -> bool {
+        if (r1.second != r2.second)
             return r1.second > r2.second;
+
+        const size_t &size = r1.second;
+        for (size_t i = 0; i < size; i++) {
+            const uint8_t &c1 = r1.first[i];
+            const uint8_t &c2 = r2.first[i];
+
+            if (c1 != c2)
+                return c1 < c2;
         }
-    );
+
+        return false;
+    };
+
+    sort(replacements.begin(), replacements.end(), sortBoards);
 
     #else
     sort(replacements.begin(), replacements.end(),

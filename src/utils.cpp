@@ -62,7 +62,6 @@ void negateBoard(uint8_t *board, size_t length) {
     }
 }
 
-
 void printBoard(uint8_t *board, size_t len, bool newline) {
     //cout << "\"";
     for (size_t i = 0; i < len; i++) {
@@ -76,12 +75,10 @@ void printBoard(uint8_t *board, size_t len, bool newline) {
 }
 
 
-
 void makeGame(uint64_t shapeNumber, uint32_t gameNumber, 
         uint8_t **board, size_t *len) {
     makeGame(numberToShape(shapeNumber), gameNumber, board, len);
 }
-
 
 void makeGame(const vector<int> &shape, uint32_t gameNumber, 
         uint8_t **board, size_t *len) {
@@ -120,6 +117,7 @@ void makeGame(const vector<int> &shape, uint32_t gameNumber,
         }
     }
 }
+
 uint8_t *addGames(uint8_t *g1, size_t g1Size,
     uint8_t *g2, size_t g2Size, size_t *newSize) {
 

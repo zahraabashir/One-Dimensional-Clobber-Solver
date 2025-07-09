@@ -1,0 +1,158 @@
+#include "miscTypes.h"
+#include "utils.h"
+#include "database3.h"
+
+using namespace std;
+
+namespace {
+
+inline bool shouldMirror(const vector<uint8_t> &board) {
+    const size_t N = board.size();
+
+    for (size_t i = 0; i < N; i++) {
+        const char &c1 = board[i];
+        const char &c2 = board[N - 1 - i];
+
+        if (c1 != c2)
+            return c2 > c1;
+    }
+
+    return false;
+}
+
+} // namespace
+
+//////////////////////////////////////////////////
+// TODO double check this is correct...
+Subgame *makeGameSingleNew(int shape, uint32_t number) {
+    assert(shape > 0);
+
+    Subgame *sg = new Subgame;
+    vector<uint8_t> &boardVec = sg->boardVec();
+
+    boardVec.reserve(shape);
+
+    for (int i = 0; i < shape; i++) {
+        const uint8_t tile = ((number >> i) & 0x1) + 1;
+        boardVec.push_back(tile);
+    }
+
+    return sg;
+}
+
+std::vector<Subgame*> makeGameNew(uint64_t shapeNumber, uint32_t gameNumber) {
+    vector<Subgame*> subgames;
+
+    vector<int> shape = numberToShape(shapeNumber);
+
+    for (int s : shape) {
+        assert(0 < s && s < 32);
+
+        uint32_t num = gameNumber;
+        gameNumber >>= s;
+
+        num &= (uint32_t(-1) >> (32 - s));
+
+        subgames.push_back(makeGameSingleNew(s, num));
+    }
+
+    return subgames;
+}
+
+Subgame *Subgame::concatSubgames(const std::vector<Subgame*> &subgames) {
+    Subgame *result = new Subgame();
+
+    const size_t nSubgames = subgames.size();
+    const size_t nEmpties = nSubgames > 1 ? nSubgames - 1 : 0;
+
+    size_t totalSize = nEmpties;
+    for (const Subgame *sg: subgames) {
+        assert(sg != nullptr);
+        totalSize += sg->size();
+    }
+
+    std::vector<uint8_t> &board = result->_data;
+    board.reserve(totalSize);
+
+    for (size_t i = 0; i < nSubgames; i++) {
+        const Subgame *sg = subgames[i];
+
+        for (const uint8_t &tile : sg->_data)
+            board.push_back(tile);
+
+        if (i + 1 < nSubgames)
+            board.push_back(EMPTY);
+    }
+
+    assert(result->size() == totalSize);
+
+    return result;
+}
+
+void Subgame::tryMirror() {
+    if (shouldMirror(_data)) {
+        const size_t N = _data.size();
+
+        vector<uint8_t> reversed;
+        reversed.reserve(N);
+
+        for (size_t i = 0; i < N; i++)
+            reversed.push_back(_data[N - 1 - i]);
+
+        _data = std::move(reversed);
+    }
+}
+
+bool Subgame::normalizeSortOrder(const Subgame *sg1, const Subgame *sg2) {
+    if (sg1 == nullptr)
+        return false;
+    if (sg2 == nullptr)
+        return true;
+
+    const size_t N1 = sg1->size();
+    const size_t N2 = sg2->size();
+
+    if (N1 != N2)
+        return N1 > N2;
+
+    for (size_t i = 0; i < N1; i++) {
+        const uint8_t &tile1 = (*sg1)[i];
+        const uint8_t &tile2 = (*sg2)[i];
+
+        if (tile1 != tile2)
+            return tile1 > tile2;
+    }
+
+    return false;
+}
+
+bool Subgame::isVisuallyInversePair(const Subgame *sg1, const Subgame *sg2) {
+    assert(sg1 != nullptr && sg2 != nullptr);
+
+    const size_t N1 = sg1->size();
+    const size_t N2 = sg2->size();
+
+    if (N1 != N2)
+        return false;
+
+    bool failForward = false;
+    bool failBackward = false;
+
+    for (size_t i = 0; i < N1; i++) {
+        const uint8_t &tile1 = (*sg1)[i];
+
+        const uint8_t &tile2 = (*sg2)[i];
+        const uint8_t &tile2Reversed = (*sg2)[N1 - 1 - i];
+
+        const uint8_t sumForward = tile1 + tile2;
+        const uint8_t sumBackward = tile1 + tile2Reversed;
+
+        failForward |= (sumForward != 3);
+        failBackward |= (sumBackward != 3);
+    }
+
+    if (failForward && failBackward)
+        return false;
+
+    return true;
+}

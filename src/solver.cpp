@@ -3,12 +3,22 @@
 #include "options.h"
 #include "utils.h"
 #include "state.h"
+#include "miscTypes.h"
 #include <cstring>
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
+#include <set>
+
+
+#define STALL() {std::cout << "STALLING" << std::endl; while(true) {}} \
+static_assert(true)
 
 using namespace std;
 
+
+
+////////////////////////////////////////////////// class AnnotatedMove
 struct AnnotatedMove {
     int from;
     int to;
@@ -35,23 +45,56 @@ public:
        - Self
        - Opponent
     */
+    //int moveScore(const AnnotatedMove &m) const {
+    //    if (m.isBest)
+    //        return 0;
+
+    //    if (m.isMiddle)
+    //        return 1;
+
+    //    if (m.oc == OC_UNKNOWN)
+    //        return 2;
+
+    //    if (m.oc == OC_N)
+    //        return 3;
+
+    //    int oppClass = player == 1 ? OC_B : OC_W;
+
+    //    return oppClass == m.oc ? 5 : 4;
+    //}
+
     int moveScore(const AnnotatedMove &m) const {
-        if (m.isBest)
-            return 0;
+        const int oppClass = player == BLACK ? OC_W : OC_B;
 
-        if (m.isMiddle)
-            return 1;
+        const bool best = m.isBest;
+        const bool middle = m.isMiddle;
+        const bool unknown = m.oc == OC_UNKNOWN;
+        const bool npos = m.oc == OC_N;
+        const bool negative = m.oc == oppClass;
+        const bool positive = !negative;
 
-        if (m.oc == OC_UNKNOWN)
-            return 2;
+        vector<bool> bools = {
+            best,
+            middle,
+            unknown,
+            npos,
 
-        if (m.oc == OC_N)
-            return 3;
+            negative,
+            positive,
+        };
 
-        int oppClass = player == 1 ? OC_B : OC_W;
+        int priority = 0;
+        for (const bool b : bools) {
+            if (b)
+                return priority;
 
-        return oppClass == m.oc ? 5 : 4;
+            priority++;
+        }
+
+        assert(false);
+        return priority;
     }
+
 
     bool operator()(const AnnotatedMove &m1, const AnnotatedMove &m2) const {
         return moveScore(m1) < moveScore(m2);
@@ -184,6 +227,53 @@ vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
     return subgames;
 }
 
+vector<Subgame*> generateSubgamesNew(uint8_t *board, size_t len) {
+    vector<Subgame*> subgames;
+
+    int start = -1;
+    int end = -1;
+
+    int foundMask = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (start == -1 && board[i] != 0) {
+            start = i;
+            foundMask = 0;
+        }
+
+        if (board[i] != 0) {
+            foundMask |= board[i];
+        }
+
+        if (start != -1 && board[i] == 0) {
+            if (foundMask == 3) {
+                //subgames.push_back(pair<int, int>(start, i));
+
+                const size_t startIdx = start;
+                const size_t endIdx = i;
+                assert(endIdx >= startIdx);
+                const size_t subgameLen = endIdx - startIdx;
+
+                subgames.push_back(new Subgame(board + startIdx, subgameLen));
+            }
+            start = -1;
+        }
+    }
+
+    if (start != -1 && foundMask == 3) {
+        //subgames.push_back(pair<int, int>(start, len));
+
+        const size_t startIdx = start;
+        const size_t endIdx = len;
+        assert(endIdx >= startIdx);
+        const size_t subgameLen = endIdx - startIdx;
+
+        subgames.push_back(new Subgame(board + startIdx, subgameLen));
+    }
+
+    return subgames;
+}
+
 
 Solver::Solver(size_t boardLen, Database *db) {
     _validEntry = false;
@@ -277,6 +367,7 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
         pair<int, bool> result = rootSearchID(state, p, n, 0, alpha, beta, cb1, cb2);
         #else
         pair<int, bool> result = rootSearchID(board, len, n, p, 0);
+        //pair<int, bool> result = searchID(board, len, n, p, 0);
         #endif
 
         if (result.second) {
@@ -288,7 +379,11 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 }
 
 //void Solver::simplify(State *state, int depth) {
+
 void Solver::simplify(uint8_t **board, size_t *boardLen) {
+    assert(false);
+    cerr << "Don't use this function" << endl;
+    exit(-1);
 
     //Get all subgames
     vector<pair<int, int>> subgames = generateSubgames(*board, *boardLen);
@@ -726,7 +821,438 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
 
 }
 
+namespace dbUtil {
 
+inline bool entryValid(const uint8_t *entry) {
+    return (entry != 0) && (*db_get_outcome(entry) != 0);
+}
+
+inline bool tryInflateLink(uint8_t *entry, Database *db, vector<Subgame*> &subgames) {
+    assert(entryValid(entry));
+
+    const uint64_t link = *db_get_link(entry);
+    if (link == 0)
+        return false;
+
+    uint8_t *newEntry = db->getFromIdx(link);
+    assert(newEntry != 0);
+
+    if (entry == newEntry)
+        return false;
+
+    const uint64_t shape = *db_get_shape(newEntry);
+    const uint32_t number = *db_get_number(newEntry);
+
+    vector<Subgame*> inflated = makeGameNew(shape, number);
+
+    subgames.reserve(subgames.size() + inflated.size());
+    for (Subgame *sg : inflated)
+        subgames.push_back(sg);
+
+    return true;
+}
+
+bool simplifySubgames(vector<Subgame*> &subgames, const vector<size_t> &indices, Database *db) {
+    if (indices.empty())
+        return false;
+
+    uint8_t *entry = 0;
+
+    if (indices.size() == 1) {
+        const Subgame *sg = subgames[indices.back()];
+        assert(sg != nullptr);
+        entry = db->get(sg->board(), sg->size());
+    } else {
+        vector<Subgame*> sumVec;
+        sumVec.reserve(indices.size());
+
+        for (const size_t &idx : indices) {
+            Subgame *sg = subgames[idx];
+            assert(sg != nullptr);
+            sumVec.push_back(sg);
+        }
+
+        Subgame *sgSum = Subgame::concatSubgames(sumVec);
+        entry = db->get(sgSum->board(), sgSum->size());
+        delete sgSum;
+    }
+
+    if (!dbUtil::entryValid(entry))
+        return false;
+
+    const bool isP = *db_get_outcome(entry) == OC_P;
+
+    if (isP || tryInflateLink(entry, db, subgames)) {
+        for (const size_t &idx : indices) {
+            Subgame *sg = subgames[idx];
+            assert(sg != nullptr);
+            delete sg;
+            subgames[idx] = nullptr;
+        }
+
+        return true;
+    }
+
+
+    return false;
+}
+
+inline void simplify1(vector<Subgame*> &subgames, Database *db) {
+    vector<size_t> indices;
+    indices.reserve(1);
+
+    for (size_t i = 0; i < subgames.size(); i++) {
+        if (subgames[i] == nullptr)
+            continue;
+
+        indices.clear();
+        indices.push_back(i);
+
+        simplifySubgames(subgames, indices, db);
+    }
+}
+
+inline void simplify2(vector<Subgame*> &subgames, Database *db) {
+    vector<size_t> indices;
+    indices.reserve(2);
+
+    for (size_t i = 0; i < subgames.size(); i++) {
+        if (subgames[i] == nullptr)
+            continue;
+        for (size_t j = i + 1; j < subgames.size(); j++) {
+            assert(subgames[i] != nullptr);
+
+            if (subgames[j] == nullptr)
+                continue;
+
+            indices.clear();
+            indices.push_back(i);
+            indices.push_back(j);
+
+            if (simplifySubgames(subgames, indices, db))
+                break;
+        }
+    }
+}
+
+
+inline void simplify3(vector<Subgame*> &subgames, Database *db) {
+    auto sortFn = [](const Subgame *sg1, const Subgame *sg2) -> bool {
+        if (sg1 == nullptr)
+            return false;
+        if (sg2 == nullptr)
+            return true;
+
+        return sg1->size() < sg2->size();
+    };
+
+    std::sort(subgames.begin(), subgames.end(), sortFn);
+
+    vector<size_t> window;
+    size_t windowSize = 0;
+
+    auto tryReplaceStep = [&]() -> bool {
+        assert(windowSize <= DB_MAX_BITS);
+
+        const size_t nSubgames = window.size();
+
+        if (nSubgames < 3)
+            return false;
+
+        const bool simplified = simplifySubgames(subgames, window, db);
+
+        if (!simplified)
+            return false;
+
+        window.clear();
+        windowSize = 0;
+
+        return true;
+    };
+
+    auto tryReplace = [&]() -> void {
+        if (window.size() < 3)
+            return;
+
+        vector<size_t> reversed;
+        reversed.reserve(window.size());
+
+        for (auto it = window.rbegin(); it != window.rend(); it++)
+            reversed.push_back(*it);
+
+        window = std::move(reversed);
+
+        while (window.size() >= 3 && !tryReplaceStep()) {
+            windowSize -= (1 + subgames[window.back()]->size());
+            window.pop_back();
+        }
+
+        window.clear();
+        windowSize = 0;
+    };
+
+    for (size_t i = 0; i < subgames.size(); i++) {
+        Subgame *sg = subgames[i];
+
+        if (sg == nullptr)
+            continue;
+
+        if (sg->size() > DB_MAX_BITS)
+            continue;
+
+        const size_t contribution = sg->size() + (window.size() > 0);
+
+        if (contribution + windowSize <= DB_MAX_BITS) {
+            window.push_back(i);
+            windowSize += contribution;
+        } else {
+            tryReplace();
+            window.clear();
+
+            window.push_back(i);
+            windowSize = sg->size();
+        }
+
+    }
+    tryReplace();
+}
+
+
+} // namespace dbUtil
+
+inline void pruneInversePairs(vector<Subgame*> &subgames) {
+    const size_t N = subgames.size();
+
+    for (size_t i = 0; i < N; i++) {
+        Subgame *sg1 = subgames[i];
+        if (sg1 == nullptr)
+            continue;
+
+        for (size_t j = i + 1; j < N; j++) {
+            assert(subgames[i] != nullptr);
+            Subgame *sg2 = subgames[j];
+            if (sg2 == nullptr)
+                continue;
+
+            if (Subgame::isVisuallyInversePair(sg1, sg2)) {
+                delete sg1;
+                delete sg2;
+                subgames[i] = nullptr;
+                subgames[j] = nullptr;
+                break;
+            }
+        }
+    }
+}
+
+
+inline void pruneNoMoveGames(vector<Subgame*> &subgames) {
+    const size_t nGames = subgames.size();
+
+    for (size_t i = 0; i < nGames; i++) {
+        Subgame *sg = subgames[i];
+
+        if (sg == nullptr)
+            continue;
+
+        bool hasMoves = false;
+        const size_t N = sg->size();
+
+        if (N >= 2) {
+            const size_t M = N - 1;
+            for (size_t j = 0; j < M; j++) {
+                const uint8_t &tile1 = (*sg)[j];
+                const uint8_t &tile2 = (*sg)[j + 1];
+
+                if (tile1 + tile2 == 3) {
+                    hasMoves = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasMoves) {
+            delete sg;
+            subgames[i] = nullptr;
+        }
+    }
+}
+
+inline void stitchGames(vector<Subgame*> &allGames, uint8_t **board,
+                        size_t *boardLen) {
+
+    const size_t nFinalGames = allGames.size();
+
+    const size_t nSpaces = nFinalGames > 1 ? nFinalGames - 1 : 0;
+    size_t totalSize = nSpaces;
+
+    for (const Subgame *sg : allGames) {
+        assert(sg != nullptr);
+        totalSize += sg->size();
+    }
+
+    if (totalSize == 0)
+        totalSize = 1;
+
+    uint8_t *newBoard = new uint8_t[totalSize];
+    for (size_t i = 0; i < totalSize; i++)
+        newBoard[i] = 0;
+
+    size_t cumulative = 0;
+    for (Subgame *sg : allGames) {
+        assert(sg != nullptr);
+
+        const size_t sgLen = sg->size();
+        const vector<uint8_t> &vec = sg->boardVecConst();
+
+        for (size_t i = 0; i < sgLen; i++)
+            newBoard[cumulative++] = vec[i];
+
+        cumulative++;
+        delete sg;
+    }
+    assert(
+            (cumulative == totalSize + 1) ||
+            (cumulative == 0 && nFinalGames == 0)
+            );
+
+    delete[] *board;
+    *board = newBoard;
+    *boardLen = totalSize;
+}
+
+inline vector<bool> pruneMoveGenerators(uint8_t *board, size_t boardLen) {
+    static std::set<uint64_t> hashes;
+    hashes.clear();
+
+    vector<bool> pruned;
+
+    vector<Subgame*> subgames = generateSubgamesNew(board, boardLen);
+    pruned.resize(subgames.size(), false);
+
+
+    const size_t nSubgames = subgames.size();
+    for (size_t i = 0; i < nSubgames; i++) {
+        Subgame *sg = subgames[i];
+
+        const uint64_t hash = getCode(sg->board(), sg->size(), BLACK);
+        delete sg;
+
+        auto it = hashes.insert(hash);
+
+        if (!it.second)
+            pruned[i] = true;
+    }
+
+    hashes.clear();
+    return pruned;
+}
+
+
+void Solver::simplifyNew(uint8_t **board, size_t *boardLen) {
+    /*
+    string testBoardString = ".W...B.BB.WW..........WWBWBWBWBWBWBWBWBB.WBW";
+
+    vector<uint8_t> testBoard;
+    for (const char &c : testBoardString)
+        testBoard.push_back(charToPlayerNumber(c));
+
+    assert(testBoard.size() == testBoardString.size());
+
+    uint8_t *boardPtr = testBoard.data();
+    size_t len = testBoard.size();
+
+    board = &boardPtr;
+    boardLen = &len;
+    */
+
+    vector<Subgame*> initialSubgames = generateSubgamesNew(*board, *boardLen);
+
+    /*
+    cout << "BOARD" << endl;
+    printBoard(*board, *boardLen);
+    cout << endl;
+
+    cout << "SUBGAMES: " << initialSubgames;
+    cout << endl;
+    */
+
+    vector<Subgame*> replacements;
+    vector<Subgame*> remainders;
+
+    size_t initialZeroes = 0;
+
+    // Filter out 0s, and games with no entries
+    for (Subgame *sg : initialSubgames) {
+        uint8_t *entry = 0;
+
+        // No entry
+        if (sg->size() <= DB_MAX_BITS)
+            entry = db->get(sg->board(), sg->size());
+
+        if (!dbUtil::entryValid(entry)) {
+            replacements.push_back(sg);
+            continue;
+        }
+
+        // Check for zero
+        const bool isP = *db_get_outcome(entry) == OC_P;
+
+        if (isP) {
+            delete sg;
+            initialZeroes++;
+            continue;
+        }
+
+        remainders.push_back(sg);
+    }
+
+    assert(initialSubgames.size() ==
+           initialZeroes + replacements.size() + remainders.size());
+
+
+    // Do replacements
+    dbUtil::simplify3(remainders, db);
+    dbUtil::simplify2(remainders, db);
+    dbUtil::simplify1(remainders, db);
+
+    // Combine games
+    vector<Subgame*> allGames;
+    allGames.reserve(remainders.size() + replacements.size());
+    for (Subgame *sg : remainders)
+        allGames.push_back(sg);
+    for (Subgame *sg : replacements)
+        allGames.push_back(sg);
+
+    // Prune G + -G
+    pruneInversePairs(allGames);
+    pruneNoMoveGames(allGames);
+
+    // Mirror games
+    for (Subgame *sg : allGames)
+        if (sg != nullptr)
+            sg->tryMirror();
+
+    // Sort games
+    std::sort(allGames.begin(), allGames.end(), Subgame::normalizeSortOrder);
+
+    // Remove nulls
+    while (!allGames.empty() && allGames.back() == nullptr)
+        allGames.pop_back();
+
+    // Stitch games back together
+    //printBoard(*board, *boardLen);
+    //cout << endl;
+
+    stitchGames(allGames, board, boardLen);
+
+    //printBoard(*board, *boardLen);
+    //cout << endl;
+
+    //cout << endl;
+
+    // TODO: is this stitching optimal? Are there 0 move games still?
+}
 
 
 pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
@@ -975,7 +1501,8 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     uint8_t *sboard = new uint8_t[boardLen];
     memcpy(sboard, board, boardLen);
 
-    simplify(&sboard, &sboardLen);
+    //simplify(&sboard, &sboardLen);
+    simplifyNew(&sboard, &sboardLen);
 
     DBOUT(
         cout << "SIMPLIFY:" << endl;
@@ -1192,6 +1719,8 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     #endif
 
 
+
+
     //generate moves
     //check for terminal
     size_t moveCount;
@@ -1212,10 +1741,14 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         return pair<int, bool>(p, true);
     }
 
+    vector<bool> prunedMoveGenerators = pruneMoveGenerators(sboard, sboardLen);
 
     //Delete dominated moves
     #if defined(SOLVER_DELETE_DOMINATED_MOVES)
     vector<pair<int, int>> sg = generateSubgames(sboard, sboardLen);
+
+    assert(sg.size() == prunedMoveGenerators.size());
+    assert(sg.size() == subgames.size());
 
     for (int i = 0; i < sg.size(); i++) {
         int start = sg[i].first;
@@ -1323,6 +1856,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
         assert(subgameIdx >= 0);
 
+        if (prunedMoveGenerators[subgameIdx])
+            continue;
+
         const int oc = outcomes[subgameIdx];
 
         int &localIdx = subgameMoveCounts[subgameIdx];
@@ -1368,6 +1904,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     bool allProven = true;
 
 
+    /*
+        TODO: Why the move ordering quirk?
+    */
     for (auto it = moveOrder.rbegin(); it != moveOrder.rend(); it++) {
         int i = *it;
 

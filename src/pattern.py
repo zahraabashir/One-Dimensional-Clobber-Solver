@@ -1,7 +1,7 @@
 import subprocess
 import time
 
-pair_range = [1, 50]
+pair_range = [1, 60]
 
 proc = subprocess.Popen("./TheSolvers --persist".split(), stdin=subprocess.PIPE,
     stderr=subprocess.PIPE, stdout=subprocess.PIPE)

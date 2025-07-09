@@ -5,6 +5,7 @@ SHELL := /bin/bash
 
 CC = g++
 #FLAGS = -Wall --std=c++17 -O3 -DNDEBUG
+#FLAGS = -Wall --std=c++17 -O3 -g -fno-omit-frame-pointer -fsanitize=address -D_GLIBCXX_DEBUG
 FLAGS = -Wall --std=c++17 -O3
 
 
@@ -17,6 +18,7 @@ default: run
 compTest: solver.o
 
 
+
 run: TheSolvers
 	@#./TheSolvers BWBWBWBWBWBWBWBWBW B
 	@#@echo Try to beat 47399 nodes 
@@ -27,13 +29,13 @@ miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test
 	-time ./Test
 
-TheSolvers: main.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp
+TheSolvers: main.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp
+DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTyppes.o
 	$(CC) $(FLAGS) $^ -o $@
 
-explore: dbExplore.cpp database3.o utils.o state.o bound.o zobrist.o MurmurHash3.cpp
+explore: dbExplore.cpp database3.o utils.o state.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
 
 

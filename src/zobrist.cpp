@@ -38,9 +38,10 @@ public:
     RandomTable();
 
     uint64_t get(uint8_t val, size_t pos);
+    const std::vector<uint64_t> &getTable();
 
+    void growTable(size_t target);
 private:
-    void _growTable(size_t target);
 
     std::vector<uint64_t> _numbers;
     size_t _currentSize;
@@ -55,13 +56,13 @@ inline RandomTable::RandomTable()
 {
     _currentSize = 0;
 
-    _growTable(4);
+    growTable(4);
 }
 
 inline uint64_t RandomTable::get(uint8_t val, size_t pos)
 {
     assert(0 <= val && val <= 2);
-    _growTable(pos + 1);
+    growTable(pos + 1);
 
     const size_t idx = pos * 3 + val;
     assert(idx < _numbers.size());
@@ -69,7 +70,11 @@ inline uint64_t RandomTable::get(uint8_t val, size_t pos)
     return _numbers[idx];
 }
 
-void RandomTable::_growTable(size_t target)
+const std::vector<uint64_t> &RandomTable::getTable() {
+    return _numbers;
+}
+
+inline void RandomTable::growTable(size_t target)
 {
     if (target < _currentSize)
         return;
@@ -94,12 +99,21 @@ using namespace std;
 uint64_t getZobristHash(int player, const uint8_t* board, size_t len) {
     static RandomTable table;
 
+    table.growTable(len + 2);
+
+    const vector<uint64_t> &numbers = table.getTable();
+
     uint64_t val = 0;
 
-    val ^= table.get(player, 0);
+    val ^= numbers[player];
 
-    for (size_t i = 0; i < len; i++)
-        val ^= table.get(board[i], i + 1);
+    size_t idx = 3;
+
+    for (size_t i = 0; i < len; i++) {
+        val ^= numbers[idx + board[i]];
+        idx += 3;
+    }
+        //val ^= table.get(board[i], i + 1);
 
     return val;
 }

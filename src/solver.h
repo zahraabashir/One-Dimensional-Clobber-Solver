@@ -116,6 +116,7 @@ class Solver {
 
 
     void simplify(uint8_t **board, size_t *boardLen);
+    void simplifyNew(uint8_t **board, size_t *boardLen);
 };
 
 

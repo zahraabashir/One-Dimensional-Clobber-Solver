@@ -7,6 +7,7 @@
 #include <vector>
 #include <cassert>
 #include <cstdint>
+#include <chrono>
 
 #define EMPTY 0
 #define BLACK 1
@@ -144,7 +145,7 @@ inline std::ostream &operator<<(std::ostream &os, const std::vector<uint8_t> &ve
 
 
 
-void printBoard(uint8_t *board, size_t len, bool newline = false);
+void printBoard(const uint8_t *board, size_t len, bool newline = false);
 
 
 void makeGame(uint64_t shapeNumber, uint32_t gameNumber, 
@@ -155,4 +156,15 @@ void makeGame(const std::vector<int> &shape, uint32_t gameNumber,
 
 uint8_t *addGames(uint8_t *g1, size_t g1Size,
     uint8_t *g2, size_t g2Size, size_t *newSize);
+
+
+
+inline uint64_t msSinceEpoch()
+{
+    using namespace std::chrono;
+
+    milliseconds t =
+        duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+    return t.count();
+}
 

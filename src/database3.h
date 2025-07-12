@@ -29,8 +29,10 @@ enum {
     DB_BOUNDS,
     DB_METRIC,
     DB_LINK,
+    DB_LINK_SMALLEST,
     DB_SHAPE,
     DB_NUMBER,
+    DB_SIZE,
 };
 
 struct DBLayout {
@@ -40,8 +42,10 @@ struct DBLayout {
         sz(int8_t[2]),     // low/high bounds
         sz(uint64_t),       // simplicity metric
         sz(uint64_t),       //link
+        sz(uint64_t),       //linkSmall
         sz(uint64_t),       //shape
         sz(uint32_t),       //number
+        sz(uint64_t),       //size
     };
 
     static constexpr size_t N = sizeof(arr) / sizeof(size_t);
@@ -80,8 +84,10 @@ uint64_t *db_get_dominance(const uint8_t *entry);
 int8_t *db_get_bounds(const uint8_t *entry);
 uint64_t *db_get_metric(const uint8_t *entry);
 uint64_t *db_get_link(const uint8_t *entry);
+uint64_t *db_get_link_smallest(const uint8_t *entry);
 uint64_t *db_get_shape(const uint8_t *entry);
 uint32_t *db_get_number(const uint8_t *entry);
+uint64_t *db_get_size(const uint8_t *entry);
 
 struct IndirectLink {
 
@@ -116,11 +122,16 @@ class Database {
 
   private:
     bool _useIndirectLinks;
-    size_t _defaultIndirectLinksSize;
-    IndirectLink *_defaultIndirectLinks;
+    size_t _defaultIndirectLinksSize1;
+    IndirectLink *_defaultIndirectLinks1;
+
+    size_t _defaultIndirectLinksSize2;
+    IndirectLink *_defaultIndirectLinks2;
+
 
   public:
-    IndirectLink &getDefaultIndirectLink(size_t entryNumber);
+    IndirectLink &getDefaultIndirectLink1(size_t entryNumber);
+    IndirectLink &getDefaultIndirectLink2(size_t entryNumber);
 
     size_t size;
 
@@ -151,7 +162,12 @@ uint64_t shapeToNumber(const std::vector<int> &shape);
 std::vector<int> numberToShape(uint64_t number);
 std::vector<std::vector<int>> makeShapes();
 
-inline IndirectLink &Database::getDefaultIndirectLink(size_t entryNumber) {
-    assert(_useIndirectLinks && entryNumber < _defaultIndirectLinksSize);
-    return _defaultIndirectLinks[entryNumber];
+inline IndirectLink &Database::getDefaultIndirectLink1(size_t entryNumber) {
+    assert(_useIndirectLinks && entryNumber < _defaultIndirectLinksSize1);
+    return _defaultIndirectLinks1[entryNumber];
+}
+
+inline IndirectLink &Database::getDefaultIndirectLink2(size_t entryNumber) {
+    assert(_useIndirectLinks && entryNumber < _defaultIndirectLinksSize2);
+    return _defaultIndirectLinks2[entryNumber];
 }

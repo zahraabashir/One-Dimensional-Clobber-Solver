@@ -156,6 +156,7 @@ struct GeneratedGame {
 
     uint64_t shapeNumber;
     uint32_t gameNumber;
+    uint64_t gameSize;
 
     std::vector<int> shape;
 };
@@ -179,6 +180,7 @@ private:
     size_t _shapeIdx;
     uint32_t _currentGameNumber;
     uint32_t _maxGameNumber;
+    uint64_t _currentGameSize;
 
     const std::vector<int> &_getCurrentShape() const;
     void _increment();
@@ -186,9 +188,7 @@ private:
     bool _incrementShape();
 
     void _reshapeGame(const std::vector<int> &newShape);
-
 };
-
 
 inline GameGenerator::GameGenerator(): _shapeIdx(0) {
     _reshapeGame(_getCurrentShape());
@@ -214,4 +214,19 @@ inline void GameGenerator::_increment() {
     if (!_incrementBoard())
         _incrementShape();
 }
+
+////////////////////////////////////////////////// class Timer
+class Timer {
+public:
+    void start() {
+        _start = msSinceEpoch();
+    }
+
+    uint64_t stop() {
+        return msSinceEpoch() - _start;
+    }
+
+private:
+    uint64_t _start;
+};
 

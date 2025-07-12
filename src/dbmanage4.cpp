@@ -16,10 +16,10 @@ TODO:
 #include <memory>
 #include <algorithm>
 #include <cstring>
-#include <map>
 #include <unordered_set>
 #include <unordered_map>
 
+#include "options.h"
 #include "solver.h"
 #include "miscTypes.h"
 #include "database3.h"
@@ -33,6 +33,8 @@ struct ReplacementMapIdx {
     uint8_t high1;
     uint8_t low2;
     uint8_t high2;
+    uint8_t low3;
+    uint8_t high3;
 
     bool operator==(const ReplacementMapIdx &other) const {
         return 
@@ -40,7 +42,9 @@ struct ReplacementMapIdx {
             (low1 == other.low1) &&
             (high1 == other.high1) &&
             (low2 == other.low2) &&
-            (high2 == other.high2);
+            (high2 == other.high2) &&
+            (low3 == other.low3) &&
+            (high3 == other.high3);
     }
 
 };
@@ -53,7 +57,9 @@ struct std::hash<ReplacementMapIdx> {
             (((uint64_t) s.low1) << 8) |
             (((uint64_t) s.high1) << 16) |
             (((uint64_t) s.low2) << 24) |
-            (((uint64_t) s.high2) << 32);
+            (((uint64_t) s.high2) << 32) |
+            (((uint64_t) s.low3) << 40) |
+            (((uint64_t) s.high3) << 48);
     }
 };
 
@@ -73,6 +79,7 @@ enum relation {
 Database *db;
 Solver *solver;
 unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMap;
+unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMapSmallest;
 
 ////////////////////////////////////////////////// helper functions
 
@@ -158,9 +165,6 @@ Subgame *getInverseScaleGameWithStar(int8_t scaleIdx) {
     return sg;
 }
 
-
-
-
 Subgame *getInverseScaleGame(int8_t scaleIdx) {
     Subgame *sg = new Subgame();
     vector<uint8_t> &boardVec = sg->boardVec();
@@ -239,17 +243,20 @@ uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) 
     for (size_t i = 0; i < moveCount; i++) {
         assertRestore1();
 
-        if (getDominated(mask, i))
-            continue;
+        //if (getDominated(mask, i))
+        //    continue;
 
         play(g1, undo1, moves[2 * i], moves[2 * i + 1]);
 
         for (size_t j = i + 1; j < moveCount; j++) {
             assertRestore2();
-            assert(!getDominated(mask, i));
+            //assert(!getDominated(mask, i));
 
-            if (getDominated(mask, j))
+            if (getDominated(mask, i) && getDominated(mask, j))
                 continue;
+
+            //if (getDominated(mask, j))
+            //    continue;
 
             play(g2, undo2, moves[2 * j], moves[2 * j + 1]);
             negateBoard(g2, g2Size);
@@ -275,7 +282,7 @@ uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) 
 
             if (compare == -1) { // I < J (from POV of player)
                 setDominated(mask, i);
-                break;
+                //break;
             }
             else if (compare == 1) // I > J (from POV of player)
                 setDominated(mask, j);
@@ -489,12 +496,17 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
         if (rel == REL_EQUAL) {
             foundIdx = i;
             found = true;
+            break;
         }
     }
 
+    bool allowInsert = game.size() <= RMAP_SIZE;
+
     if (!found) {
-        uint64_t directLink = db->getIdxDirect(game);
-        vec.emplace_back(new IndirectLink(directLink));
+        if (allowInsert) {
+            uint64_t directLink = db->getIdxDirect(game);
+            vec.emplace_back(new IndirectLink(directLink));
+        }
     } else {
         const uint64_t metric = *db_get_metric(entry);
 
@@ -506,13 +518,77 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
         assert(foundMetric != uint64_t(-1));
 
         if (metric < foundMetric) { // New game is better
-            indirectLink.directLink = db->getIdxDirect(game);
+            if (allowInsert)
+                indirectLink.directLink = db->getIdxDirect(game);
         } else if (metric > foundMetric) { // Existing game is better
             *db_get_link(entry) = (uint64_t) &indirectLink;
         }
     }
 }
 
+void addToReplacementMapSmallest(const Subgame &game, const ReplacementMapIdx &rmapIdx) {
+    vector<shared_ptr<IndirectLink>> &vec = replacementMapSmallest[rmapIdx];
+
+    uint8_t *entry = db->get(game);
+    assert(entry != 0);
+    assert(*db_get_outcome(entry) != 0 && *db_get_size(entry) != uint64_t(-1));
+
+    Subgame sgCopy = game;
+
+    size_t foundIdx = 0;
+    bool found = false;
+
+    const size_t N = vec.size();
+    for (size_t i = 0; i < N; i++) {
+        shared_ptr<IndirectLink> &indirect = vec[i];
+
+        uint8_t *linkedEntry = db->getFromIndirectIdx(*indirect);
+        assert(linkedEntry != 0);
+        uint64_t linkedShape = *db_get_shape(linkedEntry);
+        uint32_t linkedNumber = *db_get_number(linkedEntry);
+
+        vector<Subgame*> subgames = makeGameNew(linkedShape, linkedNumber);
+
+        for (Subgame *sg : subgames)
+            sg->negate();
+
+        subgames.push_back(&sgCopy);
+        Subgame *sum = Subgame::concatSubgames(subgames);
+        subgames.pop_back();
+
+        for (Subgame *sg : subgames)
+            delete sg;
+
+        relation rel = outcomeToRelation(getOutcome(*sum));
+        delete sum;
+
+        if (rel == REL_EQUAL) {
+            foundIdx = i;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        uint64_t directLink = db->getIdxDirect(game);
+        vec.emplace_back(new IndirectLink(directLink));
+    } else {
+        const uint64_t metric = *db_get_size(entry);
+
+        IndirectLink &indirectLink = *(vec[foundIdx]);
+        uint8_t *foundEntry = db->getFromIndirectIdx(indirectLink);
+        assert(foundEntry != 0 && *db_get_outcome(entry) != 0);
+
+        const uint64_t foundMetric = *db_get_size(foundEntry);
+        assert(foundMetric != uint64_t(-1));
+
+        if (metric < foundMetric) { // New game is better
+            indirectLink.directLink = db->getIdxDirect(game);
+        } else if (metric > foundMetric) { // Existing game is better
+            *db_get_link_smallest(entry) = (uint64_t) &indirectLink;
+        }
+    }
+}
 
 ////////////////////////////////////////////////// main pass functions
 
@@ -529,17 +605,9 @@ void pass_initializeAllEntries() {
 
         GeneratedGame genGame = gen.generate();
         ++gen;
-
-        uint64_t directLink = db->getIdxDirect(*genGame.game);
-
-        IndirectLink &indirect = db->getDefaultIndirectLink(entryNumber);
-        indirect.directLink = directLink;
-
-        uint64_t indirectLink = (uint64_t) &indirect;
-
-        uint8_t *entry = db->getFromIdx(indirectLink);
+        
+        uint8_t *entry = db->get(*genGame.game);
         assert(entry != 0);
-        assert(entry == db->get(*genGame.game));
 
         *db_get_outcome(entry) = 0;
         db_get_dominance(entry)[0] = 0;
@@ -547,9 +615,29 @@ void pass_initializeAllEntries() {
         db_get_bounds(entry)[0] = numeric_limits<int8_t>::max();
         db_get_bounds(entry)[1] = numeric_limits<int8_t>::min();
         *db_get_metric(entry) = uint64_t(-1);
-        *db_get_link(entry) = (uint64_t) &indirect;
         *db_get_shape(entry) = genGame.shapeNumber;
         *db_get_number(entry) = genGame.gameNumber;
+        *db_get_size(entry) = genGame.gameSize;
+
+        uint64_t directLink = db->getIdxDirect(*genGame.game);
+
+        {
+            IndirectLink &indirect = db->getDefaultIndirectLink1(entryNumber);
+            indirect.directLink = directLink;
+            uint64_t indirectLink = (uint64_t) &indirect;
+            *db_get_link(entry) = indirectLink;
+
+            assert(db->getFromIdx(indirectLink) == entry);
+        }
+
+        {
+            IndirectLink &indirect = db->getDefaultIndirectLink2(entryNumber);
+            indirect.directLink = directLink;
+            uint64_t indirectLink = (uint64_t) &indirect;
+            *db_get_link_smallest(entry) = indirectLink;
+
+            assert(db->getFromIdx(indirectLink) == entry);
+        }
 
         entryNumber++;
     }
@@ -580,8 +668,8 @@ void pass_normalGameOutcomes() {
     }
 }
 
-void pass_normalGameDominance() {
-    cout << "Finding dominated moves for normalized games" << endl;
+void pass_normalGameBounds() {
+    cout << "Finding bounds for normal games" << endl;
 
     GameGenerator gen;
 
@@ -608,11 +696,50 @@ void pass_normalGameDominance() {
         assert(normalEntry != 0);
 
         assert(*db_get_outcome(normalEntry) != 0);
+        assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
+        assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
+
+        BoundsPair bp = getBounds(*normal, 1);
+
+        db_get_bounds(normalEntry)[0] = bp.low;
+        db_get_bounds(normalEntry)[1] = bp.high;
+    }
+}
+
+void pass_normalGameDominance() {
+    cout << "Finding dominated moves for normalized games" << endl;
+
+    GameGenerator gen;
+
+    unordered_set<uint64_t> hashes;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
+
+        if (normal->size() == 0)
+            continue;
+
+        const uint64_t normalHash = normal->getHash();
+
+        {
+            auto it = hashes.insert(normalHash);
+            if (!it.second)
+                continue;
+        }
+
+        //cout << *normal << endl;
+
+        uint8_t *normalEntry = db->get(*normal);
+        assert(normalEntry != 0);
+
+        assert(*db_get_outcome(normalEntry) != 0);
 
         DominancePair dp = getDominance(*normal);
         db_get_dominance(normalEntry)[0] = dp.domBlack;
         db_get_dominance(normalEntry)[1] = dp.domWhite;
-
     }
 }
 
@@ -644,27 +771,95 @@ void pass_normalGameMetric() {
         assert(*db_get_outcome(normalEntry) != 0);
         assert(*db_get_metric(normalEntry) == uint64_t(-1));
 
-
         const uint64_t metric = getMetric(*normal);
         *db_get_metric(normalEntry) = metric;
     }
 }
 
+void pass_main() {
+    cout << "Main pass" << endl;
+    GameGenerator gen;
+
+    unordered_set<uint64_t> hashes;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
+
+        if (normal->size() == 0)
+            continue;
+
+        const uint64_t normalHash = normal->getHash();
+
+        {
+            auto it = hashes.insert(normalHash);
+            if (!it.second)
+                continue;
+        }
+
+        uint8_t *normalEntry = db->get(*normal);
+        assert(normalEntry != 0);
+        assert(*db_get_outcome(normalEntry) != 0);
+        //assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
+        //assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
+
+        assert(db_get_bounds(normalEntry)[0] != numeric_limits<int8_t>::max());
+        assert(db_get_bounds(normalEntry)[1] != numeric_limits<int8_t>::min());
+
+        cout << *normal << " " << std::flush;
+
+        // Find dominated moves
+        DominancePair dp = getDominance(*normal);
+        db_get_dominance(normalEntry)[0] = dp.domBlack;
+        db_get_dominance(normalEntry)[1] = dp.domWhite;
+
+        // Find metric
+        uint64_t metric = getMetric(*normal);
+        *db_get_metric(normalEntry) = metric;
+
+        // Index for replacement map
+        //BoundsPair bp1 = getBounds(*normal, 1);
+        //assert(bp1.low <= bp1.high);
+        BoundsPair bp1;
+        bp1.low = db_get_bounds(normalEntry)[0];
+        bp1.high = db_get_bounds(normalEntry)[1];
+
+        BoundsPair bp2 = getBounds(*normal, 2);
+        assert(bp2.low <= bp2.high);
+        BoundsPair bp3 = getBounds(*normal, 0);
+        assert(bp3.low <= bp3.high);
+
+        db_get_bounds(normalEntry)[0] = bp1.low;
+        db_get_bounds(normalEntry)[1] = bp1.high;
+
+        cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
+        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
+        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
+
+        // Find link
+        ReplacementMapIdx idx;
+        idx.outcome = *db_get_outcome(normalEntry);
+        idx.low1 = bp1.low;
+        idx.high1 = bp1.high;
+        idx.low2 = bp2.low;
+        idx.high2 = bp2.high;
+        idx.low3 = bp3.low;
+        idx.high3 = bp3.high;
+
+        //if (equalsProblemCase(*normal)) {
+        //    assert(!Solver::doDebug);
+        //    cout << "ENABLING DEBUG" << endl;
+        //    Solver::doDebug = true;
+        //}
+
+        addToReplacementMap(*normal, idx);
+        //addToReplacementMapSmallest(*normal, idx);
+    }
+}
+
 void pass_normalGameLinks() {
-    //WWBBW.WWB
-    static const vector<uint8_t> problemCase = {2,2,1,1,2,0,2,2,1};
-
-    auto equalsProblemCase = [&](const Subgame &game) -> bool {
-        if (problemCase.size() != game.size())
-            return false;
-
-        for (size_t i = 0; i < problemCase.size(); i++)
-            if (problemCase[i] != game[i])
-                return false;
-
-        return true;
-    };
-
     cout << "Finding links for normal games" << endl;
     GameGenerator gen;
 
@@ -690,21 +885,31 @@ void pass_normalGameLinks() {
         uint8_t *normalEntry = db->get(*normal);
         assert(normalEntry != 0);
         assert(*db_get_outcome(normalEntry) != 0);
-        assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
-        assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
+        //assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
+        //assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
+
+        assert(db_get_bounds(normalEntry)[0] != numeric_limits<int8_t>::max());
+        assert(db_get_bounds(normalEntry)[1] != numeric_limits<int8_t>::min());
 
         cout << *normal << " " << std::flush;
 
-        BoundsPair bp1 = getBounds(*normal, 1);
-        assert(bp1.low <= bp1.high);
+        //BoundsPair bp1 = getBounds(*normal, 1);
+        //assert(bp1.low <= bp1.high);
+        BoundsPair bp1;
+        bp1.low = db_get_bounds(normalEntry)[0];
+        bp1.high = db_get_bounds(normalEntry)[1];
+
         BoundsPair bp2 = getBounds(*normal, 2);
         assert(bp2.low <= bp2.high);
+        BoundsPair bp3 = getBounds(*normal, 0);
+        assert(bp3.low <= bp3.high);
 
         db_get_bounds(normalEntry)[0] = bp1.low;
         db_get_bounds(normalEntry)[1] = bp1.high;
 
         cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
-        cout << (int) bp2.low << " " << (int) bp2.high << ">" << endl;
+        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
+        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
 
         ReplacementMapIdx idx;
         idx.outcome = *db_get_outcome(normalEntry);
@@ -712,6 +917,8 @@ void pass_normalGameLinks() {
         idx.high1 = bp1.high;
         idx.low2 = bp2.low;
         idx.high2 = bp2.high;
+        idx.low3 = bp3.low;
+        idx.high3 = bp3.high;
 
         //if (equalsProblemCase(*normal)) {
         //    assert(!Solver::doDebug);
@@ -720,12 +927,16 @@ void pass_normalGameLinks() {
         //}
 
         addToReplacementMap(*normal, idx);
+        addToReplacementMapSmallest(*normal, idx);
     }
 }
 
-
-
 } // namespace
+
+
+
+#define TIME(x) {t.start(); x; cout << ((double) t.stop()) / 1000.0 << "s" << endl;} \
+static_assert(true)
 
 int main() {
     db = new Database();
@@ -737,10 +948,14 @@ int main() {
 
     solver = new Solver(DB_MAX_BITS, db);
 
-    pass_normalGameOutcomes();
-    pass_normalGameDominance();
-    pass_normalGameMetric();
-    pass_normalGameLinks();
+    Timer t;
+
+    TIME(pass_normalGameOutcomes());
+    TIME(pass_normalGameBounds());
+    TIME(pass_main());
+    //TIME(pass_normalGameDominance());
+    //TIME(pass_normalGameMetric());
+    //TIME(pass_normalGameLinks());
 
     db->finalizeIndirectLinks();
 

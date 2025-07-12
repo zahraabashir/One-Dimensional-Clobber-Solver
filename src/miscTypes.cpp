@@ -362,6 +362,7 @@ GeneratedGame GameGenerator::generate() const {
     genGame.game = g;
     genGame.shapeNumber = shapeNumber;
     genGame.gameNumber = _currentGameNumber;
+    genGame.gameSize = _currentGameSize;
     genGame.shape = shape;
 
     return genGame;
@@ -394,8 +395,11 @@ void GameGenerator::_reshapeGame(const vector<int> &newShape) {
     _currentGameNumber = 0;
 
     _maxGameNumber = 1;
-    for (int chunkSize : shape)
+    _currentGameSize = 0;
+    for (int chunkSize : shape) {
         _maxGameNumber <<= chunkSize;
+        _currentGameSize += chunkSize;
+    }
 
     _maxGameNumber -= 1;
 }

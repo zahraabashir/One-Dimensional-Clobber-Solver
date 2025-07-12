@@ -43,6 +43,13 @@ uint64_t *db_get_link(const uint8_t *entry) {
     return (uint64_t *) (entry + Offset<DBLayout, DB_LINK>());
 }
 
+uint64_t *db_get_link_smallest(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint64_t *) (entry + Offset<DBLayout, DB_LINK_SMALLEST>());
+}
+
 uint64_t *db_get_shape(const uint8_t *entry) {
     if (entry == 0) {
         return 0;
@@ -57,9 +64,12 @@ uint32_t *db_get_number(const uint8_t *entry) {
     return (uint32_t *) (entry + Offset<DBLayout, DB_NUMBER>());
 }
 
-
-
-
+uint64_t *db_get_size(const uint8_t *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+    return (uint64_t *) (entry + Offset<DBLayout, DB_SIZE>());
+}
 
 constexpr uint64_t shapeNumberMask() {
     uint64_t mask = 0;
@@ -165,8 +175,11 @@ vector<vector<int>> makeShapes() {
 Database::Database() {
     //cout << "Making DB" << endl;
     _useIndirectLinks = false;
-    _defaultIndirectLinksSize = 0;
-    _defaultIndirectLinks = nullptr;
+    _defaultIndirectLinksSize1 = 0;
+    _defaultIndirectLinks1 = nullptr;
+
+    _defaultIndirectLinksSize2 = 0;
+    _defaultIndirectLinks2 = nullptr;
 }
 
 void Database::init() {
@@ -259,8 +272,11 @@ Database::~Database() {
         free(data);
     }
 
-    if (_defaultIndirectLinks != nullptr)
-        delete[] _defaultIndirectLinks;
+    if (_defaultIndirectLinks1 != nullptr)
+        delete[] _defaultIndirectLinks1;
+
+    if (_defaultIndirectLinks2 != nullptr)
+        delete[] _defaultIndirectLinks2;
 }
 
 //NOTE: doesn't update header
@@ -410,6 +426,12 @@ uint64_t Database::getIdxDirect(const uint8_t *board, size_t len) {
 
     if (sectionOffset == DB_NOT_FOUND) {
         cerr << "DB NOT FOUND for valid size -- shouldn't happen" << endl;
+        cout << len << endl;
+        cout << "|";
+        for (size_t i = 0; i < len; i++)
+            cout << (unsigned int) board[i];
+        cout << "|" << endl;
+
         assert(sectionOffset != DB_NOT_FOUND);
         return DB_NOT_FOUND;
     }
@@ -469,16 +491,21 @@ uint8_t *Database::getFromIndirectIdx(const IndirectLink &indirect) {
 }
 
 void Database::enableIndirectLinks() {
-    assert(!_useIndirectLinks && _defaultIndirectLinks == nullptr);
+    assert(!_useIndirectLinks);
+    assert(_defaultIndirectLinks1 == nullptr);
+    assert(_defaultIndirectLinks2 == nullptr);
 
     _useIndirectLinks = true;
-    _defaultIndirectLinksSize = entryCount;
-    _defaultIndirectLinks = new IndirectLink[_defaultIndirectLinksSize];
+    _defaultIndirectLinksSize1 = entryCount;
+    _defaultIndirectLinks1 = new IndirectLink[_defaultIndirectLinksSize1];
+
+    _defaultIndirectLinksSize2 = entryCount;
+    _defaultIndirectLinks2 = new IndirectLink[_defaultIndirectLinksSize2];
 }
 
-
 void Database::finalizeIndirectLinks() {
-    assert(_useIndirectLinks && _defaultIndirectLinks != nullptr);
+    assert(_useIndirectLinks);
+    assert(_defaultIndirectLinks1 != nullptr && _defaultIndirectLinks2 != nullptr);
 
     GameGenerator gen;
 
@@ -488,12 +515,19 @@ void Database::finalizeIndirectLinks() {
 
         uint8_t *entry = get(*genGame.game);
 
-        uint64_t link = *db_get_link(entry);
+        {
+            uint64_t link = *db_get_link(entry);
+            IndirectLink *indirectLink1 = (IndirectLink*) link;
+            uint64_t directLink1 = indirectLink1->directLink;
+            *db_get_link(entry) = directLink1;
+        }
 
-        IndirectLink *indirectLink = (IndirectLink*) link;
-        uint64_t directLink = indirectLink->directLink;
-
-        *db_get_link(entry) = directLink;
+        {
+            uint64_t linkSmallest = *db_get_link_smallest(entry);
+            IndirectLink *indirectLink2 = (IndirectLink*) linkSmallest;
+            uint64_t directLink2 = indirectLink2->directLink;
+            *db_get_link_smallest(entry) = directLink2;
+        }
     }
 
     _useIndirectLinks = false;

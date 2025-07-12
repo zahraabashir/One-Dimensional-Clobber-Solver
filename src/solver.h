@@ -2,10 +2,26 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <random>
+#include <optional>
 
 #include "options.h"
 #include "database3.h"
+
+typedef std::pair<int, bool> SolveResult;
+
+struct SubgameRange {
+    int start;
+    int length;
+    int end;
+};
+
+inline std::ostream &operator<<(std::ostream &os, const SubgameRange &sr) {
+    os << "(" << sr.start << ", " << sr.length << ", " << sr.end << ")";
+    return os;
+}
+
 
 #define BLOCK_SIZE 4
 
@@ -117,12 +133,187 @@ class Solver {
     uint8_t *getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int player, uint64_t hash, int mode);
 
 
+    std::optional<std::pair<int, bool>> checkWinFromStaticRules(
+            const uint8_t *board, size_t boardLen,
+            const std::vector<std::pair<int, int>> &subgames,
+            std::vector<int> &outcomes, int player);
+
     void simplify(uint8_t **board, size_t *boardLen);
     void simplifyNew(uint8_t **board, size_t *boardLen);
+    void simplifyNewSmallest(uint8_t **board, size_t *boardLen);
+
+
+    std::optional<std::pair<int, bool>> checkStaticResult(uint8_t *dbEntry, int player);
+
+
+    Subgame *getSimpleBoard(const uint8_t* board, size_t len);
+    Subgame *getShortBoard(const uint8_t* board, size_t len);
+
+    std::optional<SolveResult> fullBoardStaticRules(
+                                                    uint8_t *dbEntry,
+                                                    int player);
+
+    std::optional<SolveResult> subgameStaticRules(
+const uint8_t *sboard,
+        int player, const std::vector<SubgameRange> &ranges,
+        std::vector<int> &outcomes);
+
+
+
 };
 
 
+inline void pruneInversePairs(std::vector<Subgame*> &subgames) {
+    const size_t N = subgames.size();
+
+    for (size_t i = 0; i < N; i++) {
+        Subgame *sg1 = subgames[i];
+        if (sg1 == nullptr)
+            continue;
+
+        for (size_t j = i + 1; j < N; j++) {
+            assert(subgames[i] != nullptr);
+            Subgame *sg2 = subgames[j];
+            if (sg2 == nullptr)
+                continue;
+
+            if (Subgame::isVisuallyInversePair(sg1, sg2)) {
+                delete sg1;
+                delete sg2;
+                subgames[i] = nullptr;
+                subgames[j] = nullptr;
+                break;
+            }
+        }
+    }
+}
+
+
+inline void pruneNoMoveGames(std::vector<Subgame*> &subgames) {
+    const size_t nGames = subgames.size();
+
+    for (size_t i = 0; i < nGames; i++) {
+        Subgame *sg = subgames[i];
+
+        if (sg == nullptr)
+            continue;
+
+        bool hasMoves = false;
+        const size_t N = sg->size();
+
+        if (N >= 2) {
+            const size_t M = N - 1;
+            for (size_t j = 0; j < M; j++) {
+                const uint8_t &tile1 = (*sg)[j];
+                const uint8_t &tile2 = (*sg)[j + 1];
+
+                if (tile1 + tile2 == 3) {
+                    hasMoves = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasMoves) {
+            delete sg;
+            subgames[i] = nullptr;
+        }
+    }
+}
+
+inline void stitchGames(std::vector<Subgame*> &allGames, uint8_t **board,
+                        size_t *boardLen) {
+
+    const size_t nFinalGames = allGames.size();
+
+    const size_t nSpaces = nFinalGames > 1 ? nFinalGames - 1 : 0;
+    size_t totalSize = nSpaces;
+
+    for (const Subgame *sg : allGames) {
+        assert(sg != nullptr);
+        totalSize += sg->size();
+    }
+
+    if (totalSize == 0)
+        totalSize = 1;
+
+    uint8_t *newBoard = new uint8_t[totalSize];
+    for (size_t i = 0; i < totalSize; i++)
+        newBoard[i] = 0;
+
+    size_t cumulative = 0;
+    for (Subgame *sg : allGames) {
+        assert(sg != nullptr);
+
+        const size_t sgLen = sg->size();
+        const std::vector<uint8_t> &vec = sg->boardVecConst();
+
+        for (size_t i = 0; i < sgLen; i++)
+            newBoard[cumulative++] = vec[i];
+
+        cumulative++;
+        delete sg;
+    }
+    assert(
+            (cumulative == totalSize + 1) ||
+            (cumulative == 0 && nFinalGames == 0)
+            );
+
+    delete[] *board;
+    *board = newBoard;
+    *boardLen = totalSize;
+}
+
+inline bool entryValid(const uint8_t *entry) {
+    return (entry != 0) && (*db_get_outcome(entry) != 0);
+}
+
+inline bool tryInflateLinkSmallest(const Subgame &sg, uint8_t *entry, Database *db, std::vector<Subgame*> &subgames) {
+    assert(entryValid(entry));
+
+    const uint64_t link = *db_get_link_smallest(entry);
+    if (link == 0)
+        return false;
+
+    uint8_t *newEntry = db->getFromIdx(link);
+    assert(newEntry != 0);
+
+    if (entry == newEntry)
+        return false;
+
+    const uint64_t shape = *db_get_shape(newEntry);
+    const uint32_t number = *db_get_number(newEntry);
+
+    std::vector<Subgame*> inflated = makeGameNew(shape, number);
+
+    subgames.reserve(subgames.size() + inflated.size());
+    for (Subgame *sg : inflated)
+        subgames.push_back(sg);
+
+    return true;
+}
 
 
 
+inline Subgame *Solver::getSimpleBoard(const uint8_t* board, size_t len) {
+    uint8_t *newBoard = new uint8_t[len];
+    memcpy(newBoard, board, len);
+
+    simplifyNew(&newBoard, &len);
+
+    Subgame *game = new Subgame(newBoard, len);
+    delete[] newBoard;
+    return game;
+}
+
+inline Subgame *Solver::getShortBoard(const uint8_t* board, size_t len) {
+    uint8_t *newBoard = new uint8_t[len];
+    memcpy(newBoard, board, len);
+
+    simplifyNewSmallest(&newBoard, &len);
+
+    Subgame *game = new Subgame(newBoard, len);
+    delete[] newBoard;
+    return game;
+}
 

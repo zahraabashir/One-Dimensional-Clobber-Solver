@@ -25,6 +25,7 @@ static_assert(true)
 
 
 
+
 ////////////////////////////////////////////////// class AnnotatedMove
 struct AnnotatedMove {
     int from;
@@ -91,12 +92,12 @@ public:
         };
 
         //vector<bool> bools = {
-        //    negative,
         //    positive,
-        //    npos,
-        //    unknown,
-        //    middle,
+        //    negative,
         //    best,
+        //    npos,
+        //    middle,
+        //    unknown,
         //};
 
 
@@ -244,7 +245,40 @@ vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
     return subgames;
 }
 
+vector<SubgameRange> generateSubgameRanges(const uint8_t *board, size_t len) {
+    vector<SubgameRange> subgames;
 
+    int start = -1;
+    int end = -1;
+
+    int foundMask = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (start == -1 && board[i] != 0) {
+            start = i;
+            foundMask = 0;
+        }
+        
+        if (board[i] != 0) {
+            foundMask |= board[i];
+        }
+
+        if (start != -1 && board[i] == 0) {
+            if (foundMask == 3) {
+                subgames.push_back({start, i - start, i});
+            }
+            start = -1;
+        }
+    }
+
+    if (start != -1 && foundMask == 3) {
+        //subgames.push_back(pair<int, int>(start, len));
+        subgames.push_back({start, (int) len - (int) start, (int) len});
+    }
+
+          
+    return subgames;
+}
 
 Solver::Solver(size_t boardLen, Database *db) {
     _validEntry = false;
@@ -316,15 +350,18 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
         //maxCompleted was incremented by 100
         //maxDepth check was 150
 
+        //maxDepth = 9999999;
+
         #if defined ALTERNATE_ID_SCALING
         maxCompleted *= 2;
         if (maxDepth >= 12) {
         #else
+        #error "Don't use this"
         maxCompleted += 50;
         if (maxDepth >= 30) {
         #endif
             limitCompletions = false;
-            maxDepth = 999999999999999;
+            maxDepth = 999999999;
         }
 
         if (maxDepth >= 18) { //was 10
@@ -332,6 +369,7 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
         }
 
         #if defined(SOLVER_ALPHA_BETA)
+        #error "Don't use this"
         Bound alpha = Bound::min();
         Bound beta = Bound::max();
         Bound cb1, cb2;
@@ -351,6 +389,7 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 
 //void Solver::simplify(State *state, int depth) {
 
+/*
 void Solver::simplify(uint8_t **board, size_t *boardLen) {
     assert(false);
     cerr << "Don't use this function" << endl;
@@ -791,14 +830,12 @@ void Solver::simplify(uint8_t **board, size_t *boardLen) {
     }
 
 }
+*/
 
 namespace dbUtil {
 
-inline bool entryValid(const uint8_t *entry) {
-    return (entry != 0) && (*db_get_outcome(entry) != 0);
-}
 
-inline bool tryInflateLink(const Subgame &sg, uint8_t *entry, Database *db, vector<Subgame*> &subgames) {
+inline bool tryInflateLink(uint8_t *entry, Database *db, vector<Subgame*> &subgames) {
     assert(entryValid(entry));
 
     const uint64_t link = *db_get_link(entry);
@@ -816,13 +853,6 @@ inline bool tryInflateLink(const Subgame &sg, uint8_t *entry, Database *db, vect
 
     vector<Subgame*> inflated = makeGameNew(shape, number);
 
-    IFDEB(
-        cout << "REPLACING " << sg << " (" << *db_get_metric(entry) << ")" << endl;
-        Subgame *sum = Subgame::concatSubgames(inflated);
-        cout << "WITH: " << *sum << "(" << *db_get_metric(newEntry) << ")" << endl;
-        delete sum;
-    );
-
     subgames.reserve(subgames.size() + inflated.size());
     for (Subgame *sg : inflated)
         subgames.push_back(sg);
@@ -835,7 +865,6 @@ bool simplifySubgames(vector<Subgame*> &subgames, const vector<size_t> &indices,
         return false;
 
     uint8_t *entry = 0;
-    unique_ptr<Subgame> sgSum;
 
     if (indices.size() == 1) {
         const Subgame *sg = subgames[indices.back()];
@@ -851,27 +880,17 @@ bool simplifySubgames(vector<Subgame*> &subgames, const vector<size_t> &indices,
             sumVec.push_back(sg);
         }
 
-        //Subgame *sgSum = Subgame::concatSubgames(sumVec);
-        sgSum.reset(Subgame::concatSubgames(sumVec));
+        Subgame *sgSum = Subgame::concatSubgames(sumVec);
         entry = db->get(sgSum->board(), sgSum->size());
-        //delete sgSum;
+        delete sgSum;
     }
 
-
-    if (!dbUtil::entryValid(entry))
+    if (!entryValid(entry))
         return false;
 
     const bool isP = *db_get_outcome(entry) == OC_P;
 
-    const Subgame *queriedGame;
-    if (sgSum.get() != nullptr)
-        queriedGame = sgSum.get();
-    else {
-        assert(indices.size() == 1);
-        queriedGame = subgames[indices.back()];
-    }
-
-    if (isP || tryInflateLink(*queriedGame, entry, db, subgames)) {
+    if (isP || tryInflateLink(entry, db, subgames)) {
         for (const size_t &idx : indices) {
             Subgame *sg = subgames[idx];
             assert(sg != nullptr);
@@ -1009,107 +1028,7 @@ inline void simplify3(vector<Subgame*> &subgames, Database *db) {
 
 } // namespace dbUtil
 
-inline void pruneInversePairs(vector<Subgame*> &subgames) {
-    const size_t N = subgames.size();
-
-    for (size_t i = 0; i < N; i++) {
-        Subgame *sg1 = subgames[i];
-        if (sg1 == nullptr)
-            continue;
-
-        for (size_t j = i + 1; j < N; j++) {
-            assert(subgames[i] != nullptr);
-            Subgame *sg2 = subgames[j];
-            if (sg2 == nullptr)
-                continue;
-
-            if (Subgame::isVisuallyInversePair(sg1, sg2)) {
-                delete sg1;
-                delete sg2;
-                subgames[i] = nullptr;
-                subgames[j] = nullptr;
-                break;
-            }
-        }
-    }
-}
-
-
-inline void pruneNoMoveGames(vector<Subgame*> &subgames) {
-    const size_t nGames = subgames.size();
-
-    for (size_t i = 0; i < nGames; i++) {
-        Subgame *sg = subgames[i];
-
-        if (sg == nullptr)
-            continue;
-
-        bool hasMoves = false;
-        const size_t N = sg->size();
-
-        if (N >= 2) {
-            const size_t M = N - 1;
-            for (size_t j = 0; j < M; j++) {
-                const uint8_t &tile1 = (*sg)[j];
-                const uint8_t &tile2 = (*sg)[j + 1];
-
-                if (tile1 + tile2 == 3) {
-                    hasMoves = true;
-                    break;
-                }
-            }
-        }
-
-        if (!hasMoves) {
-            delete sg;
-            subgames[i] = nullptr;
-        }
-    }
-}
-
-inline void stitchGames(vector<Subgame*> &allGames, uint8_t **board,
-                        size_t *boardLen) {
-
-    const size_t nFinalGames = allGames.size();
-
-    const size_t nSpaces = nFinalGames > 1 ? nFinalGames - 1 : 0;
-    size_t totalSize = nSpaces;
-
-    for (const Subgame *sg : allGames) {
-        assert(sg != nullptr);
-        totalSize += sg->size();
-    }
-
-    if (totalSize == 0)
-        totalSize = 1;
-
-    uint8_t *newBoard = new uint8_t[totalSize];
-    for (size_t i = 0; i < totalSize; i++)
-        newBoard[i] = 0;
-
-    size_t cumulative = 0;
-    for (Subgame *sg : allGames) {
-        assert(sg != nullptr);
-
-        const size_t sgLen = sg->size();
-        const vector<uint8_t> &vec = sg->boardVecConst();
-
-        for (size_t i = 0; i < sgLen; i++)
-            newBoard[cumulative++] = vec[i];
-
-        cumulative++;
-        delete sg;
-    }
-    assert(
-            (cumulative == totalSize + 1) ||
-            (cumulative == 0 && nFinalGames == 0)
-            );
-
-    delete[] *board;
-    *board = newBoard;
-    *boardLen = totalSize;
-}
-
+namespace {
 inline vector<bool> pruneMoveGenerators(uint8_t *board, size_t boardLen) {
     static std::set<uint64_t> hashes;
     hashes.clear();
@@ -1118,7 +1037,6 @@ inline vector<bool> pruneMoveGenerators(uint8_t *board, size_t boardLen) {
 
     vector<Subgame*> subgames = generateSubgamesNew(board, boardLen);
     pruned.resize(subgames.size(), false);
-
 
     const size_t nSubgames = subgames.size();
     for (size_t i = 0; i < nSubgames; i++) {
@@ -1136,6 +1054,8 @@ inline vector<bool> pruneMoveGenerators(uint8_t *board, size_t boardLen) {
     hashes.clear();
     return pruned;
 }
+
+} // namespace
 
 
 void Solver::simplifyNew(uint8_t **board, size_t *boardLen) {
@@ -1179,7 +1099,7 @@ void Solver::simplifyNew(uint8_t **board, size_t *boardLen) {
         if (sg->size() <= DB_MAX_BITS)
             entry = db->get(sg->board(), sg->size());
 
-        if (!dbUtil::entryValid(entry)) {
+        if (!entryValid(entry)) {
             replacements.push_back(sg);
             continue;
         }
@@ -1380,13 +1300,13 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
     int newBestMove = 0;
     bool allProven = true;
 
+    assert(bestMove >= 0);
 
     for (int i = bestMove; i < moveCount; i++) {
+        assert(i >= 0);
         if (checkedBestMove && i == bestMove) {
             continue;
         }
-
-
         
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
@@ -1470,294 +1390,237 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
     return pair<int, bool>(bestVal, false);
 }
 
-#if SEARCH_VERSION == 2
-#include "search2.cpp"
-#else
-pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
-    _validEntry = false;
+inline optional<SolveResult> Solver::fullBoardStaticRules(
+                                                    uint8_t *dbEntry,
+                                                    int player) {
+    if (dbEntry == 0)
+        return {};
 
-    DBOUT(
-        cout << endl;
-        printBoard(board, boardLen, false);
-        cout << " " << playerNumberToChar(n) << " " << depth << endl;
+    int outcome = *db_get_outcome(dbEntry);
+    if (outcome == 0)
+        return {};
 
-    );
+    if (outcome == OC_B || outcome == OC_W)
+        return {{outcome, true}};
+    if (outcome == OC_N)
+        return {{player, true}};
+    if (outcome == OC_P)
+        return {{opponentNumber(player), true}};
+    assert(false);
+}
 
+inline optional<SolveResult> Solver::subgameStaticRules(
+    const uint8_t *sboard, int player, const vector<SubgameRange> &ranges,
+    vector<int> &outcomes) {
 
-    node_count += 1;
+    assert(outcomes.empty());
 
-    size_t sboardLen = boardLen;
-    uint8_t *sboard = new uint8_t[boardLen];
-    memcpy(sboard, board, boardLen);
-
-    //simplify(&sboard, &sboardLen);
-    simplifyNew(&sboard, &sboardLen);
-
-    DBOUT(
-        cout << "SIMPLIFY:" << endl;
-        printBoard(sboard, sboardLen, false);
-        cout << " " << playerNumberToChar(n) << " " << depth << endl;
-
-    );
-
-
-    {
-        uint8_t *dbEntry = db->get(sboard, sboardLen);
-        if (dbEntry) {
-            uint8_t outcome = *db_get_outcome(dbEntry);
-
-            if (outcome != 0) {
-                completed += 1;
-            }
-
-            if (outcome == OC_B || outcome == OC_W) {
-                delete[] sboard;
-                return pair<int, bool>(outcome, true);
-            }
-            if (outcome == OC_N) {
-                delete[] sboard;
-                return pair<int, bool>(n, true);
-            }
-            if (outcome == OC_P) {
-                delete[] sboard;
-                return pair<int, bool>(p, true);
-            }
-
-        }
-    }
-
-
-    //lookup entry
-    //if solved, return
-    uint64_t hash = getCode(sboard, sboardLen, n);
-    //uint32_t hash2 = getHash2(sboard, sboardLen, n);
-    uint8_t *blockPtr = getBlockPtr(hash);
-    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
-
-    bool validEntry = entryPtr != 0;
-
-    if (validEntry && *tt_get_outcome(entryPtr) != 0) {
-        delete[] sboard;
-        return pair<int, bool>(*tt_get_outcome(entryPtr), true);
-    }
-
-    //generate subgames, look them up in the database
-    vector<pair<int, int>> subgames = generateSubgames(sboard, sboardLen);
-
-    //sort subgames by length
-    sort(subgames.begin(), subgames.end(),
-        [](const pair<int, int> &a, const pair<int, int> &b) {
-            return (a.second - a.first) > (b.second - b.first);
-        }
-    );
-
-    vector<int> lengths;
-    vector<int> outcomes;
-
-    //count outcomes
     int counts[5];
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
         counts[i] = 0;
-    }
 
     int outcomeMask = 0;
 
+    //int boundLow = 0;
+    //int boundHigh = 0;
+    //bool boundsOk = true;
 
-    //this is OK because 64 is the maximum board size
-    //uint64_t opposingPositionMask = 0;
+    for (const SubgameRange &range : ranges) {
+        uint8_t *subgameEntry = db->get(&sboard[range.start], range.length);
 
-    //vector<pair<int, int>> opposingVector;
-
-    for (auto it = subgames.begin(); it != subgames.end(); it++) {
-        int length = it->second - it->first;
-        lengths.push_back(length);
-
-        uint8_t *dbEntry = db->get(&sboard[it->first], length);
-        int outcome = dbEntry ? *db_get_outcome(dbEntry) : OC_UNKNOWN;
+        int outcome = subgameEntry ? *db_get_outcome(subgameEntry) : OC_UNKNOWN;
         outcomes.push_back(outcome);
-
         counts[outcome] += 1;
         outcomeMask |= (1 << outcome);
 
-        if ((outcome == OC_B && n == WHITE) || (outcome == OC_W && n == BLACK)) {
-            //uint64_t mask = 1;
 
-            //for (int i = 1; i < length; i++) {
-            //    mask <<= 1;
-            //    mask |= 1;
-            //}
+        //boundsOk &= !(outcome == 0);
 
-            //mask <<= it->first;
-            //if (it->first < 64) {
-            //    opposingPositionMask |= mask;
-            //}
+        //if (outcome != 0 && boundsOk) {
+        //    const int low = db_get_bounds(subgameEntry)[0];
+        //    const int high = db_get_bounds(subgameEntry)[1];
 
-            //opposingVector.push_back({it->first, it->first + length - 1});
-        }
+        //    boundLow += low;
+        //    boundHigh += high;
+        //    if (low > high)
+        //        boundsOk = false;
+        //}
     }
-
-
 
     //Only Bs
     if ((outcomeMask & ~(1 << OC_B)) == 0 && counts[OC_B] > 0) {
-        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        completed += STATIC_MC_DELTA;
-        if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = BLACK;
-            tt_get_best_moves(entryPtr)[0] = 0;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = 127 * (n == BLACK ? 1 : -1);
-        }        
-        delete[] sboard;
-        return pair<int, bool>(OC_B, true);
+        return {{OC_B, true}};
     }
 
     //Only Ws
     if ((outcomeMask & ~(1 << OC_W)) == 0 && counts[OC_W] > 0) {
-        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        completed += STATIC_MC_DELTA;
-        if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = WHITE;
-            tt_get_best_moves(entryPtr)[0] = 0;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = 127 * (n == WHITE ? 1 : -1);
-        }        
-
-        delete[] sboard;
-        return pair<int, bool>(OC_W, true);
+        return {{OC_W, true}};
     }
 
     //Only one N
     if ((outcomeMask & ~(1 << OC_N)) == 0 && counts[OC_N] == 1) {
-        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        completed += STATIC_MC_DELTA;
-        if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = n;
-            tt_get_best_moves(entryPtr)[0] = 0;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = 127;
-        }        
-        delete[] sboard;
-        return pair<int, bool>(n, true); //current player wins
+        return pair<int, bool>(player, true); //current player wins
     }
 
-    
-
-    #if defined STATIC_EXTRA
     // one N, all others positive for n
-    int _selfBit = n == 1 ? (1 << OC_B) : (1 << OC_W);
+    int _selfBit = player == 1 ? (1 << OC_B) : (1 << OC_W);
     int _ocm = outcomeMask & ~((1 << OC_N) | _selfBit);
     if (counts[OC_N] == 1 && _ocm == 0) {
-        completed += STATIC_MC_DELTA;
-        if (true) {
-            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
+        return {{player, true}};
+    }
+
+    //if (boundsOk) {
+    //    assert(boundLow <= boundHigh);
+
+    //    if (boundLow > 0)
+    //        return {{BLACK, true}};
+    //    if (boundHigh < 0)
+    //        return {{WHITE, true}};
+    //}
+
+    return {};
+}
+
+pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, int depth) {
+    _validEntry = false;
+    node_count += 1;
+
+    // Get both simplified boards
+    //unique_ptr<Subgame> boardSimple(getSimpleBoard(board, boardLen));
+    size_t sboardLen = boardLen;
+    uint8_t *sboard = new uint8_t[boardLen];
+    memcpy(sboard, board, boardLen);
+    simplifyNew(&sboard, &sboardLen);
+    unique_ptr<uint8_t[]> sboardUniquePtr(sboard);
+
+    // Get both DB entries
+    uint8_t *dbEntrySimple = db->get(sboard, sboardLen);
+
+    // Full board static rules
+    {
+        optional<SolveResult> sr = fullBoardStaticRules(dbEntrySimple, n);
+
+        if (sr.has_value()) {
+            completed += 1;
+            return *sr;
+        }
+    }
+
+    // ttable lookup
+    uint64_t ttableHash = getCode(sboard, sboardLen, n);
+    uint8_t *blockPtr = getBlockPtr(ttableHash);
+    uint8_t *entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 0);
+
+    bool validEntry = entryPtr != 0;
+
+    if (validEntry && *tt_get_outcome(entryPtr) != 0) {
+        return pair<int, bool>(*tt_get_outcome(entryPtr), true);
+    }
+
+    // Get subgame ranges
+    vector<SubgameRange> rangesSimple = generateSubgameRanges(sboard, sboardLen);
+
+    sort(rangesSimple.begin(), rangesSimple.end(),
+        [](const SubgameRange &a, const SubgameRange &b) {
+            return a.length > b.length;
+        }
+    );
+
+    // Subgame static rules
+    vector<int> outcomesSimple;
+
+    {
+        optional<SolveResult> sr = subgameStaticRules(sboard, n, rangesSimple,
+                outcomesSimple);
+
+        if (sr.has_value()) {
+            entryPtr = getEntryPtr(blockPtr, sboard,
+                sboardLen, n, ttableHash, 1);
+
+            completed += STATIC_MC_DELTA;
+            const bool win = sr->first == n;
+
+            *tt_get_valid(entryPtr) = true;
+            *tt_get_outcome(entryPtr) = sr->first;
+            tt_get_best_moves(entryPtr)[0] = 0;
+            *tt_get_depth(entryPtr) = depth;
+            *tt_get_heuristic(entryPtr) = win ? 127 : -127;
+
+            return *sr;
+        }
+    }
+
+    assert(outcomesSimple.size() == rangesSimple.size());
+
+    // Subgame deletion trick
+    #if defined(SOLVER_DELETE_SUBGAMES)
+    for (int i = 0; i < rangesSimple.size(); i++) {
+        if (outcomesSimple[i] != n)
+            continue;
+
+        size_t sboardCopyLen = sboardLen;
+        uint8_t sboardCopy[sboardCopyLen];
+        memcpy(sboardCopy, sboard, sboardLen);
+
+        const SubgameRange &range = rangesSimple[i];
+
+        for (int j = 0; j < range.length; j++)
+            sboardCopy[range.start + j] = 0;
+
+        //Don't swap players or increase depth -- we haven't played a move
+        SolveResult result = searchID(sboardCopy, sboardCopyLen, n, p, depth);
+
+        if (result.second && result.first == n) {
+            entryPtr = getEntryPtr(blockPtr, sboard,
+                sboardLen, n, ttableHash, 1);
+
             *tt_get_valid(entryPtr) = true;
             *tt_get_outcome(entryPtr) = n;
             tt_get_best_moves(entryPtr)[0] = 0;
             *tt_get_depth(entryPtr) = depth;
             *tt_get_heuristic(entryPtr) = 127;
-        }        
-        delete[] sboard;
-        return pair<int, bool>(n, true); //current player wins
-    }
-    #endif
-
-
-    //Use differences
-    #if defined(SOLVER_DELETE_SUBGAMES)
-
-    for (int i = 0; i < subgames.size(); i++) {
-        uint8_t sboardCopy[sboardLen];
-        size_t sboardCopyLen = sboardLen;
-        memcpy(sboardCopy, sboard, sboardLen);
-
-        pair<int, int> &sg = subgames[i];
-
-        if (outcomes[i] == n) {
-            for (int j = 0; j < lengths[i]; j++) {
-                sboardCopy[sg.first + j] = 0;
-            }
-
-            //Don't swap players or increase depth -- we haven't played a move
-            pair<int, bool> result = searchID(sboardCopy, sboardCopyLen, n, p, depth);
-
-            if (result.second && result.first == n) {
-
-                //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-                if (true) {
-                    *tt_get_valid(entryPtr) = true;
-                    *tt_get_outcome(entryPtr) = n;
-                    tt_get_best_moves(entryPtr)[0] = 0;
-                    *tt_get_depth(entryPtr) = depth;
-                    *tt_get_heuristic(entryPtr) = 127;
-                }        
-                delete[] sboard;
-                return result;
-            }
-
-
+            return result;
         }
     }
     #endif
 
-
-
-
-    //generate moves
-    //check for terminal
+    // Generate moves and check for terminal
     size_t moveCount;
     int *moves = getMoves(sboard, sboardLen, n, &moveCount);
 
     if (moveCount == 0) { //is terminal
         completed += 1;
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-        if (true) {
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = p;
-            tt_get_best_moves(entryPtr)[0] = 0;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = -127;
-        }
+        entryPtr = getEntryPtr(blockPtr, sboard,
+            sboardLen, n, ttableHash, 1);
 
-        delete[] sboard;
-        return pair<int, bool>(p, true);
+        *tt_get_valid(entryPtr) = true;
+        *tt_get_outcome(entryPtr) = p;
+        tt_get_best_moves(entryPtr)[0] = 0;
+        *tt_get_depth(entryPtr) = depth;
+        *tt_get_heuristic(entryPtr) = -127;
+        return {p, true};
     }
 
     vector<bool> prunedMoveGenerators = pruneMoveGenerators(sboard, sboardLen);
 
     //Delete dominated moves
     #if defined(SOLVER_DELETE_DOMINATED_MOVES)
-    vector<pair<int, int>> sg = generateSubgames(sboard, sboardLen);
+    for (int i = 0; i < rangesSimple.size(); i++) {
+        const SubgameRange &range = rangesSimple[i];
 
-    assert(sg.size() == prunedMoveGenerators.size());
-    assert(sg.size() == subgames.size());
-
-    for (int i = 0; i < sg.size(); i++) {
-        int start = sg[i].first;
-        int end = sg[i].second; //index after end
-        int len = end - start;
-
-        uint8_t *dbEntry = db->get(&sboard[start], len);
+        uint8_t *dbEntry = db->get(&sboard[range.start], range.length);
 
         uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
-        if (dominated == 0) {
+        if (dominated == 0)
             continue;
-        }
 
         int moveIndex = 0;
         for (int j = 0; j < moveCount; j++) {
             int from = moves[2 * j];
             int to = moves[2 * j + 1];
 
-            if (from >= start && from < end) { //found move
+            if (from >= range.start && from < range.end) { //found move
                 if ((dominated >> moveIndex) & ((uint64_t) 1)) {
                     //cout << "FOUND" << endl;
                     moves[2 * j] = -1;
@@ -1777,52 +1640,41 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         size_t pMoveCount;
         int *pMoves = getMoves(sboard, sboardLen, p, &pMoveCount);
 
-        if (pMoveCount > 0) {
+        if (pMoveCount > 0)
             delete[] pMoves;
-        }
 
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 1);
         int h = *tt_get_heuristic(entryPtr);
-        if (!validEntry) {
+        if (!validEntry)
             h = -pMoveCount;
-        }
 
-        //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-        if (true) {
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = EMPTY;
-            tt_get_best_moves(entryPtr)[0] = 0;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = h;
-        }        
+        *tt_get_valid(entryPtr) = true;
+        *tt_get_outcome(entryPtr) = EMPTY;
+        tt_get_best_moves(entryPtr)[0] = 0;
+        *tt_get_depth(entryPtr) = depth;
+        *tt_get_heuristic(entryPtr) = h;
 
         delete[] moves;
-        delete[] sboard;
-        return pair<int, bool>(h, false);
+        return {h, false};
     }
 
     //visit children, starting with best; find new best and update heuristic
     //if solved, save value and return
-
-
-
     int bestMove = -1;
     bool checkedBestMove = false;
 
-    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 0);
     validEntry = entryPtr != 0;
-    if (validEntry) {
+    if (validEntry)
         bestMove = tt_get_best_moves(entryPtr)[0];
-    }
-
 
     vector<int> moveOrder;
 
     vector<int> subgameMoveCounts;
-    subgameMoveCounts.resize(subgames.size(), 0);
+    subgameMoveCounts.resize(rangesSimple.size(), 0);
 
     // TODO
-    assert(subgames.size() == outcomes.size());
+    assert(rangesSimple.size() == outcomesSimple.size());
 
     vector<AnnotatedMove> annotatedMoves;
 
@@ -1834,22 +1686,21 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             continue;
 
         int subgameIdx = -1;
-        for (int i = 0; i < subgames.size(); i++) {
-            const pair<int, int> &sg = subgames[i];
-            if (sg.first <= from && from < sg.second) {
-                assert(sg.first <= to && to < sg.second);
+        for (int i = 0; i < rangesSimple.size(); i++) {
+            const SubgameRange &range = rangesSimple[i];
+            if (range.start <= from && from < range.end) {
+                assert(range.start <= to && to < range.end);
 
                 subgameIdx = i;
                 break;
             }
         }
-        assert(subgameIdx >= 0);
+        assert(subgameIdx != -1);
 
         if (prunedMoveGenerators[subgameIdx])
             continue;
 
-        const int oc = outcomes[subgameIdx];
-
+        const int oc = outcomesSimple[subgameIdx];
         int &localIdx = subgameMoveCounts[subgameIdx];
 
         annotatedMoves.push_back({});
@@ -1911,24 +1762,17 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         pair<int, bool> result = searchID(sboard, sboardLen, p, n, depth + 1);
         undo(sboard, undoBuffer);
 
-
-
         allProven &= result.second;
 
         if (result.second && result.first == n) {
-            //if (true || depth >= DEPTH(entry) || PLAYER(entry) == 0) {
-            if (true) {
-                entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-                *tt_get_valid(entryPtr) = true;
-                *tt_get_outcome(entryPtr) = n;
-                tt_get_best_moves(entryPtr)[0] = i;
-                *tt_get_depth(entryPtr) = depth;
-                *tt_get_heuristic(entryPtr) = 127;
-            }
-
+            entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 1);
+            *tt_get_valid(entryPtr) = true;
+            *tt_get_outcome(entryPtr) = n;
+            tt_get_best_moves(entryPtr)[0] = i;
+            *tt_get_depth(entryPtr) = depth;
+            *tt_get_heuristic(entryPtr) = 127;
             delete[] moves;
-            delete[] sboard;
-            return pair<int, bool>(n, true);
+            return {n, true};
         }
 
         if (!result.second) {
@@ -1948,36 +1792,27 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     delete[] moves;
 
 
-
     if (allProven) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
-        if (true) {
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = p;
-            tt_get_best_moves(entryPtr)[0] = newBestMove;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = -127;
-        }
+        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 1);
 
-        delete[] sboard;
-        return pair<int, bool>(p, true);
-    }
-
-
-    if (true) {
-        entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 1);
         *tt_get_valid(entryPtr) = true;
-        *tt_get_outcome(entryPtr) = EMPTY;
+        *tt_get_outcome(entryPtr) = p;
         tt_get_best_moves(entryPtr)[0] = newBestMove;
         *tt_get_depth(entryPtr) = depth;
-        *tt_get_heuristic(entryPtr) = bestVal;
+        *tt_get_heuristic(entryPtr) = -127;
+
+        return {p, true};
     }
-    delete[] sboard;
-    return pair<int, bool>(bestVal, false);
+
+    entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 1);
+
+    *tt_get_valid(entryPtr) = true;
+    *tt_get_outcome(entryPtr) = EMPTY;
+    tt_get_best_moves(entryPtr)[0] = newBestMove;
+    *tt_get_depth(entryPtr) = depth;
+    *tt_get_heuristic(entryPtr) = bestVal;
+    return {bestVal, false};
 }
-#endif
-
-
 
 uint8_t *Solver::getBlockPtr(uint64_t code) {
     uint64_t idx = code & codeMask;

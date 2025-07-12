@@ -57,13 +57,15 @@ def solve_board(board, player):
     assert proc.poll() is None
 
     assert line[0 : 2] in ["B ", "W "]
-    return [line[0], time_total]
+    move = line.split()[1]
+    return [line[0], time_total, move]
 
 def print_result(result, expected=None):
-    assert type(result) is list and len(result) == 2
+    assert type(result) is list and len(result) == 3
     assert type(result[0]) is str and type(result[1]) is float
+    assert type(result[2]) is str
 
-    print(f"{result[0]}, {result[1]}s")
+    print(f"{result[0]}, {result[1]}s Move: {result[2]}")
     if expected is not None and result[0] != expected:
         print("UNEXPECTED RESULT")
 

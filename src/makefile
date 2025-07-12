@@ -6,7 +6,7 @@ SHELL := /bin/bash
 CC = g++
 #FLAGS = -Wall --std=c++17 -O3 -DNDEBUG
 #FLAGS = -Wall --std=c++17 -O3 -g -fno-omit-frame-pointer -fsanitize=address -D_GLIBCXX_DEBUG
-FLAGS = -Wall --std=c++17 -O3
+FLAGS = -Wall --std=c++17 -O3 -g
 
 
 .PHONY: dbtest
@@ -29,15 +29,14 @@ miscTest: database3.o test.o utils.o
 	$(CC) $(FLAGS) $^ -o Test
 	-time ./Test
 
-TheSolvers: main.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
+TheSolvers: main.o database3.o utils.o state.o solver.o solverExtra.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
+DBManage3: dbmanage3.o database3.o utils.o state.o solver.o solverExtra.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
 
-DBManage4: dbmanage4.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
+DBManage4: dbmanage4.o database3.o utils.o state.o solver.o solverExtra.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
-
 
 explore: dbExplore.cpp database3.o utils.o state.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@

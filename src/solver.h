@@ -88,6 +88,8 @@ class Solver {
 
 
   public:
+    static bool doDebug;
+
     int codeLength;
     int codeMask;
 

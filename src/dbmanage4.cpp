@@ -29,14 +29,18 @@ using namespace std;
 
 struct ReplacementMapIdx {
     uint8_t outcome;
-    uint8_t low;
-    uint8_t high;
+    uint8_t low1;
+    uint8_t high1;
+    uint8_t low2;
+    uint8_t high2;
 
     bool operator==(const ReplacementMapIdx &other) const {
         return 
             (outcome == other.outcome) &&
-            (low == other.low) &&
-            (high == other.high);
+            (low1 == other.low1) &&
+            (high1 == other.high1) &&
+            (low2 == other.low2) &&
+            (high2 == other.high2);
     }
 
 };
@@ -44,12 +48,14 @@ struct ReplacementMapIdx {
 template <>
 struct std::hash<ReplacementMapIdx> {
     uint64_t operator()(const ReplacementMapIdx &s) const noexcept {
-        return s.outcome | (s.low << 8) | (s.high << 16);
+        return
+            s.outcome |
+            (((uint64_t) s.low1) << 8) |
+            (((uint64_t) s.high1) << 16) |
+            (((uint64_t) s.low2) << 24) |
+            (((uint64_t) s.high2) << 32);
     }
 };
-
-
-
 
 namespace {
 
@@ -63,15 +69,98 @@ enum relation {
     REL_FUZZY,
 };
 
-
-
 ////////////////////////////////////////////////// globals
 Database *db;
 Solver *solver;
 unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMap;
 
-
 ////////////////////////////////////////////////// helper functions
+
+
+/*
+
+SCALE:
+    -4 ooooox.xo      (4v)
+    -3 oooox          (3v)
+    -2 ooox.xo        (2v)
+    -1 oox            (v)
+    0  o OR x         (0)
+    1  xxo            (^)
+    2  xxxo.xo        (2^)
+    3  xxxxo          (3^)
+    4  xxxxxo.xo      (4^)
+*/
+Subgame *getInverseScaleGameNoStar(int8_t scaleIdx) {
+    Subgame *sg = new Subgame();
+    vector<uint8_t> &boardVec = sg->boardVec();
+
+    if (scaleIdx == 0) {
+        boardVec.push_back(BLACK);
+        return sg;
+    }
+
+    // Inverse. Main color WHITE if positive idx
+    const int mainColor = scaleIdx > 0 ? WHITE : BLACK;
+    const int singleColor = opponentNumber(mainColor);
+
+    boardVec.push_back(singleColor);
+
+    const int8_t nMainStones = abs(scaleIdx) + 1;
+    for (int8_t i = 0; i < nMainStones; i++)
+        boardVec.push_back(mainColor);
+
+    if (abs(scaleIdx) % 2 == 0) {
+        boardVec.push_back(EMPTY);
+        boardVec.push_back(BLACK);
+        boardVec.push_back(WHITE);
+    }
+
+    return sg;
+}
+
+/*
+
+SCALE:
+    -4 ooooox            (4v*)
+    -3 oooox.xo          (3v*)
+    -2 ooox              (2v*)
+    -1 oox.xo            (v*)
+    0  xo                (0*)
+    1  xxo.xo            (^*)
+    2  xxxo              (2^*)
+    3  xxxxo.xo          (3^*)
+    4  xxxxxo            (4^*)
+
+*/
+Subgame *getInverseScaleGameWithStar(int8_t scaleIdx) {
+    Subgame *sg = new Subgame();
+    vector<uint8_t> &boardVec = sg->boardVec();
+
+    if (abs(scaleIdx) % 2 != 0 || scaleIdx == 0) {
+        boardVec.push_back(BLACK);
+        boardVec.push_back(WHITE);
+        boardVec.push_back(EMPTY);
+    }
+
+    if (scaleIdx == 0)
+        return sg;
+
+    // Inverse. Main color WHITE if positive idx
+    const int mainColor = scaleIdx > 0 ? WHITE : BLACK;
+    const int singleColor = opponentNumber(mainColor);
+
+    boardVec.push_back(singleColor);
+
+    const int8_t nMainStones = abs(scaleIdx) + 1;
+    for (int8_t i = 0; i < nMainStones; i++)
+        boardVec.push_back(mainColor);
+
+    return sg;
+}
+
+
+
+
 Subgame *getInverseScaleGame(int8_t scaleIdx) {
     Subgame *sg = new Subgame();
     vector<uint8_t> &boardVec = sg->boardVec();
@@ -262,11 +351,19 @@ uint64_t getMetric(const Subgame &sg) {
     return metric;
 }
 
-uint8_t getOutcomeOnScale(const Subgame &sg, int8_t scaleIdx) {
+uint8_t getOutcomeOnScale(const Subgame &sg, int8_t scaleIdx, int scale) {
     Subgame sum;
     vector<uint8_t> &boardVec = sum.boardVec();
 
-    Subgame *inverseScaleGame = getInverseScaleGame(scaleIdx);
+    Subgame *inverseScaleGame = nullptr;
+    if (scale == 0)
+        inverseScaleGame = getInverseScaleGame(scaleIdx);
+    else if (scale == 1)
+        inverseScaleGame = getInverseScaleGameNoStar(scaleIdx);
+    else if (scale == 2)
+        inverseScaleGame = getInverseScaleGameWithStar(scaleIdx);
+    else
+        assert(false);
 
     boardVec = sg.boardVecConst();
     boardVec.reserve(boardVec.size() + 1 + inverseScaleGame->size());
@@ -294,12 +391,12 @@ inline relation outcomeToRelation(uint8_t outcome) {
     assert(false);
 }
 
-relation getRelationOnScale(const Subgame &sg, int8_t scaleIdx) {
-    uint8_t outcome = getOutcomeOnScale(sg, scaleIdx);
+relation getRelationOnScale(const Subgame &sg, int8_t scaleIdx, int scale) {
+    uint8_t outcome = getOutcomeOnScale(sg, scaleIdx, scale);
     return outcomeToRelation(outcome);
 }
 
-BoundsPair getBounds(const Subgame &game) {
+BoundsPair getBounds(const Subgame &game, int scale) {
     BoundsPair bp;
 
     constexpr int8_t radius = 32;
@@ -331,7 +428,7 @@ BoundsPair getBounds(const Subgame &game) {
 
     for (int8_t magnitude = 0; magnitude < radius; magnitude++) {
         const int8_t idxPos = magnitude;
-        const relation relPos = getRelationOnScale(game, idxPos);
+        const relation relPos = getRelationOnScale(game, idxPos, scale);
         if (setRelation(idxPos, relPos))
             break;
 
@@ -339,7 +436,7 @@ BoundsPair getBounds(const Subgame &game) {
             continue;
 
         const int8_t idxNeg = -magnitude;
-        const relation relNeg = getRelationOnScale(game, idxNeg);
+        const relation relNeg = getRelationOnScale(game, idxNeg, scale);
         if (setRelation(idxNeg, relNeg))
             break;
     }
@@ -409,9 +506,9 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
         assert(foundMetric != uint64_t(-1));
 
         if (metric < foundMetric) { // New game is better
-            *db_get_link(entry) = (uint64_t) &indirectLink;
-        } else if (metric > foundMetric) { // Existing game is better
             indirectLink.directLink = db->getIdxDirect(game);
+        } else if (metric > foundMetric) { // Existing game is better
+            *db_get_link(entry) = (uint64_t) &indirectLink;
         }
     }
 }
@@ -554,6 +651,20 @@ void pass_normalGameMetric() {
 }
 
 void pass_normalGameLinks() {
+    //WWBBW.WWB
+    static const vector<uint8_t> problemCase = {2,2,1,1,2,0,2,2,1};
+
+    auto equalsProblemCase = [&](const Subgame &game) -> bool {
+        if (problemCase.size() != game.size())
+            return false;
+
+        for (size_t i = 0; i < problemCase.size(); i++)
+            if (problemCase[i] != game[i])
+                return false;
+
+        return true;
+    };
+
     cout << "Finding links for normal games" << endl;
     GameGenerator gen;
 
@@ -584,17 +695,29 @@ void pass_normalGameLinks() {
 
         cout << *normal << " " << std::flush;
 
-        BoundsPair bp = getBounds(*normal);
-        assert(bp.low <= bp.high);
-        db_get_bounds(normalEntry)[0] = bp.low;
-        db_get_bounds(normalEntry)[1] = bp.high;
+        BoundsPair bp1 = getBounds(*normal, 1);
+        assert(bp1.low <= bp1.high);
+        BoundsPair bp2 = getBounds(*normal, 2);
+        assert(bp2.low <= bp2.high);
 
-        cout << "<" << (int) bp.low << " " << (int) bp.high << ">" << endl;
+        db_get_bounds(normalEntry)[0] = bp1.low;
+        db_get_bounds(normalEntry)[1] = bp1.high;
+
+        cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
+        cout << (int) bp2.low << " " << (int) bp2.high << ">" << endl;
 
         ReplacementMapIdx idx;
         idx.outcome = *db_get_outcome(normalEntry);
-        idx.low = bp.low;
-        idx.high = bp.high;
+        idx.low1 = bp1.low;
+        idx.high1 = bp1.high;
+        idx.low2 = bp2.low;
+        idx.high2 = bp2.high;
+
+        //if (equalsProblemCase(*normal)) {
+        //    assert(!Solver::doDebug);
+        //    cout << "ENABLING DEBUG" << endl;
+        //    Solver::doDebug = true;
+        //}
 
         addToReplacementMap(*normal, idx);
     }

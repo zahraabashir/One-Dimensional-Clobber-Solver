@@ -7,6 +7,7 @@
 #include <cstring>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 #include <unordered_set>
 #include <set>
 
@@ -15,6 +16,12 @@
 static_assert(true)
 
 using namespace std;
+
+
+bool Solver::doDebug = false;
+
+#define IFDEB(x) if (Solver::doDebug) {x} \
+static_assert(true)
 
 
 
@@ -82,6 +89,16 @@ public:
             negative,
             positive,
         };
+
+        //vector<bool> bools = {
+        //    negative,
+        //    positive,
+        //    npos,
+        //    unknown,
+        //    middle,
+        //    best,
+        //};
+
 
         int priority = 0;
         for (const bool b : bools) {
@@ -781,7 +798,7 @@ inline bool entryValid(const uint8_t *entry) {
     return (entry != 0) && (*db_get_outcome(entry) != 0);
 }
 
-inline bool tryInflateLink(uint8_t *entry, Database *db, vector<Subgame*> &subgames) {
+inline bool tryInflateLink(const Subgame &sg, uint8_t *entry, Database *db, vector<Subgame*> &subgames) {
     assert(entryValid(entry));
 
     const uint64_t link = *db_get_link(entry);
@@ -799,6 +816,13 @@ inline bool tryInflateLink(uint8_t *entry, Database *db, vector<Subgame*> &subga
 
     vector<Subgame*> inflated = makeGameNew(shape, number);
 
+    IFDEB(
+        cout << "REPLACING " << sg << " (" << *db_get_metric(entry) << ")" << endl;
+        Subgame *sum = Subgame::concatSubgames(inflated);
+        cout << "WITH: " << *sum << "(" << *db_get_metric(newEntry) << ")" << endl;
+        delete sum;
+    );
+
     subgames.reserve(subgames.size() + inflated.size());
     for (Subgame *sg : inflated)
         subgames.push_back(sg);
@@ -811,6 +835,7 @@ bool simplifySubgames(vector<Subgame*> &subgames, const vector<size_t> &indices,
         return false;
 
     uint8_t *entry = 0;
+    unique_ptr<Subgame> sgSum;
 
     if (indices.size() == 1) {
         const Subgame *sg = subgames[indices.back()];
@@ -826,17 +851,27 @@ bool simplifySubgames(vector<Subgame*> &subgames, const vector<size_t> &indices,
             sumVec.push_back(sg);
         }
 
-        Subgame *sgSum = Subgame::concatSubgames(sumVec);
+        //Subgame *sgSum = Subgame::concatSubgames(sumVec);
+        sgSum.reset(Subgame::concatSubgames(sumVec));
         entry = db->get(sgSum->board(), sgSum->size());
-        delete sgSum;
+        //delete sgSum;
     }
+
 
     if (!dbUtil::entryValid(entry))
         return false;
 
     const bool isP = *db_get_outcome(entry) == OC_P;
 
-    if (isP || tryInflateLink(entry, db, subgames)) {
+    const Subgame *queriedGame;
+    if (sgSum.get() != nullptr)
+        queriedGame = sgSum.get();
+    else {
+        assert(indices.size() == 1);
+        queriedGame = subgames[indices.back()];
+    }
+
+    if (isP || tryInflateLink(*queriedGame, entry, db, subgames)) {
         for (const size_t &idx : indices) {
             Subgame *sg = subgames[idx];
             assert(sg != nullptr);

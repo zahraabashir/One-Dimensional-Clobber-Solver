@@ -227,52 +227,6 @@ vector<pair<int, int>> generateSubgames(uint8_t *board, size_t len) {
     return subgames;
 }
 
-vector<Subgame*> generateSubgamesNew(uint8_t *board, size_t len) {
-    vector<Subgame*> subgames;
-
-    int start = -1;
-    int end = -1;
-
-    int foundMask = 0;
-
-    for (int i = 0; i < len; i++) {
-        if (start == -1 && board[i] != 0) {
-            start = i;
-            foundMask = 0;
-        }
-
-        if (board[i] != 0) {
-            foundMask |= board[i];
-        }
-
-        if (start != -1 && board[i] == 0) {
-            if (foundMask == 3) {
-                //subgames.push_back(pair<int, int>(start, i));
-
-                const size_t startIdx = start;
-                const size_t endIdx = i;
-                assert(endIdx >= startIdx);
-                const size_t subgameLen = endIdx - startIdx;
-
-                subgames.push_back(new Subgame(board + startIdx, subgameLen));
-            }
-            start = -1;
-        }
-    }
-
-    if (start != -1 && foundMask == 3) {
-        //subgames.push_back(pair<int, int>(start, len));
-
-        const size_t startIdx = start;
-        const size_t endIdx = len;
-        assert(endIdx >= startIdx);
-        const size_t subgameLen = endIdx - startIdx;
-
-        subgames.push_back(new Subgame(board + startIdx, subgameLen));
-    }
-
-    return subgames;
-}
 
 
 Solver::Solver(size_t boardLen, Database *db) {

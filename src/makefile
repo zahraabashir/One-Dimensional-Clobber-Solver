@@ -35,6 +35,10 @@ TheSolvers: main.o database3.o utils.o state.o solver.o bound.o zobrist.o Murmur
 DBManage3: dbmanage3.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
 
+DBManage4: dbmanage4.o database3.o utils.o state.o solver.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
+	$(CC) $(FLAGS) $^ -o $@
+
+
 explore: dbExplore.cpp database3.o utils.o state.o bound.o zobrist.o MurmurHash3.cpp miscTypes.o
 	$(CC) $(FLAGS) $^ -o $@
 
@@ -48,7 +52,7 @@ explore: dbExplore.cpp database3.o utils.o state.o bound.o zobrist.o MurmurHash3
 	$(CC) $(FLAGS) $< -o $@ -c
 
 clean:
-	-rm *.o TheSolvers DBManage dbtest DBManage2 DBManage3 Test explore
+	-rm *.o TheSolvers DBManage dbtest DBManage2 DBManage3 DBManage4 Test explore
 
 cleanall: clean
 	-make clean -C instructorSolution/sample_c++/code
@@ -72,10 +76,10 @@ report: TheSolvers referenceSolver
 freport: TheSolvers referenceSolver
 	python3 instructorSolution/runTests.py -nc --fast > correctnessReport.txt
 
-db: DBManage3
-	-rm database3.bin
+db: DBManage4
+	-rm database4.bin
 	touch database3.bin
-	-time ./DBManage3
+	-time ./DBManage4
 
 
 resetReferenceCache:

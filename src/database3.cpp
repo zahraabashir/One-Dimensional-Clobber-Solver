@@ -431,6 +431,10 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
     return sectionOffset + relativeOffset * entrySize;
 }
 
+uint64_t Database::getIdx(const Subgame &sg) {
+    return getIdx(sg.board(), sg.size());
+}
+
 uint8_t *Database::get(const uint8_t *board, size_t len) {
     uint64_t idx = getIdx(board, len);
     //cout << "IDX " << idx << endl;
@@ -439,6 +443,10 @@ uint8_t *Database::get(const uint8_t *board, size_t len) {
     }
 
     return data + idx;
+}
+
+uint8_t *Database::get(const Subgame &sg) {
+    return get(sg.board(), sg.size());
 }
 
 uint8_t *Database::getFromIdx(uint64_t idx) {

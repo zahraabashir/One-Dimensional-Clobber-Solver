@@ -1,6 +1,7 @@
 #pragma once
 
 #include "options.h"
+#include "miscTypes.h"
 #include <cstdio>
 #include <stdint.h>
 #include <vector>
@@ -83,6 +84,9 @@ uint64_t *db_get_shape(const uint8_t *entry);
 uint32_t *db_get_number(const uint8_t *entry);
 
 
+struct IndirectLink {
+    uint64_t directLink;
+};
 
 
 class Database {
@@ -118,8 +122,11 @@ class Database {
     void loadFrom(const char *fileName);
 
     uint64_t getIdx(const uint8_t *board, size_t len);
+    uint64_t getIdx(const Subgame &sg);
 
     uint8_t *get(const uint8_t *board, size_t len);
+    uint8_t *get(const Subgame &sg);
+
     uint8_t *getFromIdx(uint64_t idx);
 };
 

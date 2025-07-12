@@ -1,6 +1,11 @@
+#include <algorithm>
+#include <cstring>
+
 #include "miscTypes.h"
+#include "state.h"
 #include "utils.h"
 #include "database3.h"
+#include "zobrist.h"
 
 using namespace std;
 
@@ -103,6 +108,91 @@ void Subgame::tryMirror() {
     }
 }
 
+Subgame *Subgame::getNormalizedGame() const {
+    vector<Subgame*> subgames = generateSubgamesNew(board(), size());
+
+    for (Subgame *sg : subgames)
+        sg->tryMirror();
+
+    std::sort(subgames.begin(), subgames.end(), Subgame::normalizeSortOrder);
+
+    Subgame *normalized = Subgame::concatSubgames(subgames);
+
+    for (Subgame *sg : subgames)
+        delete sg;
+
+    return normalized;
+}
+
+
+uint64_t Subgame::getHash() const {
+    return getZobristHash(BLACK, board(), size());
+}
+
+vector<Subgame*> Subgame::getChildren(int player, uint64_t dominance) const {
+    assert(player == BLACK || player == WHITE);
+
+    vector<Subgame*> children;
+
+    const size_t boardSize = size();
+    uint8_t boardCopy[boardSize];
+
+    for (size_t i = 0; i < boardSize; i++)
+        boardCopy[i] = (*this)[i];
+
+    auto assertUndo = [&]() -> void {
+        assert(memcmp(boardCopy, board(), boardSize) == 0);
+    };
+
+    assertUndo();
+
+    size_t moveCount;
+    int *moves = getMoves(boardCopy, boardSize, player, &moveCount);
+    children.reserve(moveCount);
+
+    uint8_t undoBuffer[UNDO_BUFFER_SIZE];
+
+    for (size_t i = 0; i < moveCount; i++) {
+        if (getDominated(dominance, i))
+            continue;
+
+        assertUndo();
+        const int from = moves[2 * i];
+        const int to = moves[2 * i + 1];
+
+        play(boardCopy, undoBuffer, from, to);
+
+        Subgame *child = new Subgame(boardCopy, boardSize);
+        children.push_back(child);
+
+        undo(boardCopy, undoBuffer);
+    }
+
+    assertUndo();
+    delete[] moves;
+    return children;
+}
+
+vector<Subgame*> Subgame::getNormalizedChildren(int player, uint64_t dominance) const {
+    vector<Subgame*> childrenNonNormal = getChildren(player, dominance);
+
+    vector<Subgame*> childrenNormal;
+    childrenNormal.reserve(childrenNonNormal.size());
+
+    for (Subgame *sg : childrenNonNormal) {
+        Subgame *sgNormal = sg->getNormalizedGame();
+
+        if (sgNormal->size() == 0)
+            delete sgNormal;
+        else
+            childrenNormal.push_back(sgNormal);
+
+        delete sg;
+    }
+
+    return childrenNormal;
+}
+
 bool Subgame::normalizeSortOrder(const Subgame *sg1, const Subgame *sg2) {
     if (sg1 == nullptr)
         return false;
@@ -156,3 +246,51 @@ bool Subgame::isVisuallyInversePair(const Subgame *sg1, const Subgame *sg2) {
 
     return true;
 }
+
+vector<Subgame*> generateSubgamesNew(const uint8_t *board, size_t len) {
+    vector<Subgame*> subgames;
+
+    int start = -1;
+    int end = -1;
+
+    int foundMask = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (start == -1 && board[i] != 0) {
+            start = i;
+            foundMask = 0;
+        }
+
+        if (board[i] != 0) {
+            foundMask |= board[i];
+        }
+
+        if (start != -1 && board[i] == 0) {
+            if (foundMask == 3) {
+                //subgames.push_back(pair<int, int>(start, i));
+
+                const size_t startIdx = start;
+                const size_t endIdx = i;
+                assert(endIdx >= startIdx);
+                const size_t subgameLen = endIdx - startIdx;
+
+                subgames.push_back(new Subgame(board + startIdx, subgameLen));
+            }
+            start = -1;
+        }
+    }
+
+    if (start != -1 && foundMask == 3) {
+        //subgames.push_back(pair<int, int>(start, len));
+
+        const size_t startIdx = start;
+        const size_t endIdx = len;
+        assert(endIdx >= startIdx);
+        const size_t subgameLen = endIdx - startIdx;
+
+        subgames.push_back(new Subgame(board + startIdx, subgameLen));
+    }
+
+    return subgames;
+}
+

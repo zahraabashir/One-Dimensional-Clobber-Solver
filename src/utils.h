@@ -3,6 +3,7 @@
 #include "options.h"
 
 #include <ostream>
+#include <type_traits>
 #include <vector>
 #include <cassert>
 #include <cstdint>
@@ -63,10 +64,12 @@ int sign(const T &val) {
 
 template <class T>
 int sumBits(T val) {
+    static_assert(std::is_unsigned_v<T>);
+
     int sum = 0;
     
     while (val != 0) {
-        sum += val & T(1);
+        sum += (val & T(1));
         val >>= 1;
     }
 
@@ -125,6 +128,21 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
 
     return os;
 }
+
+template <>
+inline std::ostream &operator<<(std::ostream &os, const std::vector<uint8_t> &vec) {
+    os << '[';
+
+    for (int i = 0; i < vec.size(); i++)
+        os << playerNumberToChar(vec[i]);
+
+    os << ']';
+
+    return os;
+}
+
+
+
 
 void printBoard(uint8_t *board, size_t len, bool newline = false);
 

@@ -1,0 +1,689 @@
+/*
+TODO:
+
+    -- game/board generator
+    -- normalize function
+    -- computeOutcome()
+
+
+
+*/
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <ostream>
+#include <vector>
+#include <memory>
+#include <algorithm>
+#include <cstring>
+#include <map>
+#include <unordered_set>
+#include <unordered_map>
+
+#include "solver.h"
+#include "miscTypes.h"
+#include "database3.h"
+#include "utils.h"
+#include "state.h"
+using namespace std;
+
+struct ReplacementMapIdx {
+    uint8_t outcome;
+    uint8_t low;
+    uint8_t high;
+
+};
+
+template <>
+struct hash<ReplacementMapIdx> {
+    uint64_t operator()(const ReplacementMapIdx &s) const noexcept {
+        return s.outcome | (s.low << 8) | (s.high << 16);
+    }
+};
+
+
+namespace {
+
+////////////////////////////////////////////////// types
+enum relation {
+    REL_UNKNOWN = 0,
+    REL_LESS,
+    REL_GREATER,
+    REL_EQUAL,
+    REL_FUZZY,
+};
+
+
+//////////////////////////////////////// struct GeneratedGame
+struct GeneratedGame {
+    ~GeneratedGame();
+
+    Subgame *game;
+
+    uint64_t shapeNumber;
+    uint32_t gameNumber;
+
+    vector<int> shape;
+};
+
+GeneratedGame::~GeneratedGame() {
+    delete game;
+}
+
+//////////////////////////////////////// class GameGenerator
+class GameGenerator {
+public:
+    GameGenerator();
+
+    operator bool() const;
+    void operator++();
+    GeneratedGame generate() const;
+
+private:
+    static const vector<vector<int>> _shapeList;
+
+    size_t _shapeIdx;
+    uint32_t _currentGameNumber;
+    uint32_t _maxGameNumber;
+
+    const vector<int> &_getCurrentShape() const;
+    void _increment();
+    bool _incrementBoard();
+    bool _incrementShape();
+
+    void _reshapeGame(const vector<int> &newShape);
+
+};
+
+//////////////////////////////////////// GameGenerator implementation
+vector<vector<int>> initShapeList() {
+    vector<vector<int>> shapeListAll = makeShapes();
+
+    sort(shapeListAll.begin(), shapeListAll.end(),
+        [](const vector<int> &s1, const vector<int> &s2) {
+            int bits1 = s1.size() - 1;
+            int bits2 = s2.size() - 1;
+
+            for (int chunk : s1) {
+                bits1 += chunk;
+            }
+
+            for (int chunk : s2) {
+                bits2 += chunk;
+            }
+
+            if (bits1 == bits2) {
+                return s1.size() > s2.size();
+            }
+
+            return bits1 < bits2;
+        }
+    );
+
+
+    vector<vector<int>> shapeList;
+    for (const vector<int> &shape : shapeListAll) {
+        int totalSize = shape.size() - 1;
+
+        for (const int &chunkSize : shape)
+            totalSize += chunkSize;
+
+        if (totalSize <= 12)
+            shapeList.emplace_back(shape);
+    }
+
+    return shapeList;
+}
+
+const vector<vector<int>> GameGenerator::_shapeList = initShapeList();
+
+inline GameGenerator::GameGenerator(): _shapeIdx(0) {
+    _reshapeGame(_getCurrentShape());
+}
+
+inline GameGenerator::operator bool() const {
+    return _shapeIdx < _shapeList.size();
+}
+
+inline void GameGenerator::operator++() {
+    assert(*this);
+    _increment();
+}
+
+inline GeneratedGame GameGenerator::generate() const {
+    assert(*this);
+
+    GeneratedGame genGame;
+
+    const vector<int> &shape = _getCurrentShape();
+
+    const uint64_t shapeNumber = shapeToNumber(shape);
+
+    vector<Subgame*> subgames = makeGameNew(shapeNumber, _currentGameNumber);
+    Subgame *g = Subgame::concatSubgames(subgames);
+    for (Subgame *sg : subgames)
+        delete sg;
+
+    genGame.game = g;
+    genGame.shapeNumber = shapeNumber;
+    genGame.gameNumber = _currentGameNumber;
+    genGame.shape = shape;
+
+    return genGame;
+}
+
+inline const vector<int> &GameGenerator::_getCurrentShape() const {
+    assert(_shapeIdx < _shapeList.size());
+    return _shapeList[_shapeIdx];
+}
+
+inline void GameGenerator::_increment() {
+    assert(*this);
+
+    if (!_incrementBoard())
+        _incrementShape();
+}
+
+bool GameGenerator::_incrementBoard() {
+    assert(_currentGameNumber <= _maxGameNumber);
+
+    if (_currentGameNumber == _maxGameNumber)
+        return false;
+
+    _currentGameNumber++;
+    return true;
+}
+
+bool GameGenerator::_incrementShape() {
+    _shapeIdx++;
+    const bool hasNext = _shapeIdx < _shapeList.size();
+
+    if (hasNext)
+        _reshapeGame(_getCurrentShape());
+
+    return hasNext;
+}
+
+void GameGenerator::_reshapeGame(const vector<int> &newShape) {
+    const vector<int> &shape = _getCurrentShape();
+
+    _currentGameNumber = 0;
+
+    _maxGameNumber = 1;
+    for (int chunkSize : shape)
+        _maxGameNumber <<= chunkSize;
+
+    _maxGameNumber -= 1;
+}
+
+
+////////////////////////////////////////////////// globals
+Database *db;
+Solver *solver;
+
+
+////////////////////////////////////////////////// helper functions
+Subgame *getInverseScaleGame(int8_t scaleIdx) {
+    Subgame *sg = new Subgame();
+    vector<uint8_t> &boardVec = sg->boardVec();
+
+    // Inverse. Main color WHITE if positive idx
+    const int mainColor = scaleIdx > 0 ? WHITE : BLACK;
+    const int singleColor = opponentNumber(mainColor);
+
+    boardVec.push_back(singleColor);
+
+    const int8_t nMainStones = abs(scaleIdx);
+    for (int8_t i = 0; i < nMainStones; i++)
+        boardVec.push_back(mainColor);
+
+    return sg;
+}
+
+uint8_t getOutcome(const uint8_t *board, size_t boardLen) {
+    uint8_t boardCopy[boardLen];
+    for (size_t i = 0; i < boardLen; i++)
+        boardCopy[i] = board[i];
+
+    bool blackWin = solver->solveID(boardCopy, boardLen, BLACK) == BLACK;
+    assert(memcmp(board, boardCopy, boardLen) == 0);
+
+    bool whiteWin = solver->solveID(boardCopy, boardLen, WHITE) == WHITE;
+    assert(memcmp(board, boardCopy, boardLen) == 0);
+
+    if (!blackWin && !whiteWin) // 0 0
+        return OC_P;
+    if (!blackWin && whiteWin) // 0 1
+        return OC_W;
+    if (blackWin && !whiteWin) // 1 0
+        return OC_B;
+    if (blackWin && whiteWin) // 1 1
+        return OC_N;
+
+    assert(false);
+}
+
+uint8_t getOutcome(const Subgame &sg) {
+    return getOutcome(sg.board(), sg.size());
+}
+
+uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) {
+    assert(player == BLACK || player == WHITE);
+
+    const size_t g1Size = boardLen;
+    uint8_t g1[g1Size];
+    uint8_t undo1[UNDO_BUFFER_SIZE];
+
+    const size_t g2Size = boardLen;
+    uint8_t g2[g2Size];
+    uint8_t undo2[UNDO_BUFFER_SIZE];
+
+    for (size_t i = 0; i < boardLen; i++) {
+        g1[i] = board[i];
+        g2[i] = board[i];
+    }
+
+    auto assertRestore1 = [&]() -> void {
+        assert(memcmp(g1, board, boardLen) == 0);
+    };
+
+    auto assertRestore2 = [&]() -> void {
+        assert(memcmp(g2, board, boardLen) == 0);
+    };
+
+    assertRestore1();
+    assertRestore2();
+    uint64_t mask = 0;
+
+    size_t moveCount;
+    unique_ptr<int[]> moves(getMoves(g1, g1Size, player, &moveCount));
+
+    for (size_t i = 0; i < moveCount; i++) {
+        assertRestore1();
+
+        if (getDominated(mask, i))
+            continue;
+
+        play(g1, undo1, moves[2 * i], moves[2 * i + 1]);
+
+        for (size_t j = i + 1; j < moveCount; j++) {
+            assertRestore2();
+            assert(!getDominated(mask, i));
+
+            if (getDominated(mask, j))
+                continue;
+
+            play(g2, undo2, moves[2 * j], moves[2 * j + 1]);
+            negateBoard(g2, g2Size);
+
+            size_t g3Size;
+            uint8_t *g3 = addGames(g1, g1Size, g2, g2Size, &g3Size);
+
+            int bFirst = solver->solveID(g3, g3Size, BLACK);
+            int wFirst = solver->solveID(g3, g3Size, WHITE);
+
+            delete[] g3;
+
+            negateBoard(g2, g2Size);
+            undo(g2, undo2);
+
+            int compare = 0;
+
+            if (bFirst == wFirst)
+                compare = (bFirst == BLACK) ? 1 : -1; // Positive or negative
+
+            if (player == WHITE)
+                compare = -compare; // Positive or negative for current player
+
+            if (compare == -1) { // I < J (from POV of player)
+                setDominated(mask, i);
+                break;
+            }
+            else if (compare == 1) // I > J (from POV of player)
+                setDominated(mask, j);
+        }
+
+        undo(g1, undo1);
+    }
+
+    assertRestore1();
+    assertRestore2();
+
+    return mask;
+}
+
+DominancePair getDominance(const uint8_t *board, size_t boardLen) {
+    DominancePair dp;
+    dp.domBlack = getDominanceImplFor(board, boardLen, BLACK);
+    dp.domWhite = getDominanceImplFor(board, boardLen, WHITE);
+    return dp;
+}
+
+DominancePair getDominance(const Subgame &sg) {
+    return getDominance(sg.board(), sg.size());
+}
+
+inline uint64_t getChildMetric(const Subgame &sg) {
+    uint8_t *entry = db->get(sg);
+    assert(entry != 0);
+    assert(*db_get_outcome(entry) != 0 && *db_get_metric(entry) != uint64_t(-1));
+    return *db_get_metric(entry);
+}
+
+uint64_t getMetric(const Subgame &sg) {
+    uint64_t metric = 0;
+
+    uint8_t *entry = db->get(sg);
+    assert(entry != 0);
+    assert(*db_get_outcome(entry) != 0);
+
+    const uint64_t domBlack = db_get_dominance(entry)[0];
+    const uint64_t domWhite = db_get_dominance(entry)[1];
+
+    {
+        size_t moveCount;
+        int *movesBlack = getMoves(sg.board(), sg.size(), BLACK, &moveCount);
+        metric += moveCount;
+        delete[] movesBlack;
+
+        int *movesWhite = getMoves(sg.board(), sg.size(), WHITE, &moveCount);
+        metric += moveCount;
+        delete[] movesWhite;
+
+        uint64_t nDominatedMoves = 0;
+        nDominatedMoves += sumBits(domBlack);
+        nDominatedMoves += sumBits(domWhite);
+        assert(nDominatedMoves <= metric);
+        metric -= nDominatedMoves;
+    }
+
+    vector<Subgame*> normalChildrenBlack = sg.getNormalizedChildren(BLACK, domBlack);
+    vector<Subgame*> normalChildrenWhite = sg.getNormalizedChildren(WHITE, domWhite);
+
+    for (Subgame *sg : normalChildrenBlack) {
+        metric += getChildMetric(*sg);
+        delete sg;
+    }
+
+    for (Subgame *sg : normalChildrenWhite) {
+        metric += getChildMetric(*sg);
+        delete sg;
+    }
+
+    return metric;
+}
+
+uint8_t getOutcomeOnScale(const Subgame &sg, int8_t scaleIdx) {
+    Subgame sum;
+    vector<uint8_t> &boardVec = sum.boardVec();
+
+    Subgame *inverseScaleGame = getInverseScaleGame(scaleIdx);
+
+    boardVec = sg.boardVecConst();
+    boardVec.reserve(boardVec.size() + 1 + inverseScaleGame->size());
+
+    boardVec.push_back(EMPTY);
+
+    for (size_t i = 0; i < inverseScaleGame->size(); i++)
+        boardVec.push_back((*inverseScaleGame)[i]);
+
+    delete inverseScaleGame;
+
+    return getOutcome(sum);
+}
+
+inline relation outcomeToRelation(uint8_t outcome) {
+    if (outcome == OC_P)
+        return REL_EQUAL;
+    if (outcome == OC_B)
+        return REL_GREATER;
+    if (outcome == OC_W)
+        return REL_LESS;
+    if (outcome == OC_N)
+        return REL_FUZZY;
+
+    assert(false);
+}
+
+relation getRelationOnScale(const Subgame &sg, int8_t scaleIdx) {
+    uint8_t outcome = getOutcomeOnScale(sg, scaleIdx);
+    return outcomeToRelation(outcome);
+}
+
+BoundsPair getBounds(const Subgame &game) {
+    BoundsPair bp;
+
+    constexpr int8_t radius = 32;
+
+    bool haveLow = false;
+    bool haveHigh = false;
+    int8_t low = numeric_limits<int8_t>::min();
+    int8_t high = numeric_limits<int8_t>::max();
+
+    auto setRelation = [&](int8_t scaleIdx, relation rel) -> bool {
+        assert(rel != REL_UNKNOWN);
+
+        if (rel == REL_LESS) {
+            haveHigh = true;
+            high = min(high, scaleIdx);
+        } else if (rel == REL_GREATER) {
+            haveLow = true;
+            low = max(low, scaleIdx);
+        } else if (rel == REL_EQUAL) {
+            haveLow = true;
+            haveHigh = true;
+            low = scaleIdx;
+            high = scaleIdx;
+        }
+
+        return haveLow && haveHigh;
+    };
+
+
+    for (int8_t magnitude = 0; magnitude < radius; magnitude++) {
+        const int8_t idxPos = magnitude;
+        const relation relPos = getRelationOnScale(game, idxPos);
+        if (setRelation(idxPos, relPos))
+            break;
+
+        if (magnitude == 0)
+            continue;
+
+        const int8_t idxNeg = -magnitude;
+        const relation relNeg = getRelationOnScale(game, idxNeg);
+        if (setRelation(idxNeg, relNeg))
+            break;
+    }
+
+    assert(haveLow && haveHigh);
+    assert(low <= high);
+
+    bp.low = low;
+    bp.high = high;
+
+    return bp;
+}
+
+
+////////////////////////////////////////////////// main pass functions
+
+// Initialize all entries to uninitialized values
+void pass_initializeAllEntries() {
+    cout << "Initializing all entries" << endl;
+
+    GameGenerator gen;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        uint64_t link = db->getIdx(*genGame.game);
+
+        uint8_t *entry = db->getFromIdx(link);
+        assert(entry != 0);
+
+        *db_get_outcome(entry) = 0;
+        db_get_dominance(entry)[0] = 0;
+        db_get_dominance(entry)[1] = 0;
+        db_get_bounds(entry)[0] = numeric_limits<int8_t>::max();
+        db_get_bounds(entry)[1] = numeric_limits<int8_t>::min();
+        *db_get_metric(entry) = uint64_t(-1);
+        *db_get_link(entry) = link;
+        *db_get_shape(entry) = genGame.shapeNumber;
+        *db_get_number(entry) = genGame.gameNumber;
+    }
+}
+
+// Outcome classes for normal games
+void pass_normalGameOutcomes() {
+    cout << "Finding outcome classes for normalized games" << endl;
+
+    GameGenerator gen;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
+        if (normal->size() == 0)
+            continue;
+
+        uint8_t *entry = db->get(*normal);
+        assert(entry != 0);
+        if (*db_get_outcome(entry) != 0)
+            continue;
+
+        *db_get_outcome(entry) = getOutcome(*normal);
+    }
+}
+
+void pass_normalGameDominance() {
+    cout << "Finding dominated moves for normalized games" << endl;
+
+    GameGenerator gen;
+
+    unordered_set<uint64_t> hashes;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
+
+        if (normal->size() == 0)
+            continue;
+
+        const uint64_t normalHash = normal->getHash();
+
+        {
+            auto it = hashes.insert(normalHash);
+            if (!it.second)
+                continue;
+        }
+
+        uint8_t *normalEntry = db->get(*normal);
+        assert(normalEntry != 0);
+
+        assert(*db_get_outcome(normalEntry) != 0);
+
+        DominancePair dp = getDominance(*normal);
+        db_get_dominance(normalEntry)[0] = dp.domBlack;
+        db_get_dominance(normalEntry)[1] = dp.domWhite;
+
+    }
+}
+
+void pass_normalGameMetric() {
+    cout << "Finding metrics for normal games" << endl;
+    GameGenerator gen;
+
+    unordered_set<uint64_t> hashes;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
+
+        if (normal->size() == 0)
+            continue;
+
+        const uint64_t normalHash = normal->getHash();
+
+        {
+            auto it = hashes.insert(normalHash);
+            if (!it.second)
+                continue;
+        }
+
+        uint8_t *normalEntry = db->get(*normal);
+        assert(normalEntry != 0);
+        assert(*db_get_outcome(normalEntry) != 0);
+        assert(*db_get_metric(normalEntry) == uint64_t(-1));
+
+
+        const uint64_t metric = getMetric(*normal);
+        *db_get_metric(normalEntry) = metric;
+    }
+}
+
+void pass_normalGameLinks() {
+    cout << "Finding links for normal games" << endl;
+    GameGenerator gen;
+
+    unordered_set<uint64_t> hashes;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
+
+        if (normal->size() == 0)
+            continue;
+
+        const uint64_t normalHash = normal->getHash();
+
+        {
+            auto it = hashes.insert(normalHash);
+            if (!it.second)
+                continue;
+        }
+
+        uint8_t *normalEntry = db->get(*normal);
+        assert(normalEntry != 0);
+        assert(*db_get_outcome(normalEntry) != 0);
+        assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
+        assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
+
+        cout << *normal << " " << std::flush;
+
+        BoundsPair bp = getBounds(*normal);
+        assert(bp.low <= bp.high);
+        db_get_bounds(normalEntry)[0] = bp.low;
+        db_get_bounds(normalEntry)[1] = bp.high;
+
+        cout << "<" << (int) bp.low << " " << (int) bp.high << ">" << endl;
+
+    }
+}
+
+
+
+} // namespace
+
+int main() {
+    db = new Database();
+    db->init();
+    solver = new Solver(DB_MAX_BITS, db);
+
+    pass_initializeAllEntries();
+    pass_normalGameOutcomes();
+    pass_normalGameDominance();
+    pass_normalGameMetric();
+    pass_normalGameLinks();
+
+    db->save();
+    delete solver;
+    delete db;
+}

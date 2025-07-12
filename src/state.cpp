@@ -8,7 +8,7 @@
 
 
 
-int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *moveCount, size_t idx, size_t moveDepth) {
+int *_getMoves(const uint8_t *board, size_t len, int player, int opponent, size_t *moveCount, size_t idx, size_t moveDepth) {
     if (idx >= len) {
         if (moveDepth > 0) {
             *moveCount = moveDepth;
@@ -18,13 +18,13 @@ int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *mov
         return nullptr;
     }
 
-    uint8_t *c2 = &board[idx];
+    const uint8_t *c2 = &board[idx];
     bool move1 = false;
     bool move2 = false;
 
     if (*c2 == player) {
-        uint8_t *c1 = &board[idx - 1];
-        uint8_t *c3 = &board[idx + 1];
+        const uint8_t *c1 = &board[idx - 1];
+        const uint8_t *c3 = &board[idx + 1];
         move1 = idx > 0 && *c1 == opponent;
         move2 = (idx + 1 < len) && *c3 == opponent;
     }
@@ -43,7 +43,7 @@ int *_getMoves(uint8_t *board, size_t len, int player, int opponent, size_t *mov
     return buffer;
 }
 
-int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount) {
+int *getMoves(const uint8_t *board, size_t len, int player, size_t *moveCount) {
     return _getMoves(board, len, player, opponentNumber(player), moveCount, 0, 0);
 }
 

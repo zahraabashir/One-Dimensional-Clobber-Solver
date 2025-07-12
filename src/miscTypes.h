@@ -10,7 +10,7 @@
 struct Subgame {
     // Constructor
     Subgame();
-    Subgame(uint8_t *arr, size_t len);
+    Subgame(const uint8_t *arr, size_t len);
 
     size_t size() const;
     uint8_t *board();
@@ -19,13 +19,16 @@ struct Subgame {
     const std::vector<uint8_t> &boardVecConst() const;
     std::vector<uint8_t> &boardVec();
 
-    bool isActive() const;
-    void setIsActive(bool newActive);
-
     const uint8_t &operator[](size_t idx) const;
     uint8_t &operator[](size_t idx);
 
     void tryMirror();
+
+    Subgame *getNormalizedGame() const;
+    uint64_t getHash() const;
+
+    std::vector<Subgame*> getChildren(int player, uint64_t dominance) const;
+    std::vector<Subgame*> getNormalizedChildren(int player, uint64_t dominance) const;
 
     static Subgame *concatSubgames(const std::vector<Subgame*> &subgames);
     static bool normalizeSortOrder(const Subgame *sg1, const Subgame *sg2);
@@ -35,15 +38,14 @@ private:
     friend std::ostream &operator<<(std::ostream &os, const Subgame &sg);
 
     std::vector<uint8_t> _data;
-    bool _isActive;
 };
 
 ////////////////////////////////////////////////// Subgame methods
 // Constructor
-inline Subgame::Subgame(): _isActive(true) {
+inline Subgame::Subgame() {
 }
 
-inline Subgame::Subgame(uint8_t *arr, size_t len): _isActive(true) {
+inline Subgame::Subgame(const uint8_t *arr, size_t len) {
     _data.reserve(len);
 
     for (size_t i = 0; i < len; i++)
@@ -70,14 +72,6 @@ inline std::vector<uint8_t> &Subgame::boardVec() {
     return _data;
 }
 
-inline bool Subgame::isActive() const {
-    return _isActive;
-}
-
-inline void Subgame::setIsActive(bool newActive) {
-    _isActive = newActive;
-}
-
 inline const uint8_t &Subgame::operator[](size_t idx) const {
     assert(idx < _data.size());
     return _data[idx];
@@ -99,6 +93,29 @@ inline std::ostream &operator<<(std::ostream &os, const Subgame &sg) {
     os << ')';
     return os;
 }
+
+////////////////////////////////////////////////// struct DominancePair
+struct DominancePair {
+    uint64_t domBlack;
+    uint64_t domWhite;
+};
+
+inline void setDominated(uint64_t &mask, size_t moveIdx) {
+    assert(moveIdx < 64);
+    mask |= (uint64_t(1) << moveIdx);
+}
+
+inline bool getDominated(uint64_t &mask, size_t moveIdx) {
+    assert(moveIdx < 64);
+    return ((mask >> moveIdx) & 0x1);
+}
+
+
+////////////////////////////////////////////////// struct BoundsPair
+struct BoundsPair {
+    int8_t low;
+    int8_t high;
+};
 
 //////////////////////////////////////////////////
 std::vector<Subgame*> makeGameNew(uint64_t shapeNumber, uint32_t gameNumber);
@@ -125,4 +142,4 @@ inline std::ostream &operator<<(std::ostream &os, const std::vector<Subgame*> &v
     return os;
 }
 
-
+std::vector<Subgame*> generateSubgamesNew(const uint8_t *board, size_t len);

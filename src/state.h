@@ -4,7 +4,7 @@
 
 #define UNDO_BUFFER_SIZE (sizeof(int) + 2 * sizeof(uint8_t))
 
-int *getMoves(uint8_t *board, size_t len, int player, size_t *moveCount);
+int *getMoves(const uint8_t *board, size_t len, int player, size_t *moveCount);
 
 
 uint64_t getCode(uint8_t *board, size_t len, int player);

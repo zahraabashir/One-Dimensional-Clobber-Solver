@@ -23,6 +23,7 @@ struct Subgame {
     uint8_t &operator[](size_t idx);
 
     void tryMirror();
+    void negate();
 
     Subgame *getNormalizedGame() const;
     uint64_t getHash() const;
@@ -31,6 +32,7 @@ struct Subgame {
     std::vector<Subgame*> getNormalizedChildren(int player, uint64_t dominance) const;
 
     static Subgame *concatSubgames(const std::vector<Subgame*> &subgames);
+
     static bool normalizeSortOrder(const Subgame *sg1, const Subgame *sg2);
     static bool isVisuallyInversePair(const Subgame *sg1, const Subgame *sg2);
 
@@ -143,3 +145,73 @@ inline std::ostream &operator<<(std::ostream &os, const std::vector<Subgame*> &v
 }
 
 std::vector<Subgame*> generateSubgamesNew(const uint8_t *board, size_t len);
+
+
+
+//////////////////////////////////////// struct GeneratedGame
+struct GeneratedGame {
+    ~GeneratedGame();
+
+    Subgame *game;
+
+    uint64_t shapeNumber;
+    uint32_t gameNumber;
+
+    std::vector<int> shape;
+};
+
+inline GeneratedGame::~GeneratedGame() {
+    delete game;
+}
+
+//////////////////////////////////////// class GameGenerator
+class GameGenerator {
+public:
+    GameGenerator();
+
+    operator bool() const;
+    void operator++();
+    GeneratedGame generate() const;
+
+private:
+    static const std::vector<std::vector<int>> _shapeList;
+
+    size_t _shapeIdx;
+    uint32_t _currentGameNumber;
+    uint32_t _maxGameNumber;
+
+    const std::vector<int> &_getCurrentShape() const;
+    void _increment();
+    bool _incrementBoard();
+    bool _incrementShape();
+
+    void _reshapeGame(const std::vector<int> &newShape);
+
+};
+
+
+inline GameGenerator::GameGenerator(): _shapeIdx(0) {
+    _reshapeGame(_getCurrentShape());
+}
+
+inline GameGenerator::operator bool() const {
+    return _shapeIdx < _shapeList.size();
+}
+
+inline void GameGenerator::operator++() {
+    assert(*this);
+    _increment();
+}
+
+inline const std::vector<int> &GameGenerator::_getCurrentShape() const {
+    assert(_shapeIdx < _shapeList.size());
+    return _shapeList[_shapeIdx];
+}
+
+inline void GameGenerator::_increment() {
+    assert(*this);
+
+    if (!_incrementBoard())
+        _incrementShape();
+}
+

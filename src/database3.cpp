@@ -1,4 +1,5 @@
 #include "database3.h"
+#include "miscTypes.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -163,6 +164,9 @@ vector<vector<int>> makeShapes() {
 
 Database::Database() {
     //cout << "Making DB" << endl;
+    _useIndirectLinks = false;
+    _defaultIndirectLinksSize = 0;
+    _defaultIndirectLinks = nullptr;
 }
 
 void Database::init() {
@@ -254,6 +258,9 @@ Database::~Database() {
     if (data != NULL) {
         free(data);
     }
+
+    if (_defaultIndirectLinks != nullptr)
+        delete[] _defaultIndirectLinks;
 }
 
 //NOTE: doesn't update header
@@ -303,8 +310,6 @@ void Database::loadFrom(const char *fileName) {
     entryCount = ((size_t *) data)[1];
     index = (uint64_t *) (data + headerSize);
 }
-
-
 
 // (chunkSize, start)
 vector<tuple<int, const uint8_t *>> computeShapeData(const uint8_t *board, size_t len) {
@@ -362,9 +367,7 @@ vector<int> getShape(const uint8_t *board, size_t len) {
     return shape;
 }
 
-
-
-uint64_t Database::getIdx(const uint8_t *board, size_t len) {
+uint64_t Database::getIdxDirect(const uint8_t *board, size_t len) {
     if (len > DB_MAX_BITS) {
         return DB_NOT_FOUND;
     }
@@ -431,12 +434,12 @@ uint64_t Database::getIdx(const uint8_t *board, size_t len) {
     return sectionOffset + relativeOffset * entrySize;
 }
 
-uint64_t Database::getIdx(const Subgame &sg) {
-    return getIdx(sg.board(), sg.size());
+uint64_t Database::getIdxDirect(const Subgame &sg) {
+    return getIdxDirect(sg.board(), sg.size());
 }
 
 uint8_t *Database::get(const uint8_t *board, size_t len) {
-    uint64_t idx = getIdx(board, len);
+    uint64_t idx = getIdxDirect(board, len);
     //cout << "IDX " << idx << endl;
     if (idx == DB_NOT_FOUND) {
         return 0;
@@ -453,5 +456,45 @@ uint8_t *Database::getFromIdx(uint64_t idx) {
     if (idx == DB_NOT_FOUND) {
         return 0;
     }
-    return data + idx;
+
+    if (!_useIndirectLinks)
+        return data + idx;
+
+    const IndirectLink *indirect = ((const IndirectLink*) idx);
+    return data + indirect->directLink;
+}
+
+uint8_t *Database::getFromIndirectIdx(const IndirectLink &indirect) {
+    return getFromIdx((uint64_t) &indirect);
+}
+
+void Database::enableIndirectLinks() {
+    assert(!_useIndirectLinks && _defaultIndirectLinks == nullptr);
+
+    _useIndirectLinks = true;
+    _defaultIndirectLinksSize = entryCount;
+    _defaultIndirectLinks = new IndirectLink[_defaultIndirectLinksSize];
+}
+
+
+void Database::finalizeIndirectLinks() {
+    assert(_useIndirectLinks && _defaultIndirectLinks != nullptr);
+
+    GameGenerator gen;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        uint8_t *entry = get(*genGame.game);
+
+        uint64_t link = *db_get_link(entry);
+
+        IndirectLink *indirectLink = (IndirectLink*) link;
+        uint64_t directLink = indirectLink->directLink;
+
+        *db_get_link(entry) = directLink;
+    }
+
+    _useIndirectLinks = false;
 }

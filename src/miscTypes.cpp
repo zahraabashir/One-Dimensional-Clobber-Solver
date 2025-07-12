@@ -108,6 +108,13 @@ void Subgame::tryMirror() {
     }
 }
 
+void Subgame::negate() {
+    size_t N = size();
+
+    for (size_t i = 0; i < N; i++)
+        (*this)[i] = opponentNumber((*this)[i]);
+}
+
 Subgame *Subgame::getNormalizedGame() const {
     vector<Subgame*> subgames = generateSubgamesNew(board(), size());
 
@@ -292,5 +299,104 @@ vector<Subgame*> generateSubgamesNew(const uint8_t *board, size_t len) {
     }
 
     return subgames;
+}
+
+
+//////////////////////////////////////// GameGenerator implementation
+vector<vector<int>> initShapeList() {
+    vector<vector<int>> shapeListAll = makeShapes();
+
+    sort(shapeListAll.begin(), shapeListAll.end(),
+        [](const vector<int> &s1, const vector<int> &s2) {
+            int bits1 = s1.size() - 1;
+            int bits2 = s2.size() - 1;
+
+            for (int chunk : s1) {
+                bits1 += chunk;
+            }
+
+            for (int chunk : s2) {
+                bits2 += chunk;
+            }
+
+            if (bits1 == bits2) {
+                return s1.size() > s2.size();
+            }
+
+            return bits1 < bits2;
+        }
+    );
+
+
+    vector<vector<int>> shapeList;
+    for (const vector<int> &shape : shapeListAll) {
+        int totalSize = shape.size() - 1;
+
+        for (const int &chunkSize : shape)
+            totalSize += chunkSize;
+
+        //if (totalSize <= 12)
+        //    shapeList.emplace_back(shape);
+        shapeList.emplace_back(shape);
+    }
+
+    return shapeList;
+}
+
+const vector<vector<int>> GameGenerator::_shapeList = initShapeList();
+
+GeneratedGame GameGenerator::generate() const {
+    assert(*this);
+
+    GeneratedGame genGame;
+
+    const vector<int> &shape = _getCurrentShape();
+
+    const uint64_t shapeNumber = shapeToNumber(shape);
+
+    vector<Subgame*> subgames = makeGameNew(shapeNumber, _currentGameNumber);
+    Subgame *g = Subgame::concatSubgames(subgames);
+    for (Subgame *sg : subgames)
+        delete sg;
+
+    genGame.game = g;
+    genGame.shapeNumber = shapeNumber;
+    genGame.gameNumber = _currentGameNumber;
+    genGame.shape = shape;
+
+    return genGame;
+}
+
+
+bool GameGenerator::_incrementBoard() {
+    assert(_currentGameNumber <= _maxGameNumber);
+
+    if (_currentGameNumber == _maxGameNumber)
+        return false;
+
+    _currentGameNumber++;
+    return true;
+}
+
+bool GameGenerator::_incrementShape() {
+    _shapeIdx++;
+    const bool hasNext = _shapeIdx < _shapeList.size();
+
+    if (hasNext)
+        _reshapeGame(_getCurrentShape());
+
+    return hasNext;
+}
+
+void GameGenerator::_reshapeGame(const vector<int> &newShape) {
+    const vector<int> &shape = _getCurrentShape();
+
+    _currentGameNumber = 0;
+
+    _maxGameNumber = 1;
+    for (int chunkSize : shape)
+        _maxGameNumber <<= chunkSize;
+
+    _maxGameNumber -= 1;
 }
 

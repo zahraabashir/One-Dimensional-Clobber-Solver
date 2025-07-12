@@ -32,17 +32,27 @@ struct ReplacementMapIdx {
     uint8_t low;
     uint8_t high;
 
+    bool operator==(const ReplacementMapIdx &other) const {
+        return 
+            (outcome == other.outcome) &&
+            (low == other.low) &&
+            (high == other.high);
+    }
+
 };
 
 template <>
-struct hash<ReplacementMapIdx> {
+struct std::hash<ReplacementMapIdx> {
     uint64_t operator()(const ReplacementMapIdx &s) const noexcept {
         return s.outcome | (s.low << 8) | (s.high << 16);
     }
 };
 
 
+
+
 namespace {
+
 
 ////////////////////////////////////////////////// types
 enum relation {
@@ -54,172 +64,11 @@ enum relation {
 };
 
 
-//////////////////////////////////////// struct GeneratedGame
-struct GeneratedGame {
-    ~GeneratedGame();
-
-    Subgame *game;
-
-    uint64_t shapeNumber;
-    uint32_t gameNumber;
-
-    vector<int> shape;
-};
-
-GeneratedGame::~GeneratedGame() {
-    delete game;
-}
-
-//////////////////////////////////////// class GameGenerator
-class GameGenerator {
-public:
-    GameGenerator();
-
-    operator bool() const;
-    void operator++();
-    GeneratedGame generate() const;
-
-private:
-    static const vector<vector<int>> _shapeList;
-
-    size_t _shapeIdx;
-    uint32_t _currentGameNumber;
-    uint32_t _maxGameNumber;
-
-    const vector<int> &_getCurrentShape() const;
-    void _increment();
-    bool _incrementBoard();
-    bool _incrementShape();
-
-    void _reshapeGame(const vector<int> &newShape);
-
-};
-
-//////////////////////////////////////// GameGenerator implementation
-vector<vector<int>> initShapeList() {
-    vector<vector<int>> shapeListAll = makeShapes();
-
-    sort(shapeListAll.begin(), shapeListAll.end(),
-        [](const vector<int> &s1, const vector<int> &s2) {
-            int bits1 = s1.size() - 1;
-            int bits2 = s2.size() - 1;
-
-            for (int chunk : s1) {
-                bits1 += chunk;
-            }
-
-            for (int chunk : s2) {
-                bits2 += chunk;
-            }
-
-            if (bits1 == bits2) {
-                return s1.size() > s2.size();
-            }
-
-            return bits1 < bits2;
-        }
-    );
-
-
-    vector<vector<int>> shapeList;
-    for (const vector<int> &shape : shapeListAll) {
-        int totalSize = shape.size() - 1;
-
-        for (const int &chunkSize : shape)
-            totalSize += chunkSize;
-
-        if (totalSize <= 12)
-            shapeList.emplace_back(shape);
-    }
-
-    return shapeList;
-}
-
-const vector<vector<int>> GameGenerator::_shapeList = initShapeList();
-
-inline GameGenerator::GameGenerator(): _shapeIdx(0) {
-    _reshapeGame(_getCurrentShape());
-}
-
-inline GameGenerator::operator bool() const {
-    return _shapeIdx < _shapeList.size();
-}
-
-inline void GameGenerator::operator++() {
-    assert(*this);
-    _increment();
-}
-
-inline GeneratedGame GameGenerator::generate() const {
-    assert(*this);
-
-    GeneratedGame genGame;
-
-    const vector<int> &shape = _getCurrentShape();
-
-    const uint64_t shapeNumber = shapeToNumber(shape);
-
-    vector<Subgame*> subgames = makeGameNew(shapeNumber, _currentGameNumber);
-    Subgame *g = Subgame::concatSubgames(subgames);
-    for (Subgame *sg : subgames)
-        delete sg;
-
-    genGame.game = g;
-    genGame.shapeNumber = shapeNumber;
-    genGame.gameNumber = _currentGameNumber;
-    genGame.shape = shape;
-
-    return genGame;
-}
-
-inline const vector<int> &GameGenerator::_getCurrentShape() const {
-    assert(_shapeIdx < _shapeList.size());
-    return _shapeList[_shapeIdx];
-}
-
-inline void GameGenerator::_increment() {
-    assert(*this);
-
-    if (!_incrementBoard())
-        _incrementShape();
-}
-
-bool GameGenerator::_incrementBoard() {
-    assert(_currentGameNumber <= _maxGameNumber);
-
-    if (_currentGameNumber == _maxGameNumber)
-        return false;
-
-    _currentGameNumber++;
-    return true;
-}
-
-bool GameGenerator::_incrementShape() {
-    _shapeIdx++;
-    const bool hasNext = _shapeIdx < _shapeList.size();
-
-    if (hasNext)
-        _reshapeGame(_getCurrentShape());
-
-    return hasNext;
-}
-
-void GameGenerator::_reshapeGame(const vector<int> &newShape) {
-    const vector<int> &shape = _getCurrentShape();
-
-    _currentGameNumber = 0;
-
-    _maxGameNumber = 1;
-    for (int chunkSize : shape)
-        _maxGameNumber <<= chunkSize;
-
-    _maxGameNumber -= 1;
-}
-
 
 ////////////////////////////////////////////////// globals
 Database *db;
 Solver *solver;
+unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMap;
 
 
 ////////////////////////////////////////////////// helper functions
@@ -504,6 +353,69 @@ BoundsPair getBounds(const Subgame &game) {
     return bp;
 }
 
+void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) {
+    vector<shared_ptr<IndirectLink>> &vec = replacementMap[rmapIdx];
+
+    uint8_t *entry = db->get(game);
+    assert(entry != 0);
+    assert(*db_get_outcome(entry) != 0 && *db_get_metric(entry) != uint64_t(-1));
+
+    Subgame sgCopy = game;
+
+    size_t foundIdx = 0;
+    bool found = false;
+
+    const size_t N = vec.size();
+    for (size_t i = 0; i < N; i++) {
+        shared_ptr<IndirectLink> &indirect = vec[i];
+
+        uint8_t *linkedEntry = db->getFromIndirectIdx(*indirect);
+        assert(linkedEntry != 0);
+        uint64_t linkedShape = *db_get_shape(linkedEntry);
+        uint32_t linkedNumber = *db_get_number(linkedEntry);
+
+        vector<Subgame*> subgames = makeGameNew(linkedShape, linkedNumber);
+
+        for (Subgame *sg : subgames)
+            sg->negate();
+
+        subgames.push_back(&sgCopy);
+        Subgame *sum = Subgame::concatSubgames(subgames);
+        subgames.pop_back();
+
+        for (Subgame *sg : subgames)
+            delete sg;
+
+        relation rel = outcomeToRelation(getOutcome(*sum));
+        delete sum;
+
+        if (rel == REL_EQUAL) {
+            foundIdx = i;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        uint64_t directLink = db->getIdxDirect(game);
+        vec.emplace_back(new IndirectLink(directLink));
+    } else {
+        const uint64_t metric = *db_get_metric(entry);
+
+        IndirectLink &indirectLink = *(vec[foundIdx]);
+        uint8_t *foundEntry = db->getFromIndirectIdx(indirectLink);
+        assert(foundEntry != 0 && *db_get_outcome(entry) != 0);
+
+        const uint64_t foundMetric = *db_get_metric(foundEntry);
+        assert(foundMetric != uint64_t(-1));
+
+        if (metric < foundMetric) { // New game is better
+            *db_get_link(entry) = (uint64_t) &indirectLink;
+        } else if (metric > foundMetric) { // Existing game is better
+            indirectLink.directLink = db->getIdxDirect(game);
+        }
+    }
+}
+
 
 ////////////////////////////////////////////////// main pass functions
 
@@ -513,14 +425,24 @@ void pass_initializeAllEntries() {
 
     GameGenerator gen;
 
+    size_t entryNumber = 0;
+
     while (gen) {
+        assert(entryNumber < db->entryCount);
+
         GeneratedGame genGame = gen.generate();
         ++gen;
 
-        uint64_t link = db->getIdx(*genGame.game);
+        uint64_t directLink = db->getIdxDirect(*genGame.game);
 
-        uint8_t *entry = db->getFromIdx(link);
+        IndirectLink &indirect = db->getDefaultIndirectLink(entryNumber);
+        indirect.directLink = directLink;
+
+        uint64_t indirectLink = (uint64_t) &indirect;
+
+        uint8_t *entry = db->getFromIdx(indirectLink);
         assert(entry != 0);
+        assert(entry == db->get(*genGame.game));
 
         *db_get_outcome(entry) = 0;
         db_get_dominance(entry)[0] = 0;
@@ -528,10 +450,14 @@ void pass_initializeAllEntries() {
         db_get_bounds(entry)[0] = numeric_limits<int8_t>::max();
         db_get_bounds(entry)[1] = numeric_limits<int8_t>::min();
         *db_get_metric(entry) = uint64_t(-1);
-        *db_get_link(entry) = link;
+        *db_get_link(entry) = (uint64_t) &indirect;
         *db_get_shape(entry) = genGame.shapeNumber;
         *db_get_number(entry) = genGame.gameNumber;
+
+        entryNumber++;
     }
+    assert(entryNumber == db->entryCount);
+
 }
 
 // Outcome classes for normal games
@@ -665,6 +591,12 @@ void pass_normalGameLinks() {
 
         cout << "<" << (int) bp.low << " " << (int) bp.high << ">" << endl;
 
+        ReplacementMapIdx idx;
+        idx.outcome = *db_get_outcome(normalEntry);
+        idx.low = bp.low;
+        idx.high = bp.high;
+
+        addToReplacementMap(*normal, idx);
     }
 }
 
@@ -675,13 +607,19 @@ void pass_normalGameLinks() {
 int main() {
     db = new Database();
     db->init();
-    solver = new Solver(DB_MAX_BITS, db);
+
+    db->enableIndirectLinks();
 
     pass_initializeAllEntries();
+
+    solver = new Solver(DB_MAX_BITS, db);
+
     pass_normalGameOutcomes();
     pass_normalGameDominance();
     pass_normalGameMetric();
     pass_normalGameLinks();
+
+    db->finalizeIndirectLinks();
 
     db->save();
     delete solver;

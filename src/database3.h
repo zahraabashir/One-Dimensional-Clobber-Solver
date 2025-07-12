@@ -83,11 +83,16 @@ uint64_t *db_get_link(const uint8_t *entry);
 uint64_t *db_get_shape(const uint8_t *entry);
 uint32_t *db_get_number(const uint8_t *entry);
 
-
 struct IndirectLink {
+
+    IndirectLink(): directLink(-1) {
+    }
+
+    IndirectLink(uint64_t directLink): directLink(directLink) {
+    }
+
     uint64_t directLink;
 };
-
 
 class Database {
   private:
@@ -109,8 +114,14 @@ class Database {
     static constexpr size_t entrySize = DBLayout::size();
     size_t entryCount;
 
+  private:
+    bool _useIndirectLinks;
+    size_t _defaultIndirectLinksSize;
+    IndirectLink *_defaultIndirectLinks;
 
   public:
+    IndirectLink &getDefaultIndirectLink(size_t entryNumber);
+
     size_t size;
 
     Database();
@@ -121,16 +132,26 @@ class Database {
     void load();
     void loadFrom(const char *fileName);
 
-    uint64_t getIdx(const uint8_t *board, size_t len);
-    uint64_t getIdx(const Subgame &sg);
+    uint64_t getIdxDirect(const uint8_t *board, size_t len);
+    uint64_t getIdxDirect(const Subgame &sg);
 
     uint8_t *get(const uint8_t *board, size_t len);
     uint8_t *get(const Subgame &sg);
 
     uint8_t *getFromIdx(uint64_t idx);
-};
+    uint8_t *getFromIndirectIdx(const IndirectLink &indirect);
 
+    void enableIndirectLinks();
+
+    void finalizeIndirectLinks();
+
+};
 
 uint64_t shapeToNumber(const std::vector<int> &shape);
 std::vector<int> numberToShape(uint64_t number);
 std::vector<std::vector<int>> makeShapes();
+
+inline IndirectLink &Database::getDefaultIndirectLink(size_t entryNumber) {
+    assert(_useIndirectLinks && entryNumber < _defaultIndirectLinksSize);
+    return _defaultIndirectLinks[entryNumber];
+}

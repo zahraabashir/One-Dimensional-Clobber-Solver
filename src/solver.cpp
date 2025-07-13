@@ -1421,9 +1421,9 @@ inline optional<SolveResult> Solver::subgameStaticRules(
 
     int outcomeMask = 0;
 
-    //int boundLow = 0;
-    //int boundHigh = 0;
-    //bool boundsOk = true;
+    int boundLow = 0;
+    int boundHigh = 0;
+    bool boundsOk = true;
 
     for (const SubgameRange &range : ranges) {
         uint8_t *subgameEntry = db->get(&sboard[range.start], range.length);
@@ -1434,17 +1434,17 @@ inline optional<SolveResult> Solver::subgameStaticRules(
         outcomeMask |= (1 << outcome);
 
 
-        //boundsOk &= !(outcome == 0);
+        boundsOk &= !(outcome == 0);
 
-        //if (outcome != 0 && boundsOk) {
-        //    const int low = db_get_bounds(subgameEntry)[0];
-        //    const int high = db_get_bounds(subgameEntry)[1];
+        if (outcome != 0 && boundsOk) {
+            const int low = db_get_bounds(subgameEntry)[0];
+            const int high = db_get_bounds(subgameEntry)[1];
 
-        //    boundLow += low;
-        //    boundHigh += high;
-        //    if (low > high)
-        //        boundsOk = false;
-        //}
+            boundLow += low;
+            boundHigh += high;
+            if (low > high)
+                boundsOk = false;
+        }
     }
 
     //Only Bs
@@ -1469,14 +1469,16 @@ inline optional<SolveResult> Solver::subgameStaticRules(
         return {{player, true}};
     }
 
-    //if (boundsOk) {
-    //    assert(boundLow <= boundHigh);
+    if (boundsOk) {
+        assert(boundLow <= boundHigh);
 
-    //    if (boundLow > 0)
-    //        return {{BLACK, true}};
-    //    if (boundHigh < 0)
-    //        return {{WHITE, true}};
-    //}
+        if (boundLow > 0) {
+            return {{BLACK, true}};
+        }
+        if (boundHigh < 0)
+            return {{WHITE, true}}; {
+        }
+    }
 
     return {};
 }

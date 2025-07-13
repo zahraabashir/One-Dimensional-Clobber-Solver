@@ -310,7 +310,8 @@ DominancePair getDominance(const Subgame &sg) {
 
 inline uint64_t getChildMetric(const Subgame &sg) {
     uint8_t *entry = db->get(sg);
-    assert(entry != 0);
+    if (entry == 0)
+        return 0;
     assert(*db_get_outcome(entry) != 0 && *db_get_metric(entry) != uint64_t(-1));
     return *db_get_metric(entry);
 }
@@ -342,15 +343,15 @@ uint64_t getMetric(const Subgame &sg) {
         metric -= nDominatedMoves;
     }
 
-    vector<Subgame*> normalChildrenBlack = sg.getNormalizedChildren(BLACK, domBlack);
-    vector<Subgame*> normalChildrenWhite = sg.getNormalizedChildren(WHITE, domWhite);
+    vector<Subgame*> childrenBlack = sg.getChildren(BLACK, domBlack);
+    vector<Subgame*> childrenWhite = sg.getChildren(WHITE, domWhite);
 
-    for (Subgame *sg : normalChildrenBlack) {
+    for (Subgame *sg : childrenBlack) {
         metric += getChildMetric(*sg);
         delete sg;
     }
 
-    for (Subgame *sg : normalChildrenWhite) {
+    for (Subgame *sg : childrenWhite) {
         metric += getChildMetric(*sg);
         delete sg;
     }
@@ -859,6 +860,83 @@ void pass_main() {
     }
 }
 
+void pass_mainNoNormal() {
+    cout << "Main pass no normal" << endl;
+    GameGenerator gen;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        uint8_t *entry = db->get(*genGame.game);
+        assert(entry != 0);
+
+        bool hasOutcome = *db_get_outcome(entry) != 0;
+        if (!hasOutcome) {
+            int outcome = getOutcome(*genGame.game);
+            *db_get_outcome(entry) = outcome;
+        }
+
+        assert(*db_get_outcome(entry) != 0);
+
+        bool hasBounds = true;
+        hasBounds &= db_get_bounds(entry)[0] != numeric_limits<int8_t>::max();
+        hasBounds &= db_get_bounds(entry)[1] != numeric_limits<int8_t>::min();
+
+        cout << *genGame.game << " " << genGame.shape << " " << std::flush;
+
+        // Bounds on scale 1
+        BoundsPair bp1;
+        if (hasBounds) {
+            bp1.low = db_get_bounds(entry)[0];
+            bp1.high = db_get_bounds(entry)[1];
+        } else {
+            bp1 = getBounds(*genGame.game, 1);
+            db_get_bounds(entry)[0] = bp1.low;
+            db_get_bounds(entry)[1] = bp1.high;
+        }
+
+        // Find dominated moves
+        DominancePair dp = getDominance(*genGame.game);
+        db_get_dominance(entry)[0] = dp.domBlack;
+        db_get_dominance(entry)[1] = dp.domWhite;
+
+        // Find metric
+        uint64_t metric = getMetric(*genGame.game);
+        *db_get_metric(entry) = metric;
+
+        // Index for replacement map
+
+        BoundsPair bp2 = getBounds(*genGame.game, 2);
+        assert(bp2.low <= bp2.high);
+        BoundsPair bp3 = getBounds(*genGame.game, 0);
+        assert(bp3.low <= bp3.high);
+
+        cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
+        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
+        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
+
+        // Find link
+        ReplacementMapIdx idx;
+        idx.outcome = *db_get_outcome(entry);
+        idx.low1 = bp1.low;
+        idx.high1 = bp1.high;
+        idx.low2 = bp2.low;
+        idx.high2 = bp2.high;
+        idx.low3 = bp3.low;
+        idx.high3 = bp3.high;
+
+        //if (equalsProblemCase(*normal)) {
+        //    assert(!Solver::doDebug);
+        //    cout << "ENABLING DEBUG" << endl;
+        //    Solver::doDebug = true;
+        //}
+
+        addToReplacementMap(*genGame.game, idx);
+        //addToReplacementMapSmallest(*normal, idx);
+    }
+}
+
 void pass_normalGameLinks() {
     cout << "Finding links for normal games" << endl;
     GameGenerator gen;
@@ -927,7 +1005,7 @@ void pass_normalGameLinks() {
         //}
 
         addToReplacementMap(*normal, idx);
-        addToReplacementMapSmallest(*normal, idx);
+        //addToReplacementMapSmallest(*normal, idx);
     }
 }
 
@@ -952,7 +1030,8 @@ int main() {
 
     TIME(pass_normalGameOutcomes());
     TIME(pass_normalGameBounds());
-    TIME(pass_main());
+    TIME(pass_mainNoNormal());
+    //TIME(pass_main());
     //TIME(pass_normalGameDominance());
     //TIME(pass_normalGameMetric());
     //TIME(pass_normalGameLinks());

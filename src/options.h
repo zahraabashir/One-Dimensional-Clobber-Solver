@@ -23,7 +23,7 @@
 // games are only substituted if they are in the database, and have both dominance and bound information (so the minimum of these will determine what games can be substituted)
 
 // games can be substituted with other games that are up to/including this length
-#define RMAP_SIZE 12
+#define RMAP_SIZE 16
 
 #define DB_MAX_SUB_BITS std::min({DB_MAX_BITS, DB_MAX_DOMINANCE_BITS, DB_MAX_BOUND_BITS})
 

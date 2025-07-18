@@ -39,7 +39,7 @@ struct DBLayout {
     static constexpr size_t arr[] = {
         sz(uint8_t),        // outcome
         sz(uint64_t[2]),    // domBlack/domWhite
-        sz(int8_t[2]),     // low/high bounds
+        sz(int8_t[4]),     // low/high bounds
         sz(uint64_t),       // simplicity metric
         sz(uint64_t),       //link
         sz(uint64_t),       //linkSmall

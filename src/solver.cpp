@@ -1216,14 +1216,13 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     //Delete dominated moves
     #if defined(SOLVER_DELETE_DOMINATED_MOVES)
-    vector<pair<int, int>> sg = generateSubgames(sboard, sboardLen);
+    //vector<pair<int, int>> sg = generateSubgames(sboard, sboardLen);
+    vector<SubgameRange> ranges = generateSubgameRanges(sboard, sboardLen);
 
-    for (int i = 0; i < sg.size(); i++) {
-        int start = sg[i].first;
-        int end = sg[i].second; //index after end
-        int len = end - start;
+    for (int i = 0; i < ranges.size(); i++) {
+        const SubgameRange &range = ranges[i];
 
-        uint8_t *dbEntry = db->get(&sboard[start], len);
+        uint8_t *dbEntry = db->get(&sboard[range.start], range.length);
 
         uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
@@ -1236,7 +1235,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
             int from = moves[2 * j];
             int to = moves[2 * j + 1];
 
-            if (from >= start && from < end) { //found move
+            if (from >= range.start && from < range.end) { //found move
                 if ((dominated >> moveIndex) & ((uint64_t) 1)) {
                     //cout << "FOUND" << endl;
                     moves[2 * j] = -1;
@@ -1249,8 +1248,33 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
     }
     #endif
 
+    vector<bool> prunedMoveGenerators = pruneMoveGenerators(sboard, sboardLen);
+    assert(ranges.size() == prunedMoveGenerators.size());
 
+    for (int i = 0; i < moveCount; i++) {
+        const int from = moves[2 * i];
+        const int to = moves[2 * i + 1];
 
+        if (from == -1)
+            continue;
+
+        int subgameIdx = -1;
+        for (int j = 0; j < ranges.size(); j++) {
+            const SubgameRange &range = ranges[j];
+            if (range.start <= from && from < range.end) {
+                assert(range.start <= to && to < range.end);
+
+                subgameIdx = j;
+                break;
+            }
+        }
+        assert(subgameIdx != -1);
+
+        if (prunedMoveGenerators[subgameIdx]) {
+            moves[2 * i] = -1;
+            moves[2 * i + 1] = -1;
+        }
+    }
 
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
@@ -1311,14 +1335,14 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
 
-        if (from == -1) { //this move was pruned
+        if (from == -1 || to == -1) { //this move was pruned
+            assert(from == -1 && to == -1);
             if (!checkedBestMove) {
                 checkedBestMove = true;
                 i = -1;
             }
             continue;
         }
-
 
         play(sboard, undoBuffer, from, to);
         pair<int, bool> result = searchID(sboard, sboardLen, p, n, depth + 1);
@@ -1421,9 +1445,13 @@ inline optional<SolveResult> Solver::subgameStaticRules(
 
     int outcomeMask = 0;
 
-    int boundLow = 0;
-    int boundHigh = 0;
-    bool boundsOk = true;
+    int bound1Low = 0;
+    int bound1High = 0;
+    bool bound1Ok = true;
+
+    int bound2Low = 0;
+    int bound2High = 0;
+    bool bound2Ok = true;
 
     for (const SubgameRange &range : ranges) {
         uint8_t *subgameEntry = db->get(&sboard[range.start], range.length);
@@ -1434,17 +1462,30 @@ inline optional<SolveResult> Solver::subgameStaticRules(
         outcomeMask |= (1 << outcome);
 
 
-        boundsOk &= !(outcome == 0);
+        const bool hasOutcome = (outcome != 0);
+        bound1Ok &= hasOutcome;
+        bound2Ok &= hasOutcome;
 
-        if (outcome != 0 && boundsOk) {
-            const int low = db_get_bounds(subgameEntry)[0];
-            const int high = db_get_bounds(subgameEntry)[1];
+        if (bound1Ok) {
+            const int low1 = db_get_bounds(subgameEntry)[0];
+            const int high1 = db_get_bounds(subgameEntry)[1];
 
-            boundLow += low;
-            boundHigh += high;
-            if (low > high)
-                boundsOk = false;
+            bound1Low += low1;
+            bound1High += high1;
+            if (low1 > high1)
+                bound1Ok = false;
         }
+
+        if (bound2Ok) {
+            const int low2 = db_get_bounds(subgameEntry)[2];
+            const int high2 = db_get_bounds(subgameEntry)[3];
+
+            bound2Low += low2;
+            bound2High += high2;
+            if (low2 > high2)
+                bound2Ok = false;
+        }
+
     }
 
     //Only Bs
@@ -1469,15 +1510,25 @@ inline optional<SolveResult> Solver::subgameStaticRules(
         return {{player, true}};
     }
 
-    if (boundsOk) {
-        assert(boundLow <= boundHigh);
+    // Cutoffs were <, >, 0, 1
 
-        if (boundLow > 0) {
+
+    if (bound1Ok) {
+        assert(bound1Low <= bound1High);
+
+        if (bound1Low > 0)
             return {{BLACK, true}};
-        }
-        if (boundHigh < 0)
-            return {{WHITE, true}}; {
-        }
+        if (bound1High < 0)
+            return {{WHITE, true}};
+    }
+
+    if (bound2Ok) {
+        assert(bound2Low <= bound2High);
+
+        if (bound2Low > 1)
+            return {{BLACK, true}};
+        if (bound2High < -1)
+            return {{WHITE, true}};
     }
 
     return {};

@@ -209,7 +209,17 @@ uint8_t getOutcome(const Subgame &sg) {
     return getOutcome(sg.board(), sg.size());
 }
 
-uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) {
+uint64_t lookupComplexity(const uint8_t *board, size_t boardLen) {
+    uint8_t *entry = db->get(board, boardLen);
+    if (entry == 0)
+        return 0;
+    assert(*db_get_outcome(entry) != 0);
+    const uint64_t metric = *db_get_metric(entry);
+    assert(metric != uint64_t(-1));
+    return metric;
+}
+
+uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player, uint64_t &equal) {
     assert(player == BLACK || player == WHITE);
 
     const size_t g1Size = boardLen;
@@ -269,9 +279,6 @@ uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) 
 
             delete[] g3;
 
-            negateBoard(g2, g2Size);
-            undo(g2, undo2);
-
             int compare = 0;
 
             if (bFirst == wFirst)
@@ -286,6 +293,20 @@ uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) 
             }
             else if (compare == 1) // I > J (from POV of player)
                 setDominated(mask, j);
+            else if (bFirst == WHITE && wFirst == BLACK) {
+                const uint64_t metric1 = lookupComplexity(g1, g1Size);
+                const uint64_t metric2 = lookupComplexity(g2, g2Size);
+
+                const bool pruneFirst = metric1 > metric2;
+
+                if (pruneFirst)
+                    setDominated(equal, i);
+                else
+                    setDominated(equal, j);
+            }
+
+            negateBoard(g2, g2Size);
+            undo(g2, undo2);
         }
 
         undo(g1, undo1);
@@ -297,15 +318,15 @@ uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player) 
     return mask;
 }
 
-DominancePair getDominance(const uint8_t *board, size_t boardLen) {
+DominancePair getDominance(const uint8_t *board, size_t boardLen, DominancePair &equal) {
     DominancePair dp;
-    dp.domBlack = getDominanceImplFor(board, boardLen, BLACK);
-    dp.domWhite = getDominanceImplFor(board, boardLen, WHITE);
+    dp.domBlack = getDominanceImplFor(board, boardLen, BLACK, equal.domBlack);
+    dp.domWhite = getDominanceImplFor(board, boardLen, WHITE, equal.domWhite);
     return dp;
 }
 
-DominancePair getDominance(const Subgame &sg) {
-    return getDominance(sg.board(), sg.size());
+DominancePair getDominance(const Subgame &sg, DominancePair &equal) {
+    return getDominance(sg.board(), sg.size(), equal);
 }
 
 inline uint64_t getChildMetric(const Subgame &sg) {
@@ -615,6 +636,8 @@ void pass_initializeAllEntries() {
         db_get_dominance(entry)[1] = 0;
         db_get_bounds(entry)[0] = numeric_limits<int8_t>::max();
         db_get_bounds(entry)[1] = numeric_limits<int8_t>::min();
+        db_get_bounds(entry)[2] = numeric_limits<int8_t>::max();
+        db_get_bounds(entry)[3] = numeric_limits<int8_t>::min();
         *db_get_metric(entry) = uint64_t(-1);
         *db_get_shape(entry) = genGame.shapeNumber;
         *db_get_number(entry) = genGame.gameNumber;
@@ -699,14 +722,19 @@ void pass_normalGameBounds() {
         assert(*db_get_outcome(normalEntry) != 0);
         assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
         assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
+        assert(db_get_bounds(normalEntry)[2] == numeric_limits<int8_t>::max());
+        assert(db_get_bounds(normalEntry)[3] == numeric_limits<int8_t>::min());
 
-        BoundsPair bp = getBounds(*normal, 1);
-
-        db_get_bounds(normalEntry)[0] = bp.low;
-        db_get_bounds(normalEntry)[1] = bp.high;
+        BoundsPair bp1 = getBounds(*normal, 1);
+        db_get_bounds(normalEntry)[0] = bp1.low;
+        db_get_bounds(normalEntry)[1] = bp1.high;
+        BoundsPair bp2 = getBounds(*normal, 2);
+        db_get_bounds(normalEntry)[2] = bp2.low;
+        db_get_bounds(normalEntry)[3] = bp2.high;
     }
 }
 
+/*
 void pass_normalGameDominance() {
     cout << "Finding dominated moves for normalized games" << endl;
 
@@ -743,6 +771,7 @@ void pass_normalGameDominance() {
         db_get_dominance(normalEntry)[1] = dp.domWhite;
     }
 }
+*/
 
 void pass_normalGameMetric() {
     cout << "Finding metrics for normal games" << endl;
@@ -777,6 +806,7 @@ void pass_normalGameMetric() {
     }
 }
 
+/*
 void pass_main() {
     cout << "Main pass" << endl;
     GameGenerator gen;
@@ -856,9 +886,10 @@ void pass_main() {
         //}
 
         addToReplacementMap(*normal, idx);
-        //addToReplacementMapSmallest(*normal, idx);
+        addToReplacementMapSmallest(*normal, idx);
     }
 }
+*/
 
 void pass_mainNoNormal() {
     cout << "Main pass no normal" << endl;
@@ -882,22 +913,35 @@ void pass_mainNoNormal() {
         bool hasBounds = true;
         hasBounds &= db_get_bounds(entry)[0] != numeric_limits<int8_t>::max();
         hasBounds &= db_get_bounds(entry)[1] != numeric_limits<int8_t>::min();
+        hasBounds &= db_get_bounds(entry)[2] != numeric_limits<int8_t>::max();
+        hasBounds &= db_get_bounds(entry)[3] != numeric_limits<int8_t>::min();
 
         cout << *genGame.game << " " << genGame.shape << " " << std::flush;
 
         // Bounds on scale 1
         BoundsPair bp1;
+        BoundsPair bp2;
         if (hasBounds) {
             bp1.low = db_get_bounds(entry)[0];
             bp1.high = db_get_bounds(entry)[1];
+            bp2.low = db_get_bounds(entry)[2];
+            bp2.high = db_get_bounds(entry)[3];
         } else {
             bp1 = getBounds(*genGame.game, 1);
             db_get_bounds(entry)[0] = bp1.low;
             db_get_bounds(entry)[1] = bp1.high;
+
+            bp2 = getBounds(*genGame.game, 2);
+            db_get_bounds(entry)[2] = bp2.low;
+            db_get_bounds(entry)[3] = bp2.high;
         }
 
         // Find dominated moves
-        DominancePair dp = getDominance(*genGame.game);
+        DominancePair equal;
+        equal.domBlack = 0;
+        equal.domWhite = 0;
+
+        DominancePair dp = getDominance(*genGame.game, equal);
         db_get_dominance(entry)[0] = dp.domBlack;
         db_get_dominance(entry)[1] = dp.domWhite;
 
@@ -905,9 +949,15 @@ void pass_mainNoNormal() {
         uint64_t metric = getMetric(*genGame.game);
         *db_get_metric(entry) = metric;
 
+        // Update pruned with "equal"
+        dp.domBlack |= equal.domBlack;
+        dp.domWhite |= equal.domWhite;
+        db_get_dominance(entry)[0] = dp.domBlack;
+        db_get_dominance(entry)[1] = dp.domWhite;
+
         // Index for replacement map
 
-        BoundsPair bp2 = getBounds(*genGame.game, 2);
+        assert(bp1.low <= bp1.high);
         assert(bp2.low <= bp2.high);
         BoundsPair bp3 = getBounds(*genGame.game, 0);
         assert(bp3.low <= bp3.high);
@@ -933,7 +983,7 @@ void pass_mainNoNormal() {
         //}
 
         addToReplacementMap(*genGame.game, idx);
-        //addToReplacementMapSmallest(*normal, idx);
+        addToReplacementMapSmallest(*genGame.game, idx);
     }
 }
 

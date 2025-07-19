@@ -79,7 +79,6 @@ enum relation {
 Database *db;
 Solver *solver;
 unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMap;
-unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMapSmallest;
 
 ////////////////////////////////////////////////// helper functions
 
@@ -548,70 +547,6 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
     }
 }
 
-void addToReplacementMapSmallest(const Subgame &game, const ReplacementMapIdx &rmapIdx) {
-    vector<shared_ptr<IndirectLink>> &vec = replacementMapSmallest[rmapIdx];
-
-    uint8_t *entry = db->get(game);
-    assert(entry != 0);
-    assert(*db_get_outcome(entry) != 0 && *db_get_size(entry) != uint64_t(-1));
-
-    Subgame sgCopy = game;
-
-    size_t foundIdx = 0;
-    bool found = false;
-
-    const size_t N = vec.size();
-    for (size_t i = 0; i < N; i++) {
-        shared_ptr<IndirectLink> &indirect = vec[i];
-
-        uint8_t *linkedEntry = db->getFromIndirectIdx(*indirect);
-        assert(linkedEntry != 0);
-        uint64_t linkedShape = *db_get_shape(linkedEntry);
-        uint32_t linkedNumber = *db_get_number(linkedEntry);
-
-        vector<Subgame*> subgames = makeGameNew(linkedShape, linkedNumber);
-
-        for (Subgame *sg : subgames)
-            sg->negate();
-
-        subgames.push_back(&sgCopy);
-        Subgame *sum = Subgame::concatSubgames(subgames);
-        subgames.pop_back();
-
-        for (Subgame *sg : subgames)
-            delete sg;
-
-        relation rel = outcomeToRelation(getOutcome(*sum));
-        delete sum;
-
-        if (rel == REL_EQUAL) {
-            foundIdx = i;
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        uint64_t directLink = db->getIdxDirect(game);
-        vec.emplace_back(new IndirectLink(directLink));
-    } else {
-        const uint64_t metric = *db_get_size(entry);
-
-        IndirectLink &indirectLink = *(vec[foundIdx]);
-        uint8_t *foundEntry = db->getFromIndirectIdx(indirectLink);
-        assert(foundEntry != 0 && *db_get_outcome(entry) != 0);
-
-        const uint64_t foundMetric = *db_get_size(foundEntry);
-        assert(foundMetric != uint64_t(-1));
-
-        if (metric < foundMetric) { // New game is better
-            indirectLink.directLink = db->getIdxDirect(game);
-        } else if (metric > foundMetric) { // Existing game is better
-            *db_get_link_smallest(entry) = (uint64_t) &indirectLink;
-        }
-    }
-}
-
 ////////////////////////////////////////////////// main pass functions
 
 // Initialize all entries to uninitialized values
@@ -650,15 +585,6 @@ void pass_initializeAllEntries() {
             indirect.directLink = directLink;
             uint64_t indirectLink = (uint64_t) &indirect;
             *db_get_link(entry) = indirectLink;
-
-            assert(db->getFromIdx(indirectLink) == entry);
-        }
-
-        {
-            IndirectLink &indirect = db->getDefaultIndirectLink2(entryNumber);
-            indirect.directLink = directLink;
-            uint64_t indirectLink = (uint64_t) &indirect;
-            *db_get_link_smallest(entry) = indirectLink;
 
             assert(db->getFromIdx(indirectLink) == entry);
         }
@@ -886,7 +812,6 @@ void pass_main() {
         //}
 
         addToReplacementMap(*normal, idx);
-        addToReplacementMapSmallest(*normal, idx);
     }
 }
 */
@@ -983,7 +908,6 @@ void pass_mainNoNormal() {
         //}
 
         addToReplacementMap(*genGame.game, idx);
-        addToReplacementMapSmallest(*genGame.game, idx);
     }
 }
 
@@ -1055,7 +979,6 @@ void pass_normalGameLinks() {
         //}
 
         addToReplacementMap(*normal, idx);
-        //addToReplacementMapSmallest(*normal, idx);
     }
 }
 

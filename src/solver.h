@@ -82,6 +82,9 @@ bool *tt_get_valid(uint8_t *entry);
 uint64_t *tt_get_hash(uint8_t *entry);
 
 class Solver {
+  public:
+    static bool useBWMoveOrder;
+
   private:
     size_t boardLen;
 
@@ -140,7 +143,6 @@ class Solver {
 
     void simplify(uint8_t **board, size_t *boardLen);
     void simplifyNew(uint8_t **board, size_t *boardLen);
-    void simplifyNewSmallest(uint8_t **board, size_t *boardLen);
 
 
     std::optional<std::pair<int, bool>> checkStaticResult(uint8_t *dbEntry, int player);
@@ -268,49 +270,12 @@ inline bool entryValid(const uint8_t *entry) {
     return (entry != 0) && (*db_get_outcome(entry) != 0);
 }
 
-inline bool tryInflateLinkSmallest(const Subgame &sg, uint8_t *entry, Database *db, std::vector<Subgame*> &subgames) {
-    assert(entryValid(entry));
-
-    const uint64_t link = *db_get_link_smallest(entry);
-    if (link == 0)
-        return false;
-
-    uint8_t *newEntry = db->getFromIdx(link);
-    assert(newEntry != 0);
-
-    if (entry == newEntry)
-        return false;
-
-    const uint64_t shape = *db_get_shape(newEntry);
-    const uint32_t number = *db_get_number(newEntry);
-
-    std::vector<Subgame*> inflated = makeGameNew(shape, number);
-
-    subgames.reserve(subgames.size() + inflated.size());
-    for (Subgame *sg : inflated)
-        subgames.push_back(sg);
-
-    return true;
-}
-
-
 
 inline Subgame *Solver::getSimpleBoard(const uint8_t* board, size_t len) {
     uint8_t *newBoard = new uint8_t[len];
     memcpy(newBoard, board, len);
 
     simplifyNew(&newBoard, &len);
-
-    Subgame *game = new Subgame(newBoard, len);
-    delete[] newBoard;
-    return game;
-}
-
-inline Subgame *Solver::getShortBoard(const uint8_t* board, size_t len) {
-    uint8_t *newBoard = new uint8_t[len];
-    memcpy(newBoard, board, len);
-
-    simplifyNewSmallest(&newBoard, &len);
 
     Subgame *game = new Subgame(newBoard, len);
     delete[] newBoard;

@@ -29,7 +29,6 @@ enum {
     DB_BOUNDS,
     DB_METRIC,
     DB_LINK,
-    DB_LINK_SMALLEST,
     DB_SHAPE,
     DB_NUMBER,
     DB_SIZE,
@@ -42,7 +41,6 @@ struct DBLayout {
         sz(int8_t[4]),     // low/high bounds
         sz(uint64_t),       // simplicity metric
         sz(uint64_t),       //link
-        sz(uint64_t),       //linkSmall
         sz(uint64_t),       //shape
         sz(uint32_t),       //number
         sz(uint64_t),       //size
@@ -84,7 +82,6 @@ uint64_t *db_get_dominance(const uint8_t *entry);
 int8_t *db_get_bounds(const uint8_t *entry);
 uint64_t *db_get_metric(const uint8_t *entry);
 uint64_t *db_get_link(const uint8_t *entry);
-uint64_t *db_get_link_smallest(const uint8_t *entry);
 uint64_t *db_get_shape(const uint8_t *entry);
 uint32_t *db_get_number(const uint8_t *entry);
 uint64_t *db_get_size(const uint8_t *entry);
@@ -125,13 +122,8 @@ class Database {
     size_t _defaultIndirectLinksSize1;
     IndirectLink *_defaultIndirectLinks1;
 
-    size_t _defaultIndirectLinksSize2;
-    IndirectLink *_defaultIndirectLinks2;
-
-
   public:
     IndirectLink &getDefaultIndirectLink1(size_t entryNumber);
-    IndirectLink &getDefaultIndirectLink2(size_t entryNumber);
 
     size_t size;
 
@@ -167,7 +159,3 @@ inline IndirectLink &Database::getDefaultIndirectLink1(size_t entryNumber) {
     return _defaultIndirectLinks1[entryNumber];
 }
 
-inline IndirectLink &Database::getDefaultIndirectLink2(size_t entryNumber) {
-    assert(_useIndirectLinks && entryNumber < _defaultIndirectLinksSize2);
-    return _defaultIndirectLinks2[entryNumber];
-}

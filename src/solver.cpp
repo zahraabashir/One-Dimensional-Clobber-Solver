@@ -17,7 +17,7 @@ static_assert(true)
 
 using namespace std;
 
-
+bool Solver::useBWMoveOrder = false;
 bool Solver::doDebug = false;
 
 #define IFDEB(x) if (Solver::doDebug) {x} \
@@ -36,6 +36,8 @@ struct AnnotatedMove {
     int subgameIdx;
     bool isMiddle;
     bool isBest;
+
+    int score;
 };
 
 class MoveScorer {
@@ -71,7 +73,7 @@ public:
     //    return oppClass == m.oc ? 5 : 4;
     //}
 
-    int moveScore(const AnnotatedMove &m) const {
+    void makeMoveScore(AnnotatedMove &m) {
         const int oppClass = player == BLACK ? OC_W : OC_B;
 
         const bool best = m.isBest;
@@ -81,6 +83,9 @@ public:
         const bool negative = m.oc == oppClass;
         const bool positive = !negative;
 
+        // Previous best for BW
+
+        /*
         vector<bool> bools = {
             best,
             middle,
@@ -90,40 +95,69 @@ public:
             negative,
             positive,
         };
+        */
 
-        //vector<bool> bools = {
-        //    positive,
-        //    negative,
-        //    best,
-        //    npos,
-        //    middle,
-        //    unknown,
-        //};
+        vector<bool> bools;
 
+        if (Solver::useBWMoveOrder) {
+            // New best for BW
+            bools = {
+                best,
+                unknown,
+
+                positive,
+                middle,
+                negative,
+                npos,
+            };
+        } else {
+            // Best general
+            bools = {
+                positive,
+                negative,
+
+                npos,
+                unknown,
+                middle,
+                best,
+            };
+        }
+
+        bool found = false;
 
         int priority = 0;
         for (const bool b : bools) {
-            if (b)
-                return priority;
+            if (b) {
+                found = true;
+                break;
+            }
 
             priority++;
         }
 
-        assert(false);
-        return priority;
+        assert(found);
+        m.score = priority;
     }
 
 
     bool operator()(const AnnotatedMove &m1, const AnnotatedMove &m2) const {
-        return moveScore(m1) < moveScore(m2);
+        return (m1.score) < (m2.score);
     }
 
     int player;
 };
 
+std::random_device rd_move;
+std::mt19937 dist_move(rd_move());
+
 
 void sortMoves(vector<AnnotatedMove> &moves, int player) {
-    std::sort(moves.begin(), moves.end(), MoveScorer(player));
+    MoveScorer scorer(player);
+
+    for (AnnotatedMove &m : moves)
+        scorer.makeMoveScore(m);
+
+    std::sort(moves.begin(), moves.end(), scorer);
 }
 
 uint64_t node_count = 0; //nodes visited
@@ -1326,21 +1360,33 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     assert(bestMove >= 0);
 
-    for (int i = bestMove; i < moveCount; i++) {
-        assert(i >= 0);
-        if (checkedBestMove && i == bestMove) {
+    vector<int> moveOrder;
+    moveOrder.reserve(moveCount);
+
+    moveOrder.push_back(bestMove);
+
+    for (int i = 0; i < moveCount; i++) {
+        const int &from = moves[2 * i];
+        const int &to = moves[2 * i + 1];
+
+        if (i == bestMove)
+            continue;
+
+        if (from == -1 || to == -1) {
+            assert(from == -1 && to == -1);
             continue;
         }
-        
+
+        moveOrder.push_back(i);
+    }
+
+    for (int i : moveOrder) {
+        assert(i >= 0);
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
 
         if (from == -1 || to == -1) { //this move was pruned
             assert(from == -1 && to == -1);
-            if (!checkedBestMove) {
-                checkedBestMove = true;
-                i = -1;
-            }
             continue;
         }
 
@@ -1374,11 +1420,6 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
                 newBestMove = i;
                 bestVal = result.first;
             }
-        }
-
-        if (!checkedBestMove) {
-            checkedBestMove = true;
-            i = -1;
         }
     }
 
@@ -1714,7 +1755,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     //visit children, starting with best; find new best and update heuristic
     //if solved, save value and return
     int bestMove = -1;
-    bool checkedBestMove = false;
+    //bool checkedBestMove = false;
 
     entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 0);
     validEntry = entryPtr != 0;
@@ -1779,7 +1820,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
         const int mid = count / 2;
 
-        if (abs(mid - local) <= 1)
+        if (abs(mid - local) <= 2)
             m.isMiddle = true;
     }
 
@@ -1834,11 +1875,6 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
                 newBestMove = i;
                 bestVal = result.first;
             }
-        }
-
-        if (!checkedBestMove) {
-            checkedBestMove = true;
-            i = -1;
         }
     }
 

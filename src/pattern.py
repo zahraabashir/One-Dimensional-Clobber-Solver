@@ -6,6 +6,8 @@ import sys
 proc = None
 args = sys.argv
 mcgs_version_string = "version 1.2"
+reset = False
+altmove = False
 
 help_string = f"""\
     Usage: python3 {sys.argv[0]} <action>
@@ -14,6 +16,7 @@ help_string = f"""\
         bw <minimum N> <maximum N>
         bbw <minimum N> <maximum N>
         mcgs_gen <N cases>
+        random <board length> <N cases> <seed>
         -h, --h, -help, --help
 """
 
@@ -25,8 +28,21 @@ def print_help_message():
 
 def solve_board(board, player):
     global proc
+
+    if reset and proc is not None:
+        proc.stdin.close()
+        proc.wait()
+        proc = None
+
     if proc is None:
-        proc = subprocess.Popen("./TheSolvers --persist".split(),
+        flags = ["--persist"]
+
+        if altmove:
+            flags.append("--altmove")
+
+        flags = " ".join(flags)
+
+        proc = subprocess.Popen(f"./TheSolvers {flags}".split(),
                                 stdin=subprocess.PIPE,
                                 stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
@@ -135,6 +151,11 @@ def get_win_string(winning_player, to_play):
 
 
 def handle_bw():
+    assert proc is None
+
+    global altmove
+    altmove = True
+
     if len(args) != 4:
         print_help_message()
 
@@ -184,6 +205,48 @@ def handle_bbw():
         print("")
 
 
+def handle_random():
+    global reset
+    reset = True
+
+    if len(args) != 5:
+        print_help_message()
+
+    board_len = int(args[2])
+    n_cases = int(args[3])
+    seed = float(args[4])
+
+    random.seed(seed)
+
+    assert board_len > 0 and n_cases > 0
+
+    total_time = 0
+
+    for i in range(n_cases):
+        board_pair = get_board_random(board_len)
+        board = board_pair["clob"]
+
+        case_b = board + " " + "B"
+        case_w = board + " " + "W"
+
+        print(f"RANDOM {i + 1} of {n_cases}")
+
+        print(case_b)
+        result_b = solve_board(board, "B")
+        print_result(result_b)
+
+        print(case_w)
+        result_w = solve_board(board, "W")
+        print_result(result_w)
+
+        total_time += result_b[1]
+        total_time += result_w[1]
+
+        print("")
+
+    print(f"Total time: {total_time}s")
+
+
 def handle_mcgs_gen():
     if len(args) != 3:
         print_help_message()
@@ -217,6 +280,7 @@ actions = {
     "bw": handle_bw,
     "bbw": handle_bbw,
     "mcgs_gen": handle_mcgs_gen,
+    "random": handle_random,
 }
 
 def list_has_help_flag(l):

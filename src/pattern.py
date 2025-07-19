@@ -15,7 +15,7 @@ help_string = f"""\
     <action>:
         bw <minimum N> <maximum N>
         bbw <minimum N> <maximum N>
-        mcgs_gen <N cases>
+        mcgs_gen <board length> <N cases> <seed>
         random <board length> <N cases> <seed>
         -h, --h, -help, --help
 """
@@ -248,10 +248,14 @@ def handle_random():
 
 
 def handle_mcgs_gen():
-    if len(args) != 3:
+    if len(args) != 5:
         print_help_message()
 
-    n_cases = int(args[2])
+    board_len = int(args[2])
+    n_cases = int(args[3])
+    seed = int(args[4])
+
+    random.seed(seed)
     assert n_cases >= 0
 
     with open("clob.test", "w") as outfile:
@@ -260,7 +264,7 @@ def handle_mcgs_gen():
         outfile.write("[clobber_1xn]\n")
 
         for i in range(n_cases):
-            board_pair = get_board_random(33)
+            board_pair = get_board_random(board_len)
             board_clob = board_pair["clob"]
             board_mcgs = board_pair["mcgs"]
 

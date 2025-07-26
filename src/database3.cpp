@@ -57,11 +57,11 @@ uint32_t *db_get_number(const uint8_t *entry) {
     return (uint32_t *) (entry + Offset<DBLayout, DB_NUMBER>());
 }
 
-uint64_t *db_get_size(const uint8_t *entry) {
+uint8_t *db_get_simplest_moves(const uint8_t *entry) {
     if (entry == 0) {
         return 0;
     }
-    return (uint64_t *) (entry + Offset<DBLayout, DB_SIZE>());
+    return (uint8_t *) (entry + Offset<DBLayout, DB_SIMPLEST_MOVES>());
 }
 
 constexpr uint64_t shapeNumberMask() {

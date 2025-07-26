@@ -33,9 +33,11 @@ struct AnnotatedMove {
     int oc;
     int idx;
     int localIdx;
+    int localIdxUndom;
     int subgameIdx;
     bool isMiddle;
     bool isBest;
+    bool isSimplest;
 
     int score;
 };
@@ -82,6 +84,7 @@ public:
         const bool npos = m.oc == OC_N;
         const bool negative = m.oc == oppClass;
         const bool positive = !negative;
+        const bool simplest = m.isSimplest;
 
         // Previous best for BW
 
@@ -101,32 +104,72 @@ public:
 
         if (Solver::useBWMoveOrder) {
             // New best for BW
+            /*
             bools = {
                 best,
                 unknown,
 
                 positive,
+
                 middle,
+
                 negative,
+
                 npos,
             };
+            */
+
+            bools = {
+                npos,
+                npos && simplest,
+
+                negative,
+                negative && simplest,
+
+                middle,
+
+                positive,
+                positive && simplest,
+
+                unknown,
+                best,
+            };
+
         } else {
             // Best general
+            //bools = {
+            //    positive,
+            //    negative,
+
+            //    npos,
+            //    unknown,
+            //    middle,
+            //    best,
+            //};
+
             bools = {
                 positive,
-                negative,
+                positive && simplest,
+
+                unknown,
 
                 npos,
-                unknown,
-                middle,
+                negative,
+
+                npos && simplest,
+                negative && simplest,
+
                 best,
+                middle,
             };
+
         }
 
         bool found = false;
 
         int priority = 0;
-        for (const bool b : bools) {
+        for (auto it = bools.rbegin(); it != bools.rend(); it++) {
+            const bool &b = *it;
             if (b) {
                 found = true;
                 break;
@@ -136,7 +179,7 @@ public:
         }
 
         assert(found);
-        m.score = priority;
+        m.score = bools.size() - priority;
     }
 
 
@@ -375,7 +418,10 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
     doABPrune = false;
     maxCompleted = 1;
     limitCompletions = true;
-    maxDepth = 0;
+    maxDepth = 1;
+
+    // EXPERIMENT
+    maxCompleted = len * 2;
 
     while (true) {
         //collisions = 0;
@@ -387,16 +433,21 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
         //maxDepth = 9999999;
 
         #if defined ALTERNATE_ID_SCALING
-        maxCompleted *= 2;
-        if (maxDepth >= 12) {
-        #else
-        #error "Don't use this"
-        maxCompleted += 50;
-        if (maxDepth >= 30) {
-        #endif
-            limitCompletions = false;
-            maxDepth = 999999999;
+        if (maxDepth > 1) {
+            if (maxDepth == 2)
+                maxCompleted = 1;
+
+            maxCompleted *= 2;
+            if (maxDepth >= 12) {
+                limitCompletions = false;
+                maxDepth = 999999999;
+            }
         }
+
+
+        #else
+        #error "not implemented"
+        #endif
 
         if (maxDepth >= 18) { //was 10
             doABPrune = true;
@@ -404,10 +455,6 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 
         #if defined(SOLVER_ALPHA_BETA)
         #error "Don't use this"
-        Bound alpha = Bound::min();
-        Bound beta = Bound::max();
-        Bound cb1, cb2;
-        pair<int, bool> result = rootSearchID(state, p, n, 0, alpha, beta, cb1, cb2);
         #else
         pair<int, bool> result = rootSearchID(board, len, n, p, 0);
         //pair<int, bool> result = searchID(board, len, n, p, 0);
@@ -1312,6 +1359,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
+        /*
         completed += 1;
 
         size_t pMoveCount;
@@ -1336,40 +1384,51 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
             *tt_get_depth(entryPtr) = depth;
             *tt_get_heuristic(entryPtr) = h;
         }        
+        */
 
         delete[] moves;
         delete[] sboard;
-        return pair<int, bool>(h, false);
+        return pair<int, bool>(0, false);
     }
 
     //visit children, starting with best; find new best and update heuristic
     //if solved, save value and return
 
-    int bestMove = 0;
-    bool checkedBestMove = false;
+    int bestMove = -1;
     entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, hash, 0);
     validEntry = entryPtr != 0;
-    if (validEntry) {
+    if (validEntry)
         bestMove = tt_get_best_moves(entryPtr)[0];
-    }
 
     int bestVal = -127;
     uint8_t undoBuffer[UNDO_BUFFER_SIZE];
-    int newBestMove = 0;
+    int newBestMove = -1;
     bool allProven = true;
-
-    assert(bestMove >= 0);
 
     vector<int> moveOrder;
     moveOrder.reserve(moveCount);
 
-    moveOrder.push_back(bestMove);
+    int bwMove = -1;
+
+    if (useBWMoveOrder) {
+        for (size_t i = 0; i < moveCount; i++)
+            if (moves[2 * i] == 12 && moves[2 * i + 1] == 13) {
+                bwMove = i;
+                break;
+            }
+    }
+
+    if (bwMove != -1)
+        moveOrder.push_back(bwMove);
+
+    if (bwMove != bestMove && bestMove != -1)
+        moveOrder.push_back(bestMove);
 
     for (int i = 0; i < moveCount; i++) {
         const int &from = moves[2 * i];
         const int &to = moves[2 * i + 1];
 
-        if (i == bestMove)
+        if (i == bestMove || i == bwMove)
             continue;
 
         if (from == -1 || to == -1) {
@@ -1381,6 +1440,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
     }
 
     for (int i : moveOrder) {
+
         assert(i >= 0);
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
@@ -1476,9 +1536,12 @@ inline optional<SolveResult> Solver::fullBoardStaticRules(
 
 inline optional<SolveResult> Solver::subgameStaticRules(
     const uint8_t *sboard, int player, const vector<SubgameRange> &ranges,
-    vector<int> &outcomes) {
+    vector<int> &outcomes, vector<uint8_t> &simpleMoves) {
 
-    assert(outcomes.empty());
+    assert(outcomes.empty() && simpleMoves.empty());
+
+    outcomes.reserve(ranges.size());
+    simpleMoves.reserve(ranges.size());
 
     int counts[5];
     for (int i = 0; i < 5; i++)
@@ -1497,10 +1560,17 @@ inline optional<SolveResult> Solver::subgameStaticRules(
     for (const SubgameRange &range : ranges) {
         uint8_t *subgameEntry = db->get(&sboard[range.start], range.length);
 
-        int outcome = subgameEntry ? *db_get_outcome(subgameEntry) : OC_UNKNOWN;
+        // Get outcome
+        const int outcome = subgameEntry ? *db_get_outcome(subgameEntry) : OC_UNKNOWN;
         outcomes.push_back(outcome);
         counts[outcome] += 1;
         outcomeMask |= (1 << outcome);
+
+        // Get simple move
+        const uint8_t simpleMove = subgameEntry ?
+            db_get_simplest_moves(subgameEntry)[player - 1] : uint8_t(-1);
+
+        simpleMoves.push_back(simpleMove);
 
 
         const bool hasOutcome = (outcome != 0);
@@ -1622,10 +1692,11 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     // Subgame static rules
     vector<int> outcomesSimple;
+    vector<uint8_t> simpleMoves;
 
     {
         optional<SolveResult> sr = subgameStaticRules(sboard, n, rangesSimple,
-                outcomesSimple);
+                outcomesSimple, simpleMoves);
 
         if (sr.has_value()) {
             entryPtr = getEntryPtr(blockPtr, sboard,
@@ -1697,6 +1768,10 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     vector<bool> prunedMoveGenerators = pruneMoveGenerators(sboard, sboardLen);
 
+    bool prunedMoves[moveCount];
+    for (size_t i = 0; i < moveCount; i++)
+        prunedMoves[i] = false;
+
     //Delete dominated moves
     #if defined(SOLVER_DELETE_DOMINATED_MOVES)
     for (int i = 0; i < rangesSimple.size(); i++) {
@@ -1717,8 +1792,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             if (from >= range.start && from < range.end) { //found move
                 if ((dominated >> moveIndex) & ((uint64_t) 1)) {
                     //cout << "FOUND" << endl;
-                    moves[2 * j] = -1;
-                    moves[2 * j + 1] = -1;
+                    //moves[2 * j] = -1;
+                    //moves[2 * j + 1] = -1;
+                    prunedMoves[j] = true;
                 }
                 moveIndex++;
             }
@@ -1727,20 +1803,39 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
     #endif
 
+    auto getHeuristic = [&]() -> int {
+        int hNew = 0;
+
+        int prev = 0;
+        int streak = 0;
+
+        for (size_t i = 0; i < sboardLen; i++) {
+            int cur = sboard[i];
+
+            if (prev != cur)
+                streak = 0;
+            else
+                streak++;
+
+            if (cur == n) {
+                hNew += 1 + streak;
+            }
+
+            prev = cur;
+        }
+
+
+        return hNew;
+    };
+
     //if deep, generate heuristic and return
     if (depth == maxDepth || (limitCompletions && (completed >= maxCompleted))) {
         completed += 1;
 
-        size_t pMoveCount;
-        int *pMoves = getMoves(sboard, sboardLen, p, &pMoveCount);
-
-        if (pMoveCount > 0)
-            delete[] pMoves;
-
         entryPtr = getEntryPtr(blockPtr, sboard, sboardLen, n, ttableHash, 1);
         int h = *tt_get_heuristic(entryPtr);
         if (!validEntry)
-            h = -pMoveCount;
+            h = getHeuristic();
 
         *tt_get_valid(entryPtr) = true;
         *tt_get_outcome(entryPtr) = EMPTY;
@@ -1769,6 +1864,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
 
     // TODO
     assert(rangesSimple.size() == outcomesSimple.size());
+    assert(rangesSimple.size() == simpleMoves.size());
 
     vector<AnnotatedMove> annotatedMoves;
 
@@ -1776,8 +1872,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         const int from = moves[2 * i];
         const int to = moves[2 * i + 1];
 
-        if (from == -1)
-            continue;
+        assert(from != -1);
+
+        bool pruned = prunedMoves[i];
 
         int subgameIdx = -1;
         for (int i = 0; i < rangesSimple.size(); i++) {
@@ -1791,26 +1888,30 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
         assert(subgameIdx != -1);
 
-        if (prunedMoveGenerators[subgameIdx])
-            continue;
+        pruned |= prunedMoveGenerators[subgameIdx];
 
         const int oc = outcomesSimple[subgameIdx];
+        const uint8_t simpleMove = simpleMoves[subgameIdx];
         int &localIdx = subgameMoveCounts[subgameIdx];
 
-        annotatedMoves.push_back({});
-        AnnotatedMove &m = annotatedMoves.back();
-        m.from = from;
-        m.to = to;
-        m.oc = oc;
-        m.isMiddle = false;
-        m.idx = i;
-        m.localIdx = localIdx;
-        m.subgameIdx = subgameIdx;
-        m.isBest = (i == bestMove);
+        if (!pruned) {
+            annotatedMoves.push_back({});
+            AnnotatedMove &m = annotatedMoves.back();
+            m.from = from;
+            m.to = to;
+            m.oc = oc;
+            m.isMiddle = false;
+            m.idx = i;
+            m.localIdx = localIdx;
+            m.subgameIdx = subgameIdx;
+            m.isBest = (i == bestMove);
+            m.isSimplest = (localIdx == simpleMove);
+        }
 
         localIdx++;
     }
 
+    /*
     for (AnnotatedMove &m : annotatedMoves) {
         if (m.oc != OC_UNKNOWN)
             continue;
@@ -1819,10 +1920,25 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         const int local = m.localIdx;
 
         const int mid = count / 2;
-
+ 
         if (abs(mid - local) <= 2)
             m.isMiddle = true;
     }
+    */
+
+    for (AnnotatedMove &m : annotatedMoves) {
+        if (m.oc != OC_UNKNOWN)
+            continue;
+
+        const SubgameRange &range = rangesSimple[m.subgameIdx];
+
+        const int mid = (range.start + range.end - 1) / 2;
+        const int maxDiff = range.length / 4;
+
+        if (abs(mid - m.from) <= maxDiff)
+            m.isMiddle = true;
+    }
+
 
     sortMoves(annotatedMoves, n);
     assert(moveOrder.empty());
@@ -1830,10 +1946,10 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         moveOrder.push_back(m.idx);
 
     int bestVal = -127;
+    int newBestMove = -1;
 
     uint8_t undoBuffer[UNDO_BUFFER_SIZE];
 
-    int newBestMove = 0;
 
     bool allProven = true;
 
@@ -1847,10 +1963,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         int from = moves[2 * i];
         int to = moves[2 * i + 1];
 
-
-        if (from == -1) { //this move was pruned
-            continue;
-        }
+        assert(from != -1);
 
         play(sboard, undoBuffer, from, to);
         pair<int, bool> result = searchID(sboard, sboardLen, p, n, depth + 1);
@@ -1870,8 +1983,9 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
 
         if (!result.second) {
-            result.first *= -1;
-            if (result.first > bestVal) {
+            result.first = (result.first * -1);
+
+            if (result.first > bestVal || newBestMove == -1) {
                 newBestMove = i;
                 bestVal = result.first;
             }

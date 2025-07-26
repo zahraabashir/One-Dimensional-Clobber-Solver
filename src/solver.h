@@ -158,7 +158,7 @@ class Solver {
     std::optional<SolveResult> subgameStaticRules(
 const uint8_t *sboard,
         int player, const std::vector<SubgameRange> &ranges,
-        std::vector<int> &outcomes);
+        std::vector<int> &outcomes, std::vector<uint8_t> &simpleMoves);
 
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <optional>
 #include <cstddef>
 #include <vector>
 #include <iostream>
@@ -28,7 +29,7 @@ struct Subgame {
     Subgame *getNormalizedGame() const;
     uint64_t getHash() const;
 
-    std::vector<Subgame*> getChildren(int player, uint64_t dominance) const;
+    std::vector<std::optional<Subgame*>> getChildren(int player, uint64_t dominance) const;
     std::vector<Subgame*> getNormalizedChildren(int player, uint64_t dominance) const;
 
     static Subgame *concatSubgames(const std::vector<Subgame*> &subgames);

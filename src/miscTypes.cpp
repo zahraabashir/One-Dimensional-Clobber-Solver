@@ -136,10 +136,10 @@ uint64_t Subgame::getHash() const {
     return getZobristHash(BLACK, board(), size());
 }
 
-vector<Subgame*> Subgame::getChildren(int player, uint64_t dominance) const {
+vector<optional<Subgame*>> Subgame::getChildren(int player, uint64_t dominance) const {
     assert(player == BLACK || player == WHITE);
 
-    vector<Subgame*> children;
+    vector<optional<Subgame*>> children;
 
     const size_t boardSize = size();
     uint8_t boardCopy[boardSize];
@@ -160,8 +160,10 @@ vector<Subgame*> Subgame::getChildren(int player, uint64_t dominance) const {
     uint8_t undoBuffer[UNDO_BUFFER_SIZE];
 
     for (size_t i = 0; i < moveCount; i++) {
-        if (getDominated(dominance, i))
+        if (getDominated(dominance, i)) {
+            children.push_back({});
             continue;
+        }
 
         assertUndo();
         const int from = moves[2 * i];
@@ -181,12 +183,17 @@ vector<Subgame*> Subgame::getChildren(int player, uint64_t dominance) const {
 }
 
 vector<Subgame*> Subgame::getNormalizedChildren(int player, uint64_t dominance) const {
-    vector<Subgame*> childrenNonNormal = getChildren(player, dominance);
+    vector<optional<Subgame*>> childrenNonNormal = getChildren(player, dominance);
 
     vector<Subgame*> childrenNormal;
     childrenNormal.reserve(childrenNonNormal.size());
 
-    for (Subgame *sg : childrenNonNormal) {
+    for (optional<Subgame*> &sg_opt : childrenNonNormal) {
+        if (!sg_opt.has_value())
+            continue;
+
+        Subgame *sg = sg_opt.value();
+
         Subgame *sgNormal = sg->getNormalizedGame();
 
         if (sgNormal->size() == 0)

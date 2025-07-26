@@ -216,6 +216,9 @@ def handle_random():
     n_cases = int(args[3])
     seed = float(args[4])
 
+    if seed == 0:
+        seed = time.time_ns()
+
     random.seed(seed)
 
     assert board_len > 0 and n_cases > 0
@@ -254,6 +257,9 @@ def handle_mcgs_gen():
     board_len = int(args[2])
     n_cases = int(args[3])
     seed = int(args[4])
+
+    if seed == 0:
+        seed = time.time_ns()
 
     random.seed(seed)
     assert n_cases >= 0

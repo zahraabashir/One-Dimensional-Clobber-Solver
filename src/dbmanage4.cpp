@@ -336,7 +336,9 @@ inline uint64_t getChildMetric(const Subgame &sg) {
     return *db_get_metric(entry);
 }
 
-uint64_t getMetric(const Subgame &sg) {
+uint64_t getMetric(const Subgame &sg, uint8_t &simplestBlack,
+                   uint8_t &simplestWhite) {
+
     uint64_t metric = 0;
 
     uint8_t *entry = db->get(sg);
@@ -363,16 +365,47 @@ uint64_t getMetric(const Subgame &sg) {
         metric -= nDominatedMoves;
     }
 
-    vector<Subgame*> childrenBlack = sg.getChildren(BLACK, domBlack);
-    vector<Subgame*> childrenWhite = sg.getChildren(WHITE, domWhite);
+    vector<optional<Subgame*>> childrenBlack = sg.getChildren(BLACK, domBlack);
+    vector<optional<Subgame*>> childrenWhite = sg.getChildren(WHITE, domWhite);
 
-    for (Subgame *sg : childrenBlack) {
-        metric += getChildMetric(*sg);
+    uint64_t bestBlack = uint64_t(-1);
+    uint64_t bestWhite = uint64_t(-1);
+
+    const size_t childrenBlackSize = childrenBlack.size();
+    for (size_t i = 0; i < childrenBlackSize; i++) {
+        optional<Subgame*> &sg_opt = childrenBlack[i];
+
+        if (!sg_opt.has_value())
+            continue;
+
+        Subgame *sg = sg_opt.value();
+        const uint64_t childMetric = getChildMetric(*sg);
+        metric += childMetric;
+
+        if (childMetric < bestBlack) {
+            bestBlack = childMetric;
+            simplestBlack = i;
+        }
+
         delete sg;
     }
 
-    for (Subgame *sg : childrenWhite) {
-        metric += getChildMetric(*sg);
+    const size_t childrenWhiteSize = childrenWhite.size();
+    for (size_t i = 0; i < childrenWhiteSize; i++) {
+        optional<Subgame*> &sg_opt = childrenWhite[i];
+
+        if (!sg_opt.has_value())
+            continue;
+
+        Subgame *sg = sg_opt.value();
+        const uint64_t childMetric = getChildMetric(*sg);
+        metric += childMetric;
+
+        if (childMetric < bestWhite) {
+            bestWhite = childMetric;
+            simplestWhite = i;
+        }
+
         delete sg;
     }
 
@@ -576,7 +609,8 @@ void pass_initializeAllEntries() {
         *db_get_metric(entry) = uint64_t(-1);
         *db_get_shape(entry) = genGame.shapeNumber;
         *db_get_number(entry) = genGame.gameNumber;
-        *db_get_size(entry) = genGame.gameSize;
+        db_get_simplest_moves(entry)[0] = uint8_t(-1);
+        db_get_simplest_moves(entry)[1] = uint8_t(-1);
 
         uint64_t directLink = db->getIdxDirect(*genGame.game);
 
@@ -660,162 +694,6 @@ void pass_normalGameBounds() {
     }
 }
 
-/*
-void pass_normalGameDominance() {
-    cout << "Finding dominated moves for normalized games" << endl;
-
-    GameGenerator gen;
-
-    unordered_set<uint64_t> hashes;
-
-    while (gen) {
-        GeneratedGame genGame = gen.generate();
-        ++gen;
-
-        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
-
-        if (normal->size() == 0)
-            continue;
-
-        const uint64_t normalHash = normal->getHash();
-
-        {
-            auto it = hashes.insert(normalHash);
-            if (!it.second)
-                continue;
-        }
-
-        //cout << *normal << endl;
-
-        uint8_t *normalEntry = db->get(*normal);
-        assert(normalEntry != 0);
-
-        assert(*db_get_outcome(normalEntry) != 0);
-
-        DominancePair dp = getDominance(*normal);
-        db_get_dominance(normalEntry)[0] = dp.domBlack;
-        db_get_dominance(normalEntry)[1] = dp.domWhite;
-    }
-}
-*/
-
-void pass_normalGameMetric() {
-    cout << "Finding metrics for normal games" << endl;
-    GameGenerator gen;
-
-    unordered_set<uint64_t> hashes;
-
-    while (gen) {
-        GeneratedGame genGame = gen.generate();
-        ++gen;
-
-        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
-
-        if (normal->size() == 0)
-            continue;
-
-        const uint64_t normalHash = normal->getHash();
-
-        {
-            auto it = hashes.insert(normalHash);
-            if (!it.second)
-                continue;
-        }
-
-        uint8_t *normalEntry = db->get(*normal);
-        assert(normalEntry != 0);
-        assert(*db_get_outcome(normalEntry) != 0);
-        assert(*db_get_metric(normalEntry) == uint64_t(-1));
-
-        const uint64_t metric = getMetric(*normal);
-        *db_get_metric(normalEntry) = metric;
-    }
-}
-
-/*
-void pass_main() {
-    cout << "Main pass" << endl;
-    GameGenerator gen;
-
-    unordered_set<uint64_t> hashes;
-
-    while (gen) {
-        GeneratedGame genGame = gen.generate();
-        ++gen;
-
-        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
-
-        if (normal->size() == 0)
-            continue;
-
-        const uint64_t normalHash = normal->getHash();
-
-        {
-            auto it = hashes.insert(normalHash);
-            if (!it.second)
-                continue;
-        }
-
-        uint8_t *normalEntry = db->get(*normal);
-        assert(normalEntry != 0);
-        assert(*db_get_outcome(normalEntry) != 0);
-        //assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
-        //assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
-
-        assert(db_get_bounds(normalEntry)[0] != numeric_limits<int8_t>::max());
-        assert(db_get_bounds(normalEntry)[1] != numeric_limits<int8_t>::min());
-
-        cout << *normal << " " << std::flush;
-
-        // Find dominated moves
-        DominancePair dp = getDominance(*normal);
-        db_get_dominance(normalEntry)[0] = dp.domBlack;
-        db_get_dominance(normalEntry)[1] = dp.domWhite;
-
-        // Find metric
-        uint64_t metric = getMetric(*normal);
-        *db_get_metric(normalEntry) = metric;
-
-        // Index for replacement map
-        //BoundsPair bp1 = getBounds(*normal, 1);
-        //assert(bp1.low <= bp1.high);
-        BoundsPair bp1;
-        bp1.low = db_get_bounds(normalEntry)[0];
-        bp1.high = db_get_bounds(normalEntry)[1];
-
-        BoundsPair bp2 = getBounds(*normal, 2);
-        assert(bp2.low <= bp2.high);
-        BoundsPair bp3 = getBounds(*normal, 0);
-        assert(bp3.low <= bp3.high);
-
-        db_get_bounds(normalEntry)[0] = bp1.low;
-        db_get_bounds(normalEntry)[1] = bp1.high;
-
-        cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
-        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
-        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
-
-        // Find link
-        ReplacementMapIdx idx;
-        idx.outcome = *db_get_outcome(normalEntry);
-        idx.low1 = bp1.low;
-        idx.high1 = bp1.high;
-        idx.low2 = bp2.low;
-        idx.high2 = bp2.high;
-        idx.low3 = bp3.low;
-        idx.high3 = bp3.high;
-
-        //if (equalsProblemCase(*normal)) {
-        //    assert(!Solver::doDebug);
-        //    cout << "ENABLING DEBUG" << endl;
-        //    Solver::doDebug = true;
-        //}
-
-        addToReplacementMap(*normal, idx);
-    }
-}
-*/
-
 void pass_mainNoNormal() {
     cout << "Main pass no normal" << endl;
     GameGenerator gen;
@@ -870,9 +748,15 @@ void pass_mainNoNormal() {
         db_get_dominance(entry)[0] = dp.domBlack;
         db_get_dominance(entry)[1] = dp.domWhite;
 
-        // Find metric
-        uint64_t metric = getMetric(*genGame.game);
+        // Find metric and simplest moves
+        uint8_t simplestBlack = uint8_t(-1);
+        uint8_t simplestWhite = uint8_t(-1);
+
+        uint64_t metric = getMetric(*genGame.game, simplestBlack, simplestWhite);
         *db_get_metric(entry) = metric;
+        
+        db_get_simplest_moves(entry)[0] = simplestBlack;
+        db_get_simplest_moves(entry)[1] = simplestWhite;
 
         // Update pruned with "equal"
         dp.domBlack |= equal.domBlack;
@@ -908,77 +792,6 @@ void pass_mainNoNormal() {
         //}
 
         addToReplacementMap(*genGame.game, idx);
-    }
-}
-
-void pass_normalGameLinks() {
-    cout << "Finding links for normal games" << endl;
-    GameGenerator gen;
-
-    unordered_set<uint64_t> hashes;
-
-    while (gen) {
-        GeneratedGame genGame = gen.generate();
-        ++gen;
-
-        unique_ptr<Subgame> normal(genGame.game->getNormalizedGame());
-
-        if (normal->size() == 0)
-            continue;
-
-        const uint64_t normalHash = normal->getHash();
-
-        {
-            auto it = hashes.insert(normalHash);
-            if (!it.second)
-                continue;
-        }
-
-        uint8_t *normalEntry = db->get(*normal);
-        assert(normalEntry != 0);
-        assert(*db_get_outcome(normalEntry) != 0);
-        //assert(db_get_bounds(normalEntry)[0] == numeric_limits<int8_t>::max());
-        //assert(db_get_bounds(normalEntry)[1] == numeric_limits<int8_t>::min());
-
-        assert(db_get_bounds(normalEntry)[0] != numeric_limits<int8_t>::max());
-        assert(db_get_bounds(normalEntry)[1] != numeric_limits<int8_t>::min());
-
-        cout << *normal << " " << std::flush;
-
-        //BoundsPair bp1 = getBounds(*normal, 1);
-        //assert(bp1.low <= bp1.high);
-        BoundsPair bp1;
-        bp1.low = db_get_bounds(normalEntry)[0];
-        bp1.high = db_get_bounds(normalEntry)[1];
-
-        BoundsPair bp2 = getBounds(*normal, 2);
-        assert(bp2.low <= bp2.high);
-        BoundsPair bp3 = getBounds(*normal, 0);
-        assert(bp3.low <= bp3.high);
-
-        db_get_bounds(normalEntry)[0] = bp1.low;
-        db_get_bounds(normalEntry)[1] = bp1.high;
-
-        cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
-        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
-        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
-
-        ReplacementMapIdx idx;
-        idx.outcome = *db_get_outcome(normalEntry);
-        idx.low1 = bp1.low;
-        idx.high1 = bp1.high;
-        idx.low2 = bp2.low;
-        idx.high2 = bp2.high;
-        idx.low3 = bp3.low;
-        idx.high3 = bp3.high;
-
-        //if (equalsProblemCase(*normal)) {
-        //    assert(!Solver::doDebug);
-        //    cout << "ENABLING DEBUG" << endl;
-        //    Solver::doDebug = true;
-        //}
-
-        addToReplacementMap(*normal, idx);
     }
 }
 

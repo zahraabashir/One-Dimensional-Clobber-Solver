@@ -31,7 +31,7 @@ enum {
     DB_LINK,
     DB_SHAPE,
     DB_NUMBER,
-    DB_SIZE,
+    DB_SIMPLEST_MOVES,
 };
 
 struct DBLayout {
@@ -43,7 +43,7 @@ struct DBLayout {
         sz(uint64_t),       //link
         sz(uint64_t),       //shape
         sz(uint32_t),       //number
-        sz(uint64_t),       //size
+        sz(uint8_t[2]),     // simplest moves
     };
 
     static constexpr size_t N = sizeof(arr) / sizeof(size_t);
@@ -84,7 +84,7 @@ uint64_t *db_get_metric(const uint8_t *entry);
 uint64_t *db_get_link(const uint8_t *entry);
 uint64_t *db_get_shape(const uint8_t *entry);
 uint32_t *db_get_number(const uint8_t *entry);
-uint64_t *db_get_size(const uint8_t *entry);
+uint8_t *db_get_simplest_moves(const uint8_t *entry);
 
 struct IndirectLink {
 

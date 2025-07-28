@@ -267,13 +267,14 @@ Database::~Database() {
 }
 
 //NOTE: doesn't update header
-void Database::save() {
+void Database::save(const char *fileName) {
     cout << "DB SAVE" << endl;
-    file = fopen("database3.bin", "r+");
+    file = fopen(fileName, "r+");
     fwrite(data, 1, size, file);
     fclose(file);
 }
 
+/*
 void Database::load() {
     //cout << "DB LOAD" << endl;
 
@@ -293,6 +294,7 @@ void Database::load() {
     entryCount = ((size_t *) data)[1];
     index = (uint64_t *) (data + headerSize);
 }
+*/
 
 void Database::loadFrom(const char *fileName) {
     //cout << "DB LOAD" << endl;

@@ -77,8 +77,13 @@ enum relation {
 
 ////////////////////////////////////////////////// globals
 Database *db;
+Database *alt_db;
 Solver *solver;
-unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> replacementMap;
+
+typedef unordered_map<ReplacementMapIdx, vector<shared_ptr<IndirectLink>>> rmap_t;
+
+rmap_t replacementMap;
+rmap_t altReplacementMap;
 
 ////////////////////////////////////////////////// helper functions
 
@@ -218,6 +223,16 @@ uint64_t lookupComplexity(const uint8_t *board, size_t boardLen) {
     return metric;
 }
 
+uint64_t lookupAltComplexity(const uint8_t *board, size_t boardLen) {
+    uint8_t *entry = alt_db->get(board, boardLen);
+    if (entry == 0)
+        return 0;
+    assert(*db_get_outcome(entry) != 0);
+    const uint64_t metric = *db_get_metric(entry);
+    assert(metric != uint64_t(-1));
+    return metric;
+}
+
 uint64_t getDominanceImplFor(const uint8_t *board, size_t boardLen, int player, uint64_t &equal) {
     assert(player == BLACK || player == WHITE);
 
@@ -328,17 +343,190 @@ DominancePair getDominance(const Subgame &sg, DominancePair &equal) {
     return getDominance(sg.board(), sg.size(), equal);
 }
 
-inline uint64_t getChildMetric(const Subgame &sg) {
-    uint8_t *entry = db->get(sg);
+//////////////////////////////
+uint64_t getAltDominanceImplFor(const uint8_t *board, size_t boardLen, int player, uint64_t &equal) {
+    assert(player == BLACK || player == WHITE);
+
+    const size_t g1Size = boardLen;
+    uint8_t g1[g1Size];
+    uint8_t undo1[UNDO_BUFFER_SIZE];
+
+    const size_t g2Size = boardLen;
+    uint8_t g2[g2Size];
+    uint8_t undo2[UNDO_BUFFER_SIZE];
+
+    for (size_t i = 0; i < boardLen; i++) {
+        g1[i] = board[i];
+        g2[i] = board[i];
+    }
+
+    auto assertRestore1 = [&]() -> void {
+        assert(memcmp(g1, board, boardLen) == 0);
+    };
+
+    auto assertRestore2 = [&]() -> void {
+        assert(memcmp(g2, board, boardLen) == 0);
+    };
+
+    assertRestore1();
+    assertRestore2();
+    uint64_t mask = 0;
+
+    size_t moveCount;
+    unique_ptr<int[]> moves(getMoves(g1, g1Size, player, &moveCount));
+
+    for (size_t i = 0; i < moveCount; i++) {
+        assertRestore1();
+
+        //if (getDominated(mask, i))
+        //    continue;
+
+        play(g1, undo1, moves[2 * i], moves[2 * i + 1]);
+
+        for (size_t j = i + 1; j < moveCount; j++) {
+            assertRestore2();
+            //assert(!getDominated(mask, i));
+
+            if (getDominated(mask, i) && getDominated(mask, j))
+                continue;
+
+            //if (getDominated(mask, j))
+            //    continue;
+
+            play(g2, undo2, moves[2 * j], moves[2 * j + 1]);
+            negateBoard(g2, g2Size);
+
+            size_t g3Size;
+            uint8_t *g3 = addGames(g1, g1Size, g2, g2Size, &g3Size);
+
+            int bFirst = solver->solveID(g3, g3Size, BLACK);
+            int wFirst = solver->solveID(g3, g3Size, WHITE);
+
+            delete[] g3;
+
+            int compare = 0;
+
+            if (bFirst == wFirst)
+                compare = (bFirst == BLACK) ? 1 : -1; // Positive or negative
+
+            if (player == WHITE)
+                compare = -compare; // Positive or negative for current player
+
+            if (compare == -1) { // I < J (from POV of player)
+                setDominated(mask, i);
+                //break;
+            }
+            else if (compare == 1) // I > J (from POV of player)
+                setDominated(mask, j);
+            else if (bFirst == WHITE && wFirst == BLACK) {
+                const uint64_t metric1 = lookupAltComplexity(g1, g1Size);
+                const uint64_t metric2 = lookupAltComplexity(g2, g2Size);
+
+                const bool pruneFirst = metric1 > metric2;
+
+                if (pruneFirst)
+                    setDominated(equal, i);
+                else
+                    setDominated(equal, j);
+            }
+
+            negateBoard(g2, g2Size);
+            undo(g2, undo2);
+        }
+
+        undo(g1, undo1);
+    }
+
+    assertRestore1();
+    assertRestore2();
+
+    return mask;
+}
+
+DominancePair getAltDominance(const uint8_t *board, size_t boardLen, DominancePair &equal) {
+    DominancePair dp;
+    dp.domBlack = getAltDominanceImplFor(board, boardLen, BLACK, equal.domBlack);
+    dp.domWhite = getAltDominanceImplFor(board, boardLen, WHITE, equal.domWhite);
+    return dp;
+}
+
+DominancePair getAltDominance(const Subgame &sg, DominancePair &equal) {
+    return getAltDominance(sg.board(), sg.size(), equal);
+}
+//////////////////////////////
+
+inline uint64_t getChildMetric(const Subgame &sg, Database *target_db) {
+    uint8_t *entry = target_db->get(sg);
     if (entry == 0)
         return 0;
     assert(*db_get_outcome(entry) != 0 && *db_get_metric(entry) != uint64_t(-1));
     return *db_get_metric(entry);
 }
 
-uint64_t getMetric(const Subgame &sg, uint8_t &simplestBlack,
-                   uint8_t &simplestWhite) {
 
+uint64_t countMovesFor(const Subgame &sg, int player) {
+    size_t moveCount = 0;
+
+    int *moves = getMoves(sg.board(), sg.size(), player, &moveCount);
+    delete[] moves;
+
+    return moveCount;
+}
+
+uint64_t countMoves(const Subgame &sg) {
+    const uint64_t bMoves = countMovesFor(sg, BLACK);
+    const uint64_t wMoves = countMovesFor(sg, WHITE);
+
+    return bMoves + wMoves;
+}
+
+void getSimplest(const Subgame &sg, uint64_t domBlack, uint64_t domWhite,
+                 uint8_t &simplestBlack, uint8_t &simplestWhite, Database *target_db)
+{
+    vector<optional<Subgame*>> childrenBlack = sg.getChildren(BLACK, domBlack);
+    vector<optional<Subgame*>> childrenWhite = sg.getChildren(WHITE, domWhite);
+
+    uint64_t bestBlack = uint64_t(-1);
+    uint64_t bestWhite = uint64_t(-1);
+
+    const size_t childrenBlackSize = childrenBlack.size();
+    for (size_t i = 0; i < childrenBlackSize; i++) {
+        optional<Subgame*> &sg_opt = childrenBlack[i];
+
+        if (!sg_opt.has_value())
+            continue;
+
+        Subgame *sg = sg_opt.value();
+        const uint64_t childMetric = getChildMetric(*sg, target_db);
+
+        if (childMetric < bestBlack) {
+            bestBlack = childMetric;
+            simplestBlack = i;
+        }
+
+        delete sg;
+    }
+
+    const size_t childrenWhiteSize = childrenWhite.size();
+    for (size_t i = 0; i < childrenWhiteSize; i++) {
+        optional<Subgame*> &sg_opt = childrenWhite[i];
+
+        if (!sg_opt.has_value())
+            continue;
+
+        Subgame *sg = sg_opt.value();
+        const uint64_t childMetric = getChildMetric(*sg, target_db);
+
+        if (childMetric < bestWhite) {
+            bestWhite = childMetric;
+            simplestWhite = i;
+        }
+
+        delete sg;
+    }
+}
+
+uint64_t getMetric(const Subgame &sg) {
     uint64_t metric = 0;
 
     uint8_t *entry = db->get(sg);
@@ -368,9 +556,6 @@ uint64_t getMetric(const Subgame &sg, uint8_t &simplestBlack,
     vector<optional<Subgame*>> childrenBlack = sg.getChildren(BLACK, domBlack);
     vector<optional<Subgame*>> childrenWhite = sg.getChildren(WHITE, domWhite);
 
-    uint64_t bestBlack = uint64_t(-1);
-    uint64_t bestWhite = uint64_t(-1);
-
     const size_t childrenBlackSize = childrenBlack.size();
     for (size_t i = 0; i < childrenBlackSize; i++) {
         optional<Subgame*> &sg_opt = childrenBlack[i];
@@ -379,13 +564,8 @@ uint64_t getMetric(const Subgame &sg, uint8_t &simplestBlack,
             continue;
 
         Subgame *sg = sg_opt.value();
-        const uint64_t childMetric = getChildMetric(*sg);
+        const uint64_t childMetric = getChildMetric(*sg, db);
         metric += childMetric;
-
-        if (childMetric < bestBlack) {
-            bestBlack = childMetric;
-            simplestBlack = i;
-        }
 
         delete sg;
     }
@@ -398,13 +578,8 @@ uint64_t getMetric(const Subgame &sg, uint8_t &simplestBlack,
             continue;
 
         Subgame *sg = sg_opt.value();
-        const uint64_t childMetric = getChildMetric(*sg);
+        const uint64_t childMetric = getChildMetric(*sg, db);
         metric += childMetric;
-
-        if (childMetric < bestWhite) {
-            bestWhite = childMetric;
-            simplestWhite = i;
-        }
 
         delete sg;
     }
@@ -511,10 +686,14 @@ BoundsPair getBounds(const Subgame &game, int scale) {
     return bp;
 }
 
-void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) {
-    vector<shared_ptr<IndirectLink>> &vec = replacementMap[rmapIdx];
+//void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) {
 
-    uint8_t *entry = db->get(game);
+void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx,
+        rmap_t &targetMap, Database *target_db) {
+
+    vector<shared_ptr<IndirectLink>> &vec = targetMap[rmapIdx];
+
+    uint8_t *entry = target_db->get(game);
     assert(entry != 0);
     assert(*db_get_outcome(entry) != 0 && *db_get_metric(entry) != uint64_t(-1));
 
@@ -527,7 +706,7 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
     for (size_t i = 0; i < N; i++) {
         shared_ptr<IndirectLink> &indirect = vec[i];
 
-        uint8_t *linkedEntry = db->getFromIndirectIdx(*indirect);
+        uint8_t *linkedEntry = target_db->getFromIndirectIdx(*indirect);
         assert(linkedEntry != 0);
         uint64_t linkedShape = *db_get_shape(linkedEntry);
         uint32_t linkedNumber = *db_get_number(linkedEntry);
@@ -558,14 +737,14 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
 
     if (!found) {
         if (allowInsert) {
-            uint64_t directLink = db->getIdxDirect(game);
+            uint64_t directLink = target_db->getIdxDirect(game);
             vec.emplace_back(new IndirectLink(directLink));
         }
     } else {
         const uint64_t metric = *db_get_metric(entry);
 
         IndirectLink &indirectLink = *(vec[foundIdx]);
-        uint8_t *foundEntry = db->getFromIndirectIdx(indirectLink);
+        uint8_t *foundEntry = target_db->getFromIndirectIdx(indirectLink);
         assert(foundEntry != 0 && *db_get_outcome(entry) != 0);
 
         const uint64_t foundMetric = *db_get_metric(foundEntry);
@@ -573,7 +752,7 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
 
         if (metric < foundMetric) { // New game is better
             if (allowInsert)
-                indirectLink.directLink = db->getIdxDirect(game);
+                indirectLink.directLink = target_db->getIdxDirect(game);
         } else if (metric > foundMetric) { // Existing game is better
             *db_get_link(entry) = (uint64_t) &indirectLink;
         }
@@ -583,20 +762,20 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx) 
 ////////////////////////////////////////////////// main pass functions
 
 // Initialize all entries to uninitialized values
-void pass_initializeAllEntries() {
-    cout << "Initializing all entries" << endl;
+void pass_initializeAllEntries(Database *target_db) {
+    cout << "Initializing entries" << endl;
 
     GameGenerator gen;
 
     size_t entryNumber = 0;
 
     while (gen) {
-        assert(entryNumber < db->entryCount);
+        assert(entryNumber < target_db->entryCount);
 
         GeneratedGame genGame = gen.generate();
         ++gen;
         
-        uint8_t *entry = db->get(*genGame.game);
+        uint8_t *entry = target_db->get(*genGame.game);
         assert(entry != 0);
 
         *db_get_outcome(entry) = 0;
@@ -612,20 +791,20 @@ void pass_initializeAllEntries() {
         db_get_simplest_moves(entry)[0] = uint8_t(-1);
         db_get_simplest_moves(entry)[1] = uint8_t(-1);
 
-        uint64_t directLink = db->getIdxDirect(*genGame.game);
+        uint64_t directLink = target_db->getIdxDirect(*genGame.game);
 
         {
-            IndirectLink &indirect = db->getDefaultIndirectLink1(entryNumber);
+            IndirectLink &indirect = target_db->getDefaultIndirectLink1(entryNumber);
             indirect.directLink = directLink;
             uint64_t indirectLink = (uint64_t) &indirect;
             *db_get_link(entry) = indirectLink;
 
-            assert(db->getFromIdx(indirectLink) == entry);
+            assert(target_db->getFromIdx(indirectLink) == entry);
         }
 
         entryNumber++;
     }
-    assert(entryNumber == db->entryCount);
+    assert(entryNumber == target_db->entryCount);
 
 }
 
@@ -748,15 +927,9 @@ void pass_mainNoNormal() {
         db_get_dominance(entry)[0] = dp.domBlack;
         db_get_dominance(entry)[1] = dp.domWhite;
 
-        // Find metric and simplest moves
-        uint8_t simplestBlack = uint8_t(-1);
-        uint8_t simplestWhite = uint8_t(-1);
-
-        uint64_t metric = getMetric(*genGame.game, simplestBlack, simplestWhite);
+        // Find metric
+        uint64_t metric = getMetric(*genGame.game);
         *db_get_metric(entry) = metric;
-        
-        db_get_simplest_moves(entry)[0] = simplestBlack;
-        db_get_simplest_moves(entry)[1] = simplestWhite;
 
         // Update pruned with "equal"
         dp.domBlack |= equal.domBlack;
@@ -764,8 +937,17 @@ void pass_mainNoNormal() {
         db_get_dominance(entry)[0] = dp.domBlack;
         db_get_dominance(entry)[1] = dp.domWhite;
 
-        // Index for replacement map
+        // Find "simplest" moves
+        uint8_t simplestBlack = uint8_t(-1);
+        uint8_t simplestWhite = uint8_t(-1);
 
+        getSimplest(*genGame.game, dp.domBlack, dp.domWhite, simplestBlack,
+                    simplestWhite, db);
+        
+        db_get_simplest_moves(entry)[0] = simplestBlack;
+        db_get_simplest_moves(entry)[1] = simplestWhite;
+
+        // Index for replacement map
         assert(bp1.low <= bp1.high);
         assert(bp2.low <= bp2.high);
         BoundsPair bp3 = getBounds(*genGame.game, 0);
@@ -791,9 +973,98 @@ void pass_mainNoNormal() {
         //    Solver::doDebug = true;
         //}
 
-        addToReplacementMap(*genGame.game, idx);
+        addToReplacementMap(*genGame.game, idx, replacementMap, db);
     }
 }
+
+void pass_altDatabase() {
+    cout << "Alt DB pass" << endl;
+    GameGenerator gen;
+
+    while (gen) {
+        GeneratedGame genGame = gen.generate();
+        ++gen;
+
+        uint8_t *entry = db->get(*genGame.game);
+        uint8_t *alt_entry = alt_db->get(*genGame.game);
+        assert(entry != 0 && alt_entry != 0);
+
+        // Copy trivial fields
+
+        // Outcome
+        *db_get_outcome(alt_entry) = *db_get_outcome(entry);
+
+        // Bounds
+        db_get_bounds(alt_entry)[0] = db_get_bounds(entry)[0];
+        db_get_bounds(alt_entry)[1] = db_get_bounds(entry)[1];
+        db_get_bounds(alt_entry)[2] = db_get_bounds(entry)[2];
+        db_get_bounds(alt_entry)[3] = db_get_bounds(entry)[3];
+
+        BoundsPair bp1;
+        BoundsPair bp2;
+
+        bp1.low = db_get_bounds(alt_entry)[0];
+        bp1.high = db_get_bounds(alt_entry)[1];
+        bp2.low = db_get_bounds(alt_entry)[2];
+        bp2.high = db_get_bounds(alt_entry)[3];
+
+        // Shape
+        *db_get_shape(alt_entry) = *db_get_shape(entry);
+
+        // Number
+        *db_get_number(alt_entry) = *db_get_number(entry);
+
+        // Compute new info
+
+        // Metric
+        uint64_t totalMoves = countMoves(*genGame.game);
+        *db_get_metric(alt_entry) = totalMoves;
+
+        // Dominance
+        DominancePair equal;
+        equal.domBlack = 0;
+        equal.domWhite = 0;
+
+        DominancePair dp = getAltDominance(*genGame.game, equal);
+
+        dp.domBlack |= equal.domBlack;
+        dp.domWhite |= equal.domWhite;
+
+        // Simplest moves
+        uint8_t simplestBlack = uint8_t(-1);
+        uint8_t simplestWhite = uint8_t(-1);
+
+        getSimplest(*genGame.game, dp.domBlack, dp.domWhite, simplestBlack,
+                    simplestWhite, alt_db);
+
+        db_get_simplest_moves(alt_entry)[0] = simplestBlack;
+        db_get_simplest_moves(alt_entry)[0] = simplestWhite;
+
+
+        // Links
+        assert(bp1.low <= bp1.high);
+        assert(bp2.low <= bp2.high);
+        BoundsPair bp3 = getBounds(*genGame.game, 0);
+        assert(bp3.low <= bp3.high);
+
+        cout << "COPY: <" << (int) bp1.low << " " << (int) bp1.high << " | ";
+        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
+        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
+
+        ReplacementMapIdx idx;
+        idx.outcome = *db_get_outcome(alt_entry);
+        idx.low1 = bp1.low;
+        idx.high1 = bp1.high;
+        idx.low2 = bp2.low;
+        idx.high2 = bp2.high;
+        idx.low3 = bp3.low;
+        idx.high3 = bp3.high;
+
+        addToReplacementMap(*genGame.game, idx, altReplacementMap, alt_db);
+    }
+
+}
+
 
 } // namespace
 
@@ -805,10 +1076,9 @@ static_assert(true)
 int main() {
     db = new Database();
     db->init();
-
     db->enableIndirectLinks();
 
-    pass_initializeAllEntries();
+    pass_initializeAllEntries(db);
 
     solver = new Solver(DB_MAX_BITS, db);
 
@@ -817,14 +1087,23 @@ int main() {
     TIME(pass_normalGameOutcomes());
     TIME(pass_normalGameBounds());
     TIME(pass_mainNoNormal());
-    //TIME(pass_main());
-    //TIME(pass_normalGameDominance());
-    //TIME(pass_normalGameMetric());
-    //TIME(pass_normalGameLinks());
+
+    alt_db = new Database();
+    alt_db->init();
+    alt_db->enableIndirectLinks();
+    pass_initializeAllEntries(alt_db);
+
+
+    TIME(pass_altDatabase());
 
     db->finalizeIndirectLinks();
+    db->save("database3.bin");
 
-    db->save();
+    alt_db->finalizeIndirectLinks();
+    alt_db->save("database3_alt.bin");
+
+
     delete solver;
     delete db;
+    delete alt_db;
 }

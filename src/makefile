@@ -76,8 +76,8 @@ freport: TheSolvers referenceSolver
 	python3 instructorSolution/runTests.py -nc --fast > correctnessReport.txt
 
 db: DBManage4
-	-rm database4.bin
-	touch database3.bin
+	-rm database3.bin database3_alt.bin
+	touch database3.bin database3_alt.bin
 	-time ./DBManage4
 
 

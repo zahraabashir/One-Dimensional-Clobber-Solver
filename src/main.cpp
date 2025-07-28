@@ -10,7 +10,7 @@
 
 using namespace std;
 
-
+/*
 bool test() {
     return false;
 
@@ -54,6 +54,9 @@ bool test() {
 
     return true;
 }
+*/
+
+string solverDBName;
 
 void printUsage(const char *execName) {
     cout << "Usage:" << endl;
@@ -67,8 +70,7 @@ void printUsage(const char *execName) {
 
 void persistMain() {
     Database db;
-    db.load();
-
+    db.loadFrom(solverDBName.c_str());
 
     string boardStr;
     string toPlayStr;
@@ -163,10 +165,11 @@ int main(int argc, char **argv) {
     }
 
     bool persist = false;
+    bool altDB = false;
 
     int additionalArgs = 0;
 
-    // --persist, --altmove, --no-id
+    // --persist, --altmove, --no-id, --altdb
     int _argIdx;
     for (_argIdx = 1; _argIdx < argc; _argIdx++) {
         const char *arg = argv[_argIdx];
@@ -186,10 +189,20 @@ int main(int argc, char **argv) {
             Solver::useID = false;
             continue;
         }
+
+        if (strcmp(arg, "--altdb") == 0) {
+            altDB = true;
+            continue;
+        }
         
         additionalArgs--;
         break;
     }
+
+    if (altDB)
+        solverDBName = "database3_alt.bin";
+    else
+        solverDBName = "database3.bin";
 
 
     if (persist) {
@@ -249,7 +262,7 @@ int main(int argc, char **argv) {
 
 
     Database db;
-    db.load();
+    db.loadFrom(solverDBName.c_str());
     //db.init();
 
     const size_t boardLen = boardArgLen;

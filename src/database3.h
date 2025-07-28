@@ -131,8 +131,8 @@ class Database {
     ~Database();
 
     void init();
-    void save();
-    void load();
+    void save(const char *fileName);
+    //void load();
     void loadFrom(const char *fileName);
 
     uint64_t getIdxDirect(const uint8_t *board, size_t len);

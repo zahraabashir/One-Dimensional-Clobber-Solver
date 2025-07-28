@@ -9,6 +9,7 @@ mcgs_version_string = "version 1.2"
 reset = False
 altmove = False
 noid = False
+altdb = False
 
 help_string = f"""\
     Usage: python3 {sys.argv[0]} <action>
@@ -43,6 +44,9 @@ def solve_board(board, player):
 
         if noid:
             flags.append("--no-id")
+
+        if altdb:
+            flags.append("--altdb")
 
         flags = " ".join(flags)
 

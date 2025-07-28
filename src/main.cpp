@@ -163,10 +163,14 @@ int main(int argc, char **argv) {
     }
 
     bool persist = false;
-    Solver::useBWMoveOrder = false;
 
-    for (int i = 0; i < argc; i++) {
-        char *arg = argv[i];
+    int additionalArgs = 0;
+
+    // --persist, --altmove, --no-id
+    int _argIdx;
+    for (_argIdx = 1; _argIdx < argc; _argIdx++) {
+        const char *arg = argv[_argIdx];
+        additionalArgs++;
 
         if (strcmp(arg, "--persist") == 0) {
             persist = true;
@@ -177,32 +181,50 @@ int main(int argc, char **argv) {
             Solver::useBWMoveOrder = true;
             continue;
         }
+
+        if (strcmp(arg, "--no-id") == 0) {
+            Solver::useID = false;
+            continue;
+        }
+        
+        additionalArgs--;
+        break;
     }
 
-    int n_flags = persist + Solver::useBWMoveOrder;
-
-    if (!persist && (n_flags + 3 != argc)) {
-        printUsage(argv[0]);
-        return -1;
-    }
-
-    if (persist && n_flags + 1 != argc) {
-        printUsage(argv[0]);
-        return -1;
-    }
 
     if (persist) {
+        if (_argIdx != argc) {
+            printUsage(argv[0]);
+            return -1;
+        }
+
         persistMain();
         return 0;
     }
+
+    if (argc < 3 || additionalArgs + 3 != argc) {
+        printUsage(argv[0]);
+        return -1;
+    }
+
+    int boardArgIdx = 1 + additionalArgs;
+    int playerArgIdx = 2 + additionalArgs;
+
+    assert(boardArgIdx < argc && playerArgIdx < argc);
+
+    // Board and player args
+    const char *boardArg = argv[boardArgIdx];
+    const size_t boardArgLen = strlen(boardArg);
+
+    const char *playerArg = argv[playerArgIdx];
+    const size_t playerArgLen = strlen(playerArg);
 
     // Validate input
     {
         bool isValid = true;
 
-        size_t arg1Len = strlen(argv[1]);
-        for (size_t i = 0; i < arg1Len; i++) {
-            const char &c = argv[1][i];
+        for (size_t i = 0; i < boardArgLen; i++) {
+            const char &c = boardArg[i];
 
             if (c != 'B' && c != 'W' && c != '.') {
                 isValid = false;
@@ -210,15 +232,14 @@ int main(int argc, char **argv) {
             }
         }
 
-        size_t arg2Len = strlen(argv[2]);
-        if (arg2Len != 1) {
+        // Player
+        if (playerArgLen != 1)
             isValid = false;
-        }
 
-        const char &arg2Char = argv[2][0];
-        if (arg2Char != 'B' && arg2Char != 'W') {
+        const char &playerChar = playerArg[0];
+
+        if (playerChar != 'B' && playerChar != 'W')
             isValid = false;
-        }
 
         if (!isValid) {
             printUsage(argv[0]);
@@ -227,19 +248,17 @@ int main(int argc, char **argv) {
     }
 
 
-
     Database db;
     db.load();
     //db.init();
 
-    size_t boardLen = strlen(argv[1]);
+    const size_t boardLen = boardArgLen;
     uint8_t board[boardLen];
 
-    for (size_t i = 0; i < boardLen; i++) {
-        board[i] = charToPlayerNumber(argv[1][i]);
-    }
+    for (size_t i = 0; i < boardLen; i++)
+        board[i] = charToPlayerNumber(boardArg[i]);
 
-    int rootPlayer = charToPlayerNumber(*argv[2]);
+    int rootPlayer = charToPlayerNumber(*playerArg);
 
     Solver solver(boardLen, &db);
 

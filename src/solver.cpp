@@ -7,6 +7,7 @@
 #include <cstring>
 #include <iostream>
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <unordered_set>
 #include <set>
@@ -18,6 +19,8 @@ static_assert(true)
 using namespace std;
 
 bool Solver::useBWMoveOrder = false;
+bool Solver::useID = true;
+
 bool Solver::doDebug = false;
 
 #define IFDEB(x) if (Solver::doDebug) {x} \
@@ -42,6 +45,15 @@ struct AnnotatedMove {
     int score;
 };
 
+
+// Old best for BW (REVERSE)
+// best, unknown, positive, middle, negative, npos
+
+// NEW old best for BW (REVERSE)
+// npos, npos && simplest, negative, negative && simplest, middle, positive,
+// positive && simplest, unknown, best
+
+
 class MoveScorer {
 public:
     MoveScorer(int player): player(player) {
@@ -57,23 +69,6 @@ public:
        - Self
        - Opponent
     */
-    //int moveScore(const AnnotatedMove &m) const {
-    //    if (m.isBest)
-    //        return 0;
-
-    //    if (m.isMiddle)
-    //        return 1;
-
-    //    if (m.oc == OC_UNKNOWN)
-    //        return 2;
-
-    //    if (m.oc == OC_N)
-    //        return 3;
-
-    //    int oppClass = player == 1 ? OC_B : OC_W;
-
-    //    return oppClass == m.oc ? 5 : 4;
-    //}
 
     void makeMoveScore(AnnotatedMove &m) {
         const int oppClass = player == BLACK ? OC_W : OC_B;
@@ -86,84 +81,24 @@ public:
         const bool positive = !negative;
         const bool simplest = m.isSimplest;
 
-        // Previous best for BW
-
-        /*
-        vector<bool> bools = {
-            best,
-            middle,
-            unknown,
-            npos,
-
-            negative,
-            positive,
-        };
-        */
-
         vector<bool> bools;
 
-        if (Solver::useBWMoveOrder) {
-            // New best for BW
-            /*
-            bools = {
-                best,
-                unknown,
+        bools = {
+            positive,
+            positive && simplest,
 
-                positive,
+            unknown,
 
-                middle,
+            npos,
+            negative,
 
-                negative,
+            npos && simplest,
+            negative && simplest,
 
-                npos,
-            };
-            */
+            best,
+            middle,
 
-            bools = {
-                npos,
-                npos && simplest,
-
-                negative,
-                negative && simplest,
-
-                middle,
-
-                positive,
-                positive && simplest,
-
-                unknown,
-                best,
-            };
-
-        } else {
-            // Best general
-            //bools = {
-            //    positive,
-            //    negative,
-
-            //    npos,
-            //    unknown,
-            //    middle,
-            //    best,
-            //};
-
-            bools = {
-                positive,
-                positive && simplest,
-
-                unknown,
-
-                npos,
-                negative,
-
-                npos && simplest,
-                negative && simplest,
-
-                best,
-                middle,
-            };
-
-        }
+        };
 
         bool found = false;
 
@@ -422,6 +357,9 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
 
     // EXPERIMENT
     maxCompleted = len * 2;
+
+    if (!useID)
+        maxDepth = std::numeric_limits<int>::max();
 
     while (true) {
         //collisions = 0;

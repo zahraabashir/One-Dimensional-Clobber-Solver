@@ -84,6 +84,7 @@ uint64_t *tt_get_hash(uint8_t *entry);
 class Solver {
   public:
     static bool useBWMoveOrder;
+    static bool useID;
 
   private:
     size_t boardLen;

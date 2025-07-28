@@ -8,6 +8,7 @@ args = sys.argv
 mcgs_version_string = "version 1.2"
 reset = False
 altmove = False
+noid = False
 
 help_string = f"""\
     Usage: python3 {sys.argv[0]} <action>
@@ -39,6 +40,9 @@ def solve_board(board, player):
 
         if altmove:
             flags.append("--altmove")
+
+        if noid:
+            flags.append("--no-id")
 
         flags = " ".join(flags)
 

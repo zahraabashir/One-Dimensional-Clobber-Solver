@@ -1,6 +1,7 @@
 import subprocess
 import time
 import random
+import select
 import sys
 
 proc = None
@@ -10,6 +11,24 @@ reset = False
 altmove = False
 noid = False
 altdb = False
+uselinks = True
+opt_level = None
+csv_file = None
+timeout_ms = 60_000
+
+zobrist_table = []
+zobrist_size = 1024
+int64_max = 0xFFFFFFFFFFFFFFFF
+
+csv_fields = [
+    "board",
+    "player",
+    "move_count",
+    "seconds",
+    "opt_level",
+    "diagram_id",
+    "hash",
+]
 
 help_string = f"""\
     Usage: python3 {sys.argv[0]} <action>
@@ -19,8 +38,36 @@ help_string = f"""\
         bbw <minimum N> <maximum N>
         mcgs_gen <board length> <N cases> <seed>
         random <board length> <N cases> <seed>
+        rand_exp <board length> <N cases> <seed>
         -h, --h, -help, --help
 """
+
+############################################################
+for i in range(zobrist_size):
+    for j in range(3):
+        zobrist_table.append(random.randint(0, int64_max))
+
+
+assert len(zobrist_table) == 3 * zobrist_size
+############################################################
+
+
+def get_zobrist_char_clob(tile, idx):
+    assert type(tile) is str
+    assert type(idx) is int and idx >= 0
+    char_idx = [".", "B", "W"].index(tile)
+    return zobrist_table[idx * 3 + char_idx]
+
+
+def zobrist_hash(board, player):
+    val = 0
+    val ^= get_zobrist_char_clob(player, 0)
+
+    for i in range(len(board)):
+        char = board[i]
+        val ^= get_zobrist_char_clob(char, i + 1)
+
+    return val
 
 
 def print_help_message():
@@ -28,8 +75,47 @@ def print_help_message():
     exit(0)
 
 
+def set_opt_level(level):
+    assert type(level) is int
+    global opt_level, altdb, uselinks, noid
+    opt_level = level
+
+    if level == 0:
+        noid = False
+        altdb = False
+        uselinks = False
+        return
+    elif level == 1:
+        noid = False
+        altdb = True
+        uselinks = True
+        return
+    elif level == 2:
+        noid = False
+        altdb = False
+        uselinks = True
+        return
+
+    if level == 3:
+        noid = True
+        altdb = False
+        uselinks = False
+        return
+    elif level == 4:
+        noid = True
+        altdb = True
+        uselinks = True
+        return
+    elif level == 5:
+        noid = True
+        altdb = False
+        uselinks = True
+        return
+
+    assert False
+
 def solve_board(board, player):
-    global proc
+    global proc, altmove, noid, altdb, uselinks
 
     if reset and proc is not None:
         proc.stdin.close()
@@ -48,9 +134,15 @@ def solve_board(board, player):
         if altdb:
             flags.append("--altdb")
 
+        if not uselinks:
+            flags.append("--no-links")
+
         flags = " ".join(flags)
 
-        proc = subprocess.Popen(f"./TheSolvers {flags}".split(),
+        command = f"./TheSolvers {flags}"
+        #print(command)
+
+        proc = subprocess.Popen(command.split(),
                                 stdin=subprocess.PIPE,
                                 stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
@@ -73,10 +165,25 @@ def solve_board(board, player):
     proc.stdin.write(bytes(case + "\n", "utf-8"))
     proc.stdin.flush()
 
-    line = proc.stdout.readline().decode("utf-8").strip()
+    timeout = timeout_ms / 1000.0 if timeout_ms is not None else None
+    ready, _, failures = select.select([proc.stdout], [], [],
+                                       timeout)
+
 
     time_end = time.time_ns() / (1_000_000 * 1000)
     time_total = time_end - time_start
+
+    assert len(failures) == 0
+
+    if len(ready) == 0:
+        proc.kill()
+        proc.wait()
+        return None
+
+    assert len(ready) == 1
+
+    stdout = ready[0]
+    line = stdout.readline().decode("utf-8").strip()
 
     assert proc.poll() is None
 
@@ -98,6 +205,12 @@ def assert_board_format(board):
     for tile in board:
         assert type(tile) is int
         assert 0 <= tile and tile <= 2
+
+
+def assert_board_format_clob(board):
+    assert type(board) is str
+    for tile in board:
+        assert tile in ["B", "W", "."]
 
 
 def assert_int_interval(low, high):
@@ -257,6 +370,140 @@ def handle_random():
 
     print(f"Total time: {total_time}s")
 
+def open_csv():
+    global csv_file
+    assert csv_file is None
+    csv_file = open("random_experiment.csv", "w")
+
+    fields = ",".join([f"\"{x}\"" for x in csv_fields])
+    csv_file.write(fields + "\n")
+    csv_file.flush()
+
+
+def assert_csv_row_format(row):
+    assert type(row) is dict
+    assert set(csv_fields) == set(row.keys())
+
+def write_csv(row):
+    assert_csv_row_format(row)
+    assert csv_file is not None
+
+    fields = []
+    for name in csv_fields:
+        field = str(row[name])
+        assert "\"" not in field
+        fields.append("\"" + field + "\"")
+
+    line = ",".join(fields)
+    csv_file.write(line + "\n")
+
+
+def get_opponent(player):
+    assert type(player) is str and player in ["B", "W"]
+
+    if player == "B":
+        return "W"
+    return "B"
+
+def count_moves(board, player):
+    assert_board_format_clob(board)
+    assert type(player) is str and player in ["B", "W"]
+
+    opp = get_opponent(player)
+    count = 0
+
+    n_tiles = len(board)
+    for i in range(n_tiles):
+        tile = board[i]
+        if (tile != player):
+            continue
+        prev = board[i - 1] if i > 0 else "."
+        next = board[i + 1] if i + 1 < n_tiles else "."
+
+        count += int(prev == opp)
+        count += int(next == opp)
+
+    return count
+
+def handle_rand_exp():
+    global reset
+    reset = True
+
+    if len(args) != 5:
+        print_help_message()
+
+    board_len = int(args[2])
+    n_cases = int(args[3])
+    seed = float(args[4])
+
+    assert board_len > 0 and n_cases > 0
+
+    if seed == 0:
+        seed = time.time_ns()
+
+    random.seed(seed)
+
+    levels = [2, 5]
+    seen_tests = set()
+    n_timeouts = 0
+
+    open_csv()
+
+    i = -1
+    while i + 1 < n_cases:
+        i += 1
+        board = get_board_random(board_len)["clob"]
+        player = random.choice(["B", "W"])
+
+        hash = zobrist_hash(board, player)
+
+        if hash in seen_tests:
+            i -= 1
+            continue
+
+        seen_tests.add(hash)
+
+        move_count = count_moves(board, player)
+
+        case = board + " " + player
+
+        print(f"RANDOM EXPERIMENT {i + 1} of {n_cases}")
+        print(case)
+
+        results = []
+
+        for level in levels:
+            set_opt_level(level)
+            result = solve_board(board, player)
+
+            if result is None:
+                print("TIMEOUT")
+                n_timeouts += 1
+                results.clear()
+                break
+
+
+            duration = result[1]
+            print(f"Level {level}: {duration}")
+
+            results.append({
+                "board": board,
+                "player": player,
+                "move_count": move_count,
+                "seconds": duration,
+                "opt_level": level,
+                "diagram_id": 0,
+                "hash": hash,
+            })
+
+        if len(results) == 0:
+            continue
+
+        for result in results:
+            write_csv(result)
+
+    print(f"Completed with {n_timeouts} timeout(s)")
+
 
 def handle_mcgs_gen():
     if len(args) != 5:
@@ -299,7 +546,9 @@ actions = {
     "bbw": handle_bbw,
     "mcgs_gen": handle_mcgs_gen,
     "random": handle_random,
+    "rand_exp": handle_rand_exp,
 }
+
 
 def list_has_help_flag(l):
     assert type(l) is list
@@ -319,3 +568,6 @@ if action not in actions:
 
 action_fn = actions[action]
 action_fn()
+
+if csv_file is not None:
+    csv_file.close()

@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <random>
 #include <optional>
 
@@ -31,6 +32,11 @@ extern int best_to;
 
 #define STORED_BEST_MOVES 1
 
+typedef int32_t heuristic_t;
+constexpr heuristic_t H_MIN = std::numeric_limits<heuristic_t>::min() + 1;
+constexpr heuristic_t H_MAX = std::numeric_limits<heuristic_t>::max();
+static_assert(H_MIN == -H_MAX);
+
 struct TTLayout {
     static constexpr size_t arr[] = {
         //sz(uint8_t),        // board length
@@ -39,7 +45,7 @@ struct TTLayout {
         sz(uint8_t),        // outcome
         sz(int8_t[STORED_BEST_MOVES]),     // best moves
         sz(unsigned int),   // depth
-        sz(int8_t),         // heuristic
+        sz(heuristic_t),         // heuristic
         sz(bool),           // valid
         sz(uint64_t),       // hash
     };
@@ -77,7 +83,7 @@ uint8_t *tt_get_player(uint8_t *entry);
 uint8_t *tt_get_outcome(uint8_t *entry);
 int8_t *tt_get_best_moves(uint8_t *entry);
 unsigned int *tt_get_depth(uint8_t *entry);
-int8_t *tt_get_heuristic(uint8_t *entry);
+heuristic_t *tt_get_heuristic(uint8_t *entry);
 bool *tt_get_valid(uint8_t *entry);
 uint64_t *tt_get_hash(uint8_t *entry);
 
@@ -85,6 +91,7 @@ class Solver {
   public:
     static bool useBWMoveOrder;
     static bool useID;
+    static bool useLinks;
 
   private:
     size_t boardLen;

@@ -6,6 +6,8 @@
 
 int *getMoves(const uint8_t *board, size_t len, int player, size_t *moveCount);
 
+size_t getMoveCount(const uint8_t *board, size_t len, int player);
+
 
 uint64_t getCode(uint8_t *board, size_t len, int player);
 //uint32_t getHash2(uint8_t *board, size_t len, int player);

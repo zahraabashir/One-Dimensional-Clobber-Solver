@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
 
     int additionalArgs = 0;
 
-    // --persist, --altmove, --no-id, --altdb
+    // --persist, --altmove, --no-id, --altdb, --no-links
     int _argIdx;
     for (_argIdx = 1; _argIdx < argc; _argIdx++) {
         const char *arg = argv[_argIdx];
@@ -194,6 +194,12 @@ int main(int argc, char **argv) {
             altDB = true;
             continue;
         }
+
+        if (strcmp(arg, "--no-links") == 0) {
+            Solver::useLinks = false;
+            continue;
+        }
+
         
         additionalArgs--;
         break;

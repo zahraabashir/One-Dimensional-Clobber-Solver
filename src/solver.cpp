@@ -20,6 +20,7 @@ using namespace std;
 
 bool Solver::useBWMoveOrder = false;
 bool Solver::useID = true;
+bool Solver::useLinks = true;
 
 bool Solver::doDebug = false;
 
@@ -97,7 +98,6 @@ public:
 
             best,
             middle,
-
         };
 
         bool found = false;
@@ -195,12 +195,12 @@ unsigned int *tt_get_depth(uint8_t *entry) {
     return (unsigned int *) (entry + Offset<TTLayout, TT_DEPTH>());
 }
 
-int8_t *tt_get_heuristic(uint8_t *entry) {
+heuristic_t *tt_get_heuristic(uint8_t *entry) {
     assert(_validEntry);
     if (entry == 0) {
         return 0;
     }
-    return (int8_t *) (entry + Offset<TTLayout, TT_HEURISTIC>());
+    return (heuristic_t *) (entry + Offset<TTLayout, TT_HEURISTIC>());
 }
 
 bool *tt_get_valid(uint8_t *entry) {
@@ -375,8 +375,9 @@ int Solver::solveID(uint8_t *board, size_t len, int n) {
             if (maxDepth == 2)
                 maxCompleted = 1;
 
-            maxCompleted *= 2;
+            maxCompleted *= 3;
             if (maxDepth >= 12) {
+                //cout << "MAX" << endl;
                 limitCompletions = false;
                 maxDepth = 999999999;
             }
@@ -857,6 +858,9 @@ namespace dbUtil {
 inline bool tryInflateLink(uint8_t *entry, Database *db, vector<Subgame*> &subgames) {
     assert(entryValid(entry));
 
+    if (!Solver::useLinks)
+        return false;
+
     const uint64_t link = *db_get_link(entry);
     if (link == 0)
         return false;
@@ -909,7 +913,7 @@ bool simplifySubgames(vector<Subgame*> &subgames, const vector<size_t> &indices,
 
     const bool isP = *db_get_outcome(entry) == OC_P;
 
-    if (isP || tryInflateLink(entry, db, subgames)) {
+    if (isP || (tryInflateLink(entry, db, subgames))) {
         for (const size_t &idx : indices) {
             Subgame *sg = subgames[idx];
             assert(sg != nullptr);
@@ -1225,7 +1229,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
             *tt_get_outcome(entryPtr) = p;
             tt_get_best_moves(entryPtr)[0] = 0;
             *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = -127;
+            *tt_get_heuristic(entryPtr) = H_MIN;
         }
 
         delete[] sboard;
@@ -1402,7 +1406,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
                 *tt_get_outcome(entryPtr) = n;
                 tt_get_best_moves(entryPtr)[0] = i;
                 *tt_get_depth(entryPtr) = depth;
-                *tt_get_heuristic(entryPtr) = 127;
+                *tt_get_heuristic(entryPtr) = H_MAX;
             }
             best_from = from;
             best_to = to;
@@ -1414,6 +1418,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
         if (!result.second) {
             result.first *= -1;
+
             if (result.first > bestVal) {
                 newBestMove = i;
                 bestVal = result.first;
@@ -1432,7 +1437,7 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
             *tt_get_outcome(entryPtr) = p;
             tt_get_best_moves(entryPtr)[0] = newBestMove;
             *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = -127;
+            *tt_get_heuristic(entryPtr) = H_MIN;
         }
         best_from = -1;
         best_to = -1;
@@ -1647,7 +1652,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             *tt_get_outcome(entryPtr) = sr->first;
             tt_get_best_moves(entryPtr)[0] = 0;
             *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = win ? 127 : -127;
+            *tt_get_heuristic(entryPtr) = win ? H_MAX : H_MIN;
 
             return *sr;
         }
@@ -1681,7 +1686,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
             *tt_get_outcome(entryPtr) = n;
             tt_get_best_moves(entryPtr)[0] = 0;
             *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = 127;
+            *tt_get_heuristic(entryPtr) = H_MAX;
             return result;
         }
     }
@@ -1700,7 +1705,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         *tt_get_outcome(entryPtr) = p;
         tt_get_best_moves(entryPtr)[0] = 0;
         *tt_get_depth(entryPtr) = depth;
-        *tt_get_heuristic(entryPtr) = -127;
+        *tt_get_heuristic(entryPtr) = H_MIN;
         return {p, true};
     }
 
@@ -1741,29 +1746,115 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     }
     #endif
 
+    /*
     auto getHeuristic = [&]() -> int {
-        int hNew = 0;
+        int score = 0;
+        int currentBlock = 0;
 
-        int prev = 0;
-        int streak = 0;
+        int beforeBlock = EMPTY;
+        int afterBlock = EMPTY;
 
-        for (size_t i = 0; i < sboardLen; i++) {
-            int cur = sboard[i];
+        size_t i = 0;
+        for (; i < sboardLen; i++) {
+            const uint8_t &c = sboard[i];
 
-            if (prev != cur)
-                streak = 0;
-            else
-                streak++;
-
-            if (cur == n) {
-                hNew += 1 + streak;
+            if (c == n) {
+                currentBlock++;
+                continue;
             }
 
-            prev = cur;
+            afterBlock = c;
+
+            if (currentBlock > 0) {
+                int blockMoves = (beforeBlock == p) + (afterBlock == p);
+                score += (blockMoves * currentBlock);
+            }
+
+            currentBlock = 0;
+            beforeBlock = c;
+            afterBlock = EMPTY;
         }
 
+        afterBlock = EMPTY;
+        if (currentBlock > 0) {
+            int blockMoves = (beforeBlock == p) + (afterBlock == p);
+            score += (blockMoves * currentBlock);
+        }
 
-        return hNew;
+        return score;
+    };
+    */
+
+    /*
+    auto getHeuristic = [&]() -> int {
+        int h = 0;
+
+        int neutral = 0;
+
+        for (size_t i = 0; i < rangesSimple.size(); i++) {
+            int oc = outcomesSimple[i];
+
+            const SubgameRange &range = rangesSimple[i];
+            int size = (range.length);
+
+            if (oc == n)
+                h += size;
+            else if (oc == p)
+                h -= size;
+            else if (oc == OC_N)
+                neutral++;
+                //neutral += size / 2;
+        }
+
+        int h_abs = abs(h);
+        int h_sign = h < 0 ? -1 : 1;
+
+        neutral = min(h_abs / 2, neutral);
+
+        h = h_sign * (h_abs - neutral);
+
+        return h * (100 - depth);
+    };
+    */
+
+
+    /*
+    auto getHeuristic = [&]() -> int {
+        return moveCount;
+    };
+    */
+
+    auto getHeuristic = [&]() -> int {
+        int diffCountSelf = 0;
+        int diffCountOpp = 0;
+
+        size_t newMoveCount;
+        uint8_t ub[UNDO_BUFFER_SIZE];
+
+        for (int i = 0; i < moveCount; i++) {
+            const int from = moves[2 * i];
+            const int to = moves[2 * i + 1];
+
+            play(sboard, ub, from, to);
+            newMoveCount = getMoveCount(sboard, sboardLen, p);
+            undo(sboard, ub);
+
+            if ((moveCount - newMoveCount) > 1)
+                diffCountSelf++;
+
+            play(sboard, ub, to, from);
+            newMoveCount = getMoveCount(sboard, sboardLen, n);
+            undo(sboard, ub);
+
+            if ((moveCount - newMoveCount) > 1)
+                diffCountOpp++;
+        }
+
+        int h = (diffCountSelf - diffCountOpp) * depth;
+        h += diffCountSelf;
+
+        //int h = (diffCountSelf * 2) + (moveCount - diffCountSelf);
+        return h;
     };
 
     //if deep, generate heuristic and return
@@ -1921,7 +2012,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         }
 
         if (!result.second) {
-            result.first = (result.first * -1);
+            result.first *= -1;
 
             if (result.first > bestVal || newBestMove == -1) {
                 newBestMove = i;
@@ -1940,7 +2031,7 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         *tt_get_outcome(entryPtr) = p;
         tt_get_best_moves(entryPtr)[0] = newBestMove;
         *tt_get_depth(entryPtr) = depth;
-        *tt_get_heuristic(entryPtr) = -127;
+        *tt_get_heuristic(entryPtr) = H_MIN;
 
         return {p, true};
     }
@@ -2086,7 +2177,7 @@ uint8_t *Solver::getEntryPtr(uint8_t *blockPtr, uint8_t *board, size_t len, int 
         uint8_t *outcome = tt_get_outcome(entry);
         int8_t *moves = tt_get_best_moves(entry);
         unsigned int *depth = tt_get_depth(entry);
-        int8_t *heuristic = tt_get_heuristic(entry);
+        heuristic_t *heuristic = tt_get_heuristic(entry);
         bool *valid = tt_get_valid(entry);
         uint64_t *ehash = tt_get_hash(entry);
 

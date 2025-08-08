@@ -42,7 +42,7 @@ help_string = f"""\
         bbw <minimum N> <maximum N>
         mcgs_gen <board length> <N cases> <seed>
         random <board length> <N cases> <seed>
-        rand_exp <board length> <N cases> <seed>
+        rand_exp <board lengths comma separated> <N cases> <seed> <comma_separated_ablations> <out_file> <timeout>
         -h, --h, -help, --help
 """
 
@@ -85,49 +85,34 @@ def set_opt_level(level):
     global nodelete, nodominance
     opt_level = level
 
-    if level == 0:
-        noid = False
-        altdb = False
-        uselinks = False
-        return
-    elif level == 1:
-        noid = False
-        altdb = True
-        uselinks = True
-        return
-    elif level == 2:
-        noid = False
-        altdb = False
-        uselinks = True
-        return
-
-    if level == 3:
-        noid = True
-        altdb = False
-        uselinks = False
-        return
-    elif level == 4:
-        noid = True
-        altdb = True
-        uselinks = True
-        return
-    elif level == 5:
-        noid = True
-        altdb = False
-        uselinks = True
-        return
-    # Testing
-
     noid = False
     altdb = False
     uselinks = True
     nodelete = False
     nodominance = False
 
-    if level == 100:
+    if level == 0:
+        return
+    if level == 1:
+        altdb = True
+        return
+    if level == 2:
+        noid = True
+        return
+    if level == 3:
+        nodelete = True
+        return
+    if level == 4:
+        nodominance = True
+        return
+    if level == 5:
+        uselinks = False
         return
 
-    elif level == 101:
+    if level == 6:
+        altdb = True
+        noid = True
+        nodelete = True
         return
 
     assert False
@@ -359,7 +344,7 @@ def handle_random():
 
     board_len = int(args[2])
     n_cases = int(args[3])
-    seed = float(args[4])
+    seed = int(args[4])
 
     if seed == 0:
         seed = time.time_ns()
@@ -394,10 +379,15 @@ def handle_random():
 
     print(f"Total time: {total_time}s")
 
-def open_csv():
+def open_csv(filename):
     global csv_file
     assert csv_file is None
-    csv_file = open("random_experiment.csv", "w")
+    assert filename is None or type(filename) is str
+
+    if filename is None:
+        filename = "random_experiment.csv"
+
+    csv_file = open(filename, "w")
 
     fields = ",".join([f"\"{x}\"" for x in csv_fields])
     csv_file.write(fields + "\n")
@@ -450,34 +440,38 @@ def count_moves(board, player):
     return count
 
 def handle_rand_exp():
-    global reset
+    global reset, timeout_ms
     reset = True
 
-    if len(args) != 5:
+    if len(args) != 8:
         print_help_message()
 
-    board_len = int(args[2])
+    board_lens = [int(x) for x in args[2].split(",")]
     n_cases = int(args[3])
-    seed = float(args[4])
+    seed = int(args[4])
+    levels = [int(x) for x in args[5].split(",")]
+    out_filename = args[6]
+    timeout_ms = 1000 * int(args[7])
 
-    assert board_len > 0 and n_cases > 0
+    assert len(board_lens) == 2 and board_lens[0] <= board_lens[1]
+    board_lens = [x for x in range(board_lens[0], board_lens[1] + 1)]
+    assert n_cases > 0
 
     if seed == 0:
         seed = time.time_ns()
 
     random.seed(seed)
 
-    levels = [2, 5]
-    #levels = [100, 101]
     seen_tests = set()
     n_timeouts = 0
 
-    open_csv()
+    open_csv(out_filename)
 
     i = -1
     while i + 1 < n_cases:
         i += 1
-        board = get_board_random(board_len)["clob"]
+        boardlength = random.choice(board_lens)
+        board = get_board_random(boardlength)["clob"]
         player = random.choice(["B", "W"])
 
         hash = zobrist_hash(board, player)
@@ -505,8 +499,8 @@ def handle_rand_exp():
                 print("TIMEOUT")
                 n_timeouts += 1
                 results.clear()
+                i -= 1
                 break
-
 
             duration = result[1]
             print(f"Level {level}: {duration}")
@@ -526,6 +520,11 @@ def handle_rand_exp():
 
         for result in results:
             write_csv(result)
+
+    log = open(out_filename + ".log", "w")
+    log.write(f"Timeouts: {n_timeouts}\n")
+    log.write(f"Seed: {seed}\n")
+    log.close()
 
     print(f"Completed with {n_timeouts} timeout(s)")
 

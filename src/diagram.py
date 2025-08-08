@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 ################################################## Global variables
-args = sys.argv
+assert len(sys.argv) == 3
+args = sys.argv[1 : ]
 
-out_dir = "diagrams"
-in_file_name = "random_experiment.csv"
+in_filename = args[0]
+out_filename = args[1]
 
 ################################################## Helper functions
 
@@ -124,7 +125,7 @@ def make_diagram_abs_delta(info):
 
 
     # Read data from file
-    wrapped = WrappedReader(in_file_name)
+    wrapped = WrappedReader(in_filename)
     reader = wrapped.reader()
 
     data = {}
@@ -163,8 +164,10 @@ def make_diagram_abs_delta(info):
     x_data = [i for i in range(len(data_list))]
     for ol in opt_labels:
         ol_id, ol_name, ol_color, ol_marker = ol
-
-        y_data = np.array([group[ol_id] for group in data_list])
+        y_data = [group.get(ol_id) for group in data_list]
+        y_data = np.array([x for x in y_data if x is not None])
+        if len(y_data) == 0:
+            continue
 
         plt.scatter(x_data, y_data, label=ol_name, color=ol_color,
                     marker=ol_marker)
@@ -173,7 +176,7 @@ def make_diagram_abs_delta(info):
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.savefig(pathlib.Path(out_dir) / file_name)
+    plt.savefig(out_filename)
     #plt.show()
 
 def make_diagram(info):
@@ -223,7 +226,7 @@ def make_diagram(info):
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.savefig(pathlib.Path(out_dir) / file_name)
+    plt.savefig(out_filename)
     #plt.show()
 
 
@@ -231,34 +234,10 @@ def make_diagram(info):
 
 ################################################## Main script
 # Initialize file system stuff
-assert file_exists(in_file_name)
-
-if file_exists(out_dir):
-    delete_file(out_dir)
-
-create_dir(out_dir)
+assert file_exists(in_filename)
 
 # Read data
 diagram_info_list = [
-    {
-        "diagram_id": 0,
-
-        "title": "Time vs Move Count",
-        "file_name": "diagram1.png",
-
-        "x_label": "Move Count",
-        "y_label": "Time (seconds)",
-
-        "x_field": "move_count",
-        "y_field": "seconds",
-
-        "opt_labels": [
-            [0, "No Links", "red", "1"],
-            [1, "Links (Complexity Score 2)", "green", "2"],
-            [2, "Links (Complexity Score 4)", "blue", "3"],
-        ],
-    },
-
     {
         "diagram_id": 0,
 
@@ -273,20 +252,21 @@ diagram_info_list = [
 
         "opt_labels": [
 
-            #[0, "No Links", "red", "1"],
-            #[1, "Links (Complexity Score 2)", "green", "1"],
-            [2, "Links (Complexity Score 4)", "blue", "2"],
+            [0, "Default", "green", "1"],
 
-            #[3, "No ID, No Links", "pink", "4"],
-            #[4, "No ID, Links (Complexity Score 2)", "brown", "3"],
-            [5, "No ID, Links (Complexity Score 4)", "red", "4"],
+            [1, "Complexity Score 3", "blue", "2"],
+            [2, "No ID", "blue", "2"],
+            [3, "No Subgame Delete", "blue", "2"],
+            [4, "No Prune Dominated", "blue", "2"],
+            [5, "No Substitute", "blue", "2"],
+            [6, "No Misc", "blue", "2"],
         ],
     },
 ]
 
 
 #make_diagram(diagram_info_list[0])
-make_diagram_abs_delta(diagram_info_list[1])
+make_diagram_abs_delta(diagram_info_list[0])
 
 #for info in diagram_info_list:
 #    make_diagram_abs_delta(info)

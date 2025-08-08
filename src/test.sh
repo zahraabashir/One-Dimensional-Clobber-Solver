@@ -1,5 +1,5 @@
 #!/bin/bash
 #make -j 11 && echo -ne "\e[3J" && clear && python3 pattern.py random 61 4 1337
-make -j 11 && echo -ne "\e[3J" && clear && python3 pattern.py random 60 6 465
+make -j 11 && echo -ne "\e[3J" && clear && python3 pattern.py rand_exp 62 15 0
 
 

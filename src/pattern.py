@@ -9,9 +9,13 @@ args = sys.argv
 mcgs_version_string = "version 1.2"
 reset = False
 altmove = False
+
 noid = False
 altdb = False
+nodelete = False
+nodominance = False
 uselinks = True
+
 opt_level = None
 csv_file = None
 timeout_ms = 60_000
@@ -78,6 +82,7 @@ def print_help_message():
 def set_opt_level(level):
     assert type(level) is int
     global opt_level, altdb, uselinks, noid
+    global nodelete, nodominance
     opt_level = level
 
     if level == 0:
@@ -111,6 +116,19 @@ def set_opt_level(level):
         altdb = False
         uselinks = True
         return
+    # Testing
+
+    noid = False
+    altdb = False
+    uselinks = True
+    nodelete = False
+    nodominance = False
+
+    if level == 100:
+        return
+
+    elif level == 101:
+        return
 
     assert False
 
@@ -136,6 +154,12 @@ def solve_board(board, player):
 
         if not uselinks:
             flags.append("--no-links")
+
+        if nodelete:
+            flags.append("--no-delete-subgames")
+
+        if nodominance:
+            flags.append("--no-delete-dominated")
 
         flags = " ".join(flags)
 
@@ -444,6 +468,7 @@ def handle_rand_exp():
     random.seed(seed)
 
     levels = [2, 5]
+    #levels = [100, 101]
     seen_tests = set()
     n_timeouts = 0
 

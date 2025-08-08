@@ -92,6 +92,8 @@ class Solver {
     static bool useBWMoveOrder;
     static bool useID;
     static bool useLinks;
+    static bool deleteGames;
+    static bool deleteDominated;
 
   private:
     size_t boardLen;

@@ -21,6 +21,8 @@ using namespace std;
 bool Solver::useBWMoveOrder = false;
 bool Solver::useID = true;
 bool Solver::useLinks = true;
+bool Solver::deleteGames = true;
+bool Solver::deleteDominated = true;
 
 bool Solver::doDebug = false;
 
@@ -1238,38 +1240,40 @@ pair<int, bool> Solver::rootSearchID(uint8_t *board, size_t boardLen, int n, int
 
 
     //Delete dominated moves
-    #if defined(SOLVER_DELETE_DOMINATED_MOVES)
+    //#if defined(SOLVER_DELETE_DOMINATED_MOVES)
     //vector<pair<int, int>> sg = generateSubgames(sboard, sboardLen);
     vector<SubgameRange> ranges = generateSubgameRanges(sboard, sboardLen);
 
-    for (int i = 0; i < ranges.size(); i++) {
-        const SubgameRange &range = ranges[i];
+    if (Solver::deleteDominated) {
+        for (int i = 0; i < ranges.size(); i++) {
+            const SubgameRange &range = ranges[i];
 
-        uint8_t *dbEntry = db->get(&sboard[range.start], range.length);
+            uint8_t *dbEntry = db->get(&sboard[range.start], range.length);
 
-        uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
+            uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
-        if (dominated == 0) {
-            continue;
-        }
-
-        int moveIndex = 0;
-        for (int j = 0; j < moveCount; j++) {
-            int from = moves[2 * j];
-            int to = moves[2 * j + 1];
-
-            if (from >= range.start && from < range.end) { //found move
-                if ((dominated >> moveIndex) & ((uint64_t) 1)) {
-                    //cout << "FOUND" << endl;
-                    moves[2 * j] = -1;
-                    moves[2 * j + 1] = -1;
-                }
-                moveIndex++;
+            if (dominated == 0) {
+                continue;
             }
-        }
 
+            int moveIndex = 0;
+            for (int j = 0; j < moveCount; j++) {
+                int from = moves[2 * j];
+                int to = moves[2 * j + 1];
+
+                if (from >= range.start && from < range.end) { //found move
+                    if ((dominated >> moveIndex) & ((uint64_t) 1)) {
+                        //cout << "FOUND" << endl;
+                        moves[2 * j] = -1;
+                        moves[2 * j + 1] = -1;
+                    }
+                    moveIndex++;
+                }
+            }
+
+        }
     }
-    #endif
+    //#endif
 
     vector<bool> prunedMoveGenerators = pruneMoveGenerators(sboard, sboardLen);
     assert(ranges.size() == prunedMoveGenerators.size());
@@ -1661,36 +1665,52 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
     assert(outcomesSimple.size() == rangesSimple.size());
 
     // Subgame deletion trick
-    #if defined(SOLVER_DELETE_SUBGAMES)
-    for (int i = 0; i < rangesSimple.size(); i++) {
-        if (outcomesSimple[i] != n)
-            continue;
+    //#if defined(SOLVER_DELETE_SUBGAMES)
 
-        size_t sboardCopyLen = sboardLen;
-        uint8_t sboardCopy[sboardCopyLen];
-        memcpy(sboardCopy, sboard, sboardLen);
+    assert(rangesSimple.size() == outcomesSimple.size());
+    if (Solver::deleteGames) {
+        for (int i = 0; i < rangesSimple.size(); i++) {
+            const int oc = outcomesSimple[i];
 
-        const SubgameRange &range = rangesSimple[i];
+            if (oc != n && oc != OC_N)
+                continue;
 
-        for (int j = 0; j < range.length; j++)
-            sboardCopy[range.start + j] = 0;
+            const SubgameRange &range = rangesSimple[i];
 
-        //Don't swap players or increase depth -- we haven't played a move
-        SolveResult result = searchID(sboardCopy, sboardCopyLen, n, p, depth);
+            constexpr int limit = 40;
+            const int newLen = (int) sboardLen - (int) range.length;
+            if (newLen > limit)
+                continue;
 
-        if (result.second && result.first == n) {
-            entryPtr = getEntryPtr(blockPtr, sboard,
-                sboardLen, n, ttableHash, 1);
+            size_t sboardCopyLen = sboardLen;
+            uint8_t sboardCopy[sboardCopyLen];
+            memcpy(sboardCopy, sboard, sboardLen);
 
-            *tt_get_valid(entryPtr) = true;
-            *tt_get_outcome(entryPtr) = n;
-            tt_get_best_moves(entryPtr)[0] = 0;
-            *tt_get_depth(entryPtr) = depth;
-            *tt_get_heuristic(entryPtr) = H_MAX;
-            return result;
+            for (int j = 0; j < range.length; j++)
+                sboardCopy[range.start + j] = 0;
+
+            SolveResult result;
+
+            //Don't swap players or increase depth -- we haven't played a move
+            if (oc == n)
+                result = searchID(sboardCopy, sboardCopyLen, n, p, depth);
+            else
+                result = searchID(sboardCopy, sboardCopyLen, p, n, depth + 1);
+
+            if (result.second && result.first == n) {
+                entryPtr = getEntryPtr(blockPtr, sboard,
+                    sboardLen, n, ttableHash, 1);
+
+                *tt_get_valid(entryPtr) = true;
+                *tt_get_outcome(entryPtr) = n;
+                tt_get_best_moves(entryPtr)[0] = 0;
+                *tt_get_depth(entryPtr) = depth;
+                *tt_get_heuristic(entryPtr) = H_MAX;
+                return result;
+            }
         }
     }
-    #endif
+    //#endif
 
     // Generate moves and check for terminal
     size_t moveCount;
@@ -1716,35 +1736,37 @@ pair<int, bool> Solver::searchID(uint8_t *board, size_t boardLen, int n, int p, 
         prunedMoves[i] = false;
 
     //Delete dominated moves
-    #if defined(SOLVER_DELETE_DOMINATED_MOVES)
-    for (int i = 0; i < rangesSimple.size(); i++) {
-        const SubgameRange &range = rangesSimple[i];
+    //#if defined(SOLVER_DELETE_DOMINATED_MOVES)
+    if (Solver::deleteDominated) {
+        for (int i = 0; i < rangesSimple.size(); i++) {
+            const SubgameRange &range = rangesSimple[i];
 
-        uint8_t *dbEntry = db->get(&sboard[range.start], range.length);
+            uint8_t *dbEntry = db->get(&sboard[range.start], range.length);
 
-        uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
+            uint64_t dominated = dbEntry ? db_get_dominance(dbEntry)[n - 1] : 0;
 
-        if (dominated == 0)
-            continue;
+            if (dominated == 0)
+                continue;
 
-        int moveIndex = 0;
-        for (int j = 0; j < moveCount; j++) {
-            int from = moves[2 * j];
-            int to = moves[2 * j + 1];
+            int moveIndex = 0;
+            for (int j = 0; j < moveCount; j++) {
+                int from = moves[2 * j];
+                int to = moves[2 * j + 1];
 
-            if (from >= range.start && from < range.end) { //found move
-                if ((dominated >> moveIndex) & ((uint64_t) 1)) {
-                    //cout << "FOUND" << endl;
-                    //moves[2 * j] = -1;
-                    //moves[2 * j + 1] = -1;
-                    prunedMoves[j] = true;
+                if (from >= range.start && from < range.end) { //found move
+                    if ((dominated >> moveIndex) & ((uint64_t) 1)) {
+                        //cout << "FOUND" << endl;
+                        //moves[2 * j] = -1;
+                        //moves[2 * j + 1] = -1;
+                        prunedMoves[j] = true;
+                    }
+                    moveIndex++;
                 }
-                moveIndex++;
             }
-        }
 
+        }
     }
-    #endif
+    //#endif
 
     /*
     auto getHeuristic = [&]() -> int {

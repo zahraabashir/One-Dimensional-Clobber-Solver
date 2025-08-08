@@ -200,6 +200,16 @@ int main(int argc, char **argv) {
             continue;
         }
 
+        if (strcmp(arg, "--no-delete-subgames") == 0) {
+            Solver::deleteGames = false;
+            continue;
+        }
+
+        if (strcmp(arg, "--no-delete-dominated") == 0) {
+            Solver::deleteDominated = false;
+            continue;
+        }
+
         
         additionalArgs--;
         break;

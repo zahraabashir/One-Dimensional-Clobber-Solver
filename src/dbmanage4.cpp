@@ -33,8 +33,6 @@ struct ReplacementMapIdx {
     uint8_t high1;
     uint8_t low2;
     uint8_t high2;
-    uint8_t low3;
-    uint8_t high3;
 
     bool operator==(const ReplacementMapIdx &other) const {
         return 
@@ -42,9 +40,7 @@ struct ReplacementMapIdx {
             (low1 == other.low1) &&
             (high1 == other.high1) &&
             (low2 == other.low2) &&
-            (high2 == other.high2) &&
-            (low3 == other.low3) &&
-            (high3 == other.high3);
+            (high2 == other.high2);
     }
 
 };
@@ -57,9 +53,7 @@ struct std::hash<ReplacementMapIdx> {
             (((uint64_t) s.low1) << 8) |
             (((uint64_t) s.high1) << 16) |
             (((uint64_t) s.low2) << 24) |
-            (((uint64_t) s.high2) << 32) |
-            (((uint64_t) s.low3) << 40) |
-            (((uint64_t) s.high3) << 48);
+            (((uint64_t) s.high2) << 32);
     }
 };
 
@@ -526,10 +520,10 @@ void getSimplest(const Subgame &sg, uint64_t domBlack, uint64_t domWhite,
     }
 }
 
-uint64_t getMetric(const Subgame &sg) {
+uint64_t getMetric(const Subgame &sg, bool shallow, Database *target_db) {
     uint64_t metric = 0;
 
-    uint8_t *entry = db->get(sg);
+    uint8_t *entry = target_db->get(sg);
     assert(entry != 0);
     assert(*db_get_outcome(entry) != 0);
 
@@ -553,6 +547,9 @@ uint64_t getMetric(const Subgame &sg) {
         metric -= nDominatedMoves;
     }
 
+    if (shallow)
+        return metric;
+
     vector<optional<Subgame*>> childrenBlack = sg.getChildren(BLACK, domBlack);
     vector<optional<Subgame*>> childrenWhite = sg.getChildren(WHITE, domWhite);
 
@@ -564,7 +561,7 @@ uint64_t getMetric(const Subgame &sg) {
             continue;
 
         Subgame *sg = sg_opt.value();
-        const uint64_t childMetric = getChildMetric(*sg, db);
+        const uint64_t childMetric = getChildMetric(*sg, target_db);
         metric += childMetric;
 
         delete sg;
@@ -578,7 +575,7 @@ uint64_t getMetric(const Subgame &sg) {
             continue;
 
         Subgame *sg = sg_opt.value();
-        const uint64_t childMetric = getChildMetric(*sg, db);
+        const uint64_t childMetric = getChildMetric(*sg, target_db);
         metric += childMetric;
 
         delete sg;
@@ -754,7 +751,8 @@ void addToReplacementMap(const Subgame &game, const ReplacementMapIdx &rmapIdx,
             if (allowInsert)
                 indirectLink.directLink = target_db->getIdxDirect(game);
         } else if (metric > foundMetric) { // Existing game is better
-            *db_get_link(entry) = (uint64_t) &indirectLink;
+            //*db_get_link(entry) = (uint64_t) &indirectLink;
+            ((IndirectLink*) *db_get_link(entry))->directLink = indirectLink.directLink;
         }
     }
 }
@@ -928,7 +926,7 @@ void pass_mainNoNormal() {
         db_get_dominance(entry)[1] = dp.domWhite;
 
         // Find metric
-        uint64_t metric = getMetric(*genGame.game);
+        uint64_t metric = getMetric(*genGame.game, false, db);
         *db_get_metric(entry) = metric;
 
         // Update pruned with "equal"
@@ -936,7 +934,7 @@ void pass_mainNoNormal() {
         dp.domWhite |= equal.domWhite;
         db_get_dominance(entry)[0] = dp.domBlack;
         db_get_dominance(entry)[1] = dp.domWhite;
-
+          
         // Find "simplest" moves
         uint8_t simplestBlack = uint8_t(-1);
         uint8_t simplestWhite = uint8_t(-1);
@@ -950,12 +948,9 @@ void pass_mainNoNormal() {
         // Index for replacement map
         assert(bp1.low <= bp1.high);
         assert(bp2.low <= bp2.high);
-        BoundsPair bp3 = getBounds(*genGame.game, 0);
-        assert(bp3.low <= bp3.high);
 
         cout << "<" << (int) bp1.low << " " << (int) bp1.high << " | ";
-        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
-        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
+        cout << (int) bp2.low << " " << (int) bp2.high << ">" << endl;
 
         // Find link
         ReplacementMapIdx idx;
@@ -964,8 +959,6 @@ void pass_mainNoNormal() {
         idx.high1 = bp1.high;
         idx.low2 = bp2.low;
         idx.high2 = bp2.high;
-        idx.low3 = bp3.low;
-        idx.high3 = bp3.high;
 
         //if (equalsProblemCase(*normal)) {
         //    assert(!Solver::doDebug);
@@ -1017,8 +1010,9 @@ void pass_altDatabase() {
         // Compute new info
 
         // Metric
-        uint64_t totalMoves = countMoves(*genGame.game);
-        *db_get_metric(alt_entry) = totalMoves;
+        //uint64_t totalMoves = countMoves(*genGame.game);
+        //*db_get_metric(alt_entry) = totalMoves;
+
 
         // Dominance
         DominancePair equal;
@@ -1026,9 +1020,18 @@ void pass_altDatabase() {
         equal.domWhite = 0;
 
         DominancePair dp = getAltDominance(*genGame.game, equal);
+        db_get_dominance(alt_entry)[0] = dp.domBlack;
+        db_get_dominance(alt_entry)[1] = dp.domWhite;
 
+        // New metric
+        uint64_t metric = getMetric(*genGame.game, true, alt_db);
+        *db_get_metric(alt_entry) = metric;
+
+        // Update equal
         dp.domBlack |= equal.domBlack;
         dp.domWhite |= equal.domWhite;
+        db_get_dominance(alt_entry)[0] = dp.domBlack;
+        db_get_dominance(alt_entry)[1] = dp.domWhite;
 
         // Simplest moves
         uint8_t simplestBlack = uint8_t(-1);
@@ -1038,18 +1041,15 @@ void pass_altDatabase() {
                     simplestWhite, alt_db);
 
         db_get_simplest_moves(alt_entry)[0] = simplestBlack;
-        db_get_simplest_moves(alt_entry)[0] = simplestWhite;
+        db_get_simplest_moves(alt_entry)[1] = simplestWhite;
 
 
         // Links
         assert(bp1.low <= bp1.high);
         assert(bp2.low <= bp2.high);
-        BoundsPair bp3 = getBounds(*genGame.game, 0);
-        assert(bp3.low <= bp3.high);
 
         cout << "COPY: <" << (int) bp1.low << " " << (int) bp1.high << " | ";
-        cout << (int) bp2.low << " " << (int) bp2.high << " | ";
-        cout << (int) bp3.low << " " << (int) bp3.high << ">" << endl;
+        cout << (int) bp2.low << " " << (int) bp2.high << ">" << endl;
 
         ReplacementMapIdx idx;
         idx.outcome = *db_get_outcome(alt_entry);
@@ -1057,8 +1057,6 @@ void pass_altDatabase() {
         idx.high1 = bp1.high;
         idx.low2 = bp2.low;
         idx.high2 = bp2.high;
-        idx.low3 = bp3.low;
-        idx.high3 = bp3.high;
 
         addToReplacementMap(*genGame.game, idx, altReplacementMap, alt_db);
     }

@@ -86,7 +86,7 @@ def make_plot(filename, data, opts):
         assert type(d) is list and len(d) == 2
 
     x_data = [d[0] for d in data]
-    y_data = [math.log(d[1]) for d in data]
+    y_data = [d[1] for d in data]
 
     plt.close()
     plt.title(opts["title"])
@@ -96,21 +96,34 @@ def make_plot(filename, data, opts):
     plt.savefig(filename)
 
 
+def get_fit(data):
+    x_data = [d[0] for d in data]
+    y_data = [d[1] for d in data]
+    slope, intercept = np.polyfit(x_data, y_data, 1)
+    print(f"Slope: {slope}, Intercept: {intercept}")
 
-print(get_xo_data())
-print(get_xxo_data())
+data1 = get_xo_data()
+data1 = data1[23 : 44]
 
-make_plot("xo_plot.png", get_xo_data(), {
+for d in data1:
+    d[1] = math.log(d[1], 10)
+
+make_plot("xo_plot.png", data1, {
     "x_name": "# pairs",
     "y_name": "Log time (ms)",
     "title": "XO solve time vs pair count"
 })
 
+get_fit(data1)
+
 data2 = get_xxo_data()
-data2 = [[d[0], d[1] + d[2]] for d in data2]
+data2 = data2[7 : 24]
+data2 = [[d[0], math.log(d[1] + d[2], 10)] for d in data2]
 
 make_plot("xxo_plot.png", data2, {
     "x_name": "# groups",
     "y_name": "Log time (ms)",
     "title": "XXO solve time vs XXO group count"
 })
+
+get_fit(data2)
